@@ -1,0 +1,53 @@
+//Run npx prisma generate everytime a change is made
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  output = "../node_modules/.prisma/client"
+}
+
+model company {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products product[]
+}
+
+model product {
+  id               Int                  @id @default(autoincrement())
+  productid        String               @unique
+  title            String
+  companyid        Int
+  sellingcompany   company             @relation(fields: [companyid], references: [id])
+  description      String?
+  shortdescription String?
+  categories       category[]           @relation("ConnectedCategory")
+  url              String
+  brand            String
+  productimageurl  String?
+  certificates     productcertificate[]
+}
+
+model productcertificate {
+  id               Int         @id @default(autoincrement())
+  certificateid    Int
+  certificate      certificate @relation(fields: [certificateid], references: [id])
+  fileurl          String
+  productid        String
+  connectedproduct product    @relation(fields: [productid], references: [productid])
+}
+
+model certificate {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  productcertificate productcertificate[]
+}
+
+model category {
+  id       Int       @id @default(autoincrement())
+  name     String @unique
+  products product[] @relation("ConnectedCategory")
+}
