@@ -80,6 +80,7 @@ const CreateProductCertificates = async(product : BykoProduct) => {
           certificate : {
             connect : { id : 1 }
           },
+          connectedproduct : null,
           fileurl : product.epdUrl
         }
       }).then((prodcert) => {
@@ -94,6 +95,7 @@ const CreateProductCertificates = async(product : BykoProduct) => {
           certificate : {
             connect : { id : 2 }
           },
+          connectedproduct : null,
           fileurl : product.fscUrl
         }
       }).then((prodcert) => {
@@ -108,6 +110,7 @@ const CreateProductCertificates = async(product : BykoProduct) => {
           certificate : {
             connect : { id : 3 }
           },
+          connectedproduct : null,
           fileurl : product.vocUrl
         }
       }).then((prodcert) => {
@@ -132,7 +135,7 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
 
   let certificateObjectList = await CreateProductCertificates(product)
   
-  const newProduct = await prisma.product.upsert({
+  await prisma.product.upsert({
     where: {
       productid : product.axId
     },
