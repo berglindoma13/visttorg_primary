@@ -1,7 +1,8 @@
 import { ProductCertificate } from './certificates'
 
 export interface ProductProps {
-  Id : string,
+  id : number,
+  productid: string,
   title : string,
   description : string,
   shortdescription : string,

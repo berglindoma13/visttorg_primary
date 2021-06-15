@@ -19,10 +19,10 @@ interface CheckboxesProps {
 
 const Checkbox = ({ keyer, value, handleChange} : CheckboxComponentProps) => {
   return(
-    <label>
-      <input type="checkbox" value={keyer} onChange={event => handleChange(event)}/>
+    <StyledLabel>
+      <StyledInput type="checkbox" value={keyer} onChange={event => handleChange(event)}/>
       {value}
-    </label>
+    </StyledLabel>
   )
 }
 
@@ -68,6 +68,19 @@ const Container = styled.div`
 `
 
 const CheckboxListTitle = styled.span`
-  font-size:18px;
-  font-weight:bold;
+  font-size:24px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  display:block;
+  margin-bottom:5px;
+  margin-top:20px;
+`
+
+const StyledLabel = styled.label`
+  margin: 5px 0;
+  font-size:20px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+`
+
+const StyledInput = styled.input`
+  margin-right: 15px;
 `

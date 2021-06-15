@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react"
 import { GetStaticProps } from "next"
 import styled from 'styled-components'
 import prisma from '../lib/prisma'
-import { ProductProps, Company, Category } from '../types/products'
-import { ProductCertificate } from '../types/certificates'
+import { ProductProps, Category } from '../types/products'
+import { Certificate, ProductCertificate } from '../types/certificates'
 import Head from 'next/head'
 import Checkboxes from '../components/Inputs/checkboxes'
 import Image from 'next/image'
@@ -21,30 +21,32 @@ export const getStaticProps: GetStaticProps = async () => {
       }
     },
   });
-  return { props: { productList }}
+
+  const categories = await prisma.category.findMany()
+  const certificates = await prisma.certificate.findMany()
+
+  return { props: { productList, categories, certificates }}
 }
 
 type HomeProps = {
   productList: ProductProps[]
+  categories: Category[]
+  certificates : Certificate[]
 }
 
-const MockCategories = [
-  { keyer: 'Annað', value: 'Annað'},
-  { keyer: 'Steypa', value: 'Steypa'}
-]
+interface CheckboxProps {
+  keyer : string
+  value : string
+}
 
-const MockCertificateList = [
-  { keyer: 'VOC', value: 'VOC'},
-  { keyer: 'FSC', value: 'FSC'},
-  { keyer: 'EPD', value: 'EPD'}
-]
-
-
-const Home = ({ productList } : HomeProps) => {
+const Home = ({ productList, categories, certificates } : HomeProps) => {
   const [query, setQuery] = useState("");
   const [filteredList, setFilteredList] = useState<Array<ProductProps>>([])
   const [activeCategories, setActiveCategories] = useState<Array<string>>([])
   const [activeCertificates, setActiveCertificates] = useState<Array<string>>([])
+
+  const [categoryOptions, setCategoryOptions] = useState<Array<CheckboxProps>>()
+  const [certificateOptions, setCertificateOptions] = useState<Array<CheckboxProps>>()
 
   const handleCategoryChange = (value : string) => {
     console.log("toggling category")
@@ -53,6 +55,18 @@ const Home = ({ productList } : HomeProps) => {
   const handleCertificateChange = (value : string) => {
     console.log("toggling certificate")
   }
+
+  useEffect(() => {
+    setCategoryOptions(categories.map(cat => {
+      const keyvalue = { keyer : cat.name, value: cat.name }
+      return keyvalue
+    }))
+
+    setCertificateOptions(certificates.map(cat => {
+      const keyvalue = { keyer : cat.name, value: cat.name }
+      return keyvalue
+    }))
+  },[])
   
   useEffect(() => {
     if(query != ""){
@@ -88,41 +102,43 @@ const Home = ({ productList } : HomeProps) => {
     }))
   },[activeCertificates])
 
+
   return (
     <StyledPage>
       <Head>
         <title>VistTorg</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico"/>
       </Head>
+      <BackgroundImage src="/alex-_ZfLlKxilpw-unsplash.jpg" alt="Background picture"/>
       <StyledForm>
         <StyledInput type="text" onChange={value => setQuery(value.target.value)} placeholder="Leita eftir nafni vöru"/>
       </StyledForm>
       <StyledContainer>
         <StyledLeft>
-          <Checkboxes options={MockCategories} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories}/>
-          <Checkboxes options={MockCertificateList} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates}/>
+          {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories}/>}
+          {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates}/>}
         </StyledLeft>
         <StyledRight>
-          {filteredList.map((product, index) => {
+          {filteredList && filteredList.map((product, index) => {
             return(
-              <ProductResult key={index}>
-                <Image src={product.productimageurl} alt={`product image - ${product.title}`} height="100%" width="100%"/>
-                <p>Nafn: {product.title}</p>
-                <p>Vörumerki: {product.brand}</p>
-                <p>Flokkar: {product.categories.map((category : Category, index : number) => {
-                  return (
-                    <span key={index}>{category.name}</span>
-                  )
-                })}</p>
-                <p>Vottanir: {product.certificates.map((certificate : ProductCertificate, index : number) => {
-                  return (
-                    <span key={index}>{certificate.certificate.name}, </span>
-                  )
-                })}</p>
-                <p>Löng lýsing: {product.description}</p>
-                <p>Stutt lýsing: {product.shortdescription}</p>
-                <p>Fyrirtæki: {product.sellingcompany.name}</p>
-                <p>Slóð: <a target="_blank" href={product.url}>{product.url}</a></p>
+              <ProductResult key={index} href={`/product/${product.productid}`}>
+                <ContentWrapper>
+                  <Image src={product.productimageurl} alt={`product image - ${product.title}`} height="100%" width="100%"/>
+                  <ProductTextItem><ProductTextBold>Nafn:</ProductTextBold><ProductText>{product.title}</ProductText></ProductTextItem>
+                  <ProductTextItem><ProductTextBold>Vörumerki: </ProductTextBold><ProductText>{product.brand}</ProductText></ProductTextItem>
+                  <ProductTextItem><ProductTextBold>Flokkar:</ProductTextBold><ProductText>{product.categories.map((category : Category, index : number) => {
+                    return (
+                      <span key={index}>{index === 0 ? category.name : `, ${category.name}`}</span>
+                    )
+                  })}</ProductText></ProductTextItem>
+                  <ProductTextItem><ProductTextBold>Vottanir:</ProductTextBold><ProductText>{product.certificates.map((certificate : ProductCertificate, index : number) => {
+                    return (
+                      <span key={index}>{index === 0 ? certificate.certificate.name : `, ${certificate.certificate.name}`}</span>
+                    )
+                  })}</ProductText></ProductTextItem>
+                  <ProductTextItem><ProductTextBold>Stutt lýsing:</ProductTextBold><ProductDescription dangerouslySetInnerHTML={{ __html: product.shortdescription }}/></ProductTextItem>
+                  <ProductTextItem><ProductTextBold>Fyrirtæki:</ProductTextBold><ProductText>{product.sellingcompany.name}</ProductText></ProductTextItem>
+                </ContentWrapper>
               </ProductResult>
             )
           })}
@@ -134,26 +150,67 @@ const Home = ({ productList } : HomeProps) => {
 
 export default Home
 
+const ContentWrapper = styled.div`
+  background-color: rgba(255,255,255, 0.5);
+  padding:20px;
+`
+
+const ProductTextBold = styled.p`
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  font-weight: bold;
+  margin-right:5px;
+`
+
+const ProductText = styled.p`
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+`
+
+const ProductDescription = styled.div`
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+`
+
+const ProductTextItem = styled.div`
+  display:flex;
+`
+
+const BackgroundImage = styled.img`
+  position: fixed;
+  width:100vw;
+  height:100vh;
+  object-fit: cover;
+  top:0;
+  left:0;
+  z-index: -1;
+`
+
 const StyledContainer = styled.div`
   display:flex;
 `
 
 const StyledLeft = styled.div`
   width:20%;
+  display: flex;
+  flex-direction: column;
 `
 
 const StyledRight = styled.div`
-  width:80%
+  width:80%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 `
 
 const StyledPage = styled.div`
   padding: 40px 15px;
 `
 
-const ProductResult = styled.div`
-  margin: 10px 0;
-  border: 1px solid black;
-  padding:20px;
+const ProductResult = styled.a`
+  padding:10px;
+  width:32%;
+
+  @media(max-width: 1200px){
+    width: 50%;
+  }
 `
 
 const StyledForm = styled.div`
