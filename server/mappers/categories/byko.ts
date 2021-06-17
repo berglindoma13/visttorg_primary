@@ -4,7 +4,7 @@ export default {
     'Timbur'
   ],
  
-  'Lagnir ': [
+  'Lagnir': [
     'Lagnavörur'
   ],
   

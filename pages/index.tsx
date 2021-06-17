@@ -151,8 +151,9 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
 export default Home
 
 const ContentWrapper = styled.div`
-  background-color: rgba(255,255,255, 0.5);
-  padding:20px;
+  background-color: #fbefef;
+  padding: 20px;
+  box-shadow: 5px 5px 11px 1px rgb(210 182 182 / 80%);
 `
 
 const ProductTextBold = styled.p`
@@ -225,4 +226,5 @@ const StyledInput = styled.input`
   padding-left:20px;
   width:50vw;
   margin-bottom:20px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
 `

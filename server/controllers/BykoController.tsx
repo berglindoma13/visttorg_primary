@@ -216,6 +216,7 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
   }
 
   const mappedCategory: Array<ConnectedCategory> = await getMappedCategory(product.prodTypeParent)
+  console.log('mappedCategory', mappedCategory)
   
   if(mappedCategory.length > 0){
     await prisma.product.upsert({
@@ -253,7 +254,6 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         brand : product.brand
       }
     })
-    
     await CreateProductCertificates(product)
   }
 }
