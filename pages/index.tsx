@@ -254,6 +254,9 @@ const CertificateImage = styled.img`
 
 const ProductCompanyLogoWrapper = styled.div`
   flex:1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
 `
 
 const ProductCertificatesWrapper = styled.div`
