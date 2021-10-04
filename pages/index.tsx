@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react"
 import { GetStaticProps } from "next"
 import styled from 'styled-components'
-import prisma from '../lib/prisma'
+import { prismaInstance } from '../lib/prisma'
 import { ProductProps, Category } from '../types/products'
 import { Certificate, ProductCertificate } from '../types/certificates'
 import Head from 'next/head'
 import Checkboxes from '../components/Inputs/checkboxes'
 import Image from 'next/image'
+import BykoLogoSvg from "../components/Svg/Logos/Byko"
+import SvanurinnLogoSVG from '../components/Svg/Logos/Svanurinn'
+import VocLogoSVG from '../components/Svg/Logos/Voc'
+import BykoCertificateMapper from '../mappers/byko'
 
 export const getStaticProps: GetStaticProps = async () => {
 
-  const productList = await prisma.product.findMany({
+  const productList = await prismaInstance.product.findMany({
     include: {
       sellingcompany: true,
       categories : true,
@@ -22,8 +26,8 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   });
 
-  const categories = await prisma.category.findMany()
-  const certificates = await prisma.certificate.findMany()
+  const categories = await prismaInstance.category.findMany()
+  const certificates = await prismaInstance.certificate.findMany()
 
   return { props: { productList, categories, certificates }}
 }
@@ -48,12 +52,9 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
   const [categoryOptions, setCategoryOptions] = useState<Array<CheckboxProps>>()
   const [certificateOptions, setCertificateOptions] = useState<Array<CheckboxProps>>()
 
-  const handleCategoryChange = (value : string) => {
-    console.log("toggling category")
-  }
-
-  const handleCertificateChange = (value : string) => {
-    console.log("toggling certificate")
+  const clearAllFilters = () => {
+    setActiveCategories([])
+    setActiveCertificates([])
   }
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
     }))
 
     setCertificateOptions(certificates.map(cat => {
-      const keyvalue = { keyer : cat.name, value: cat.name }
+      const keyvalue = { keyer : BykoCertificateMapper[cat.name], value: cat.name }
       return keyvalue
     }))
   },[])
@@ -109,35 +110,85 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
         <title>VistTorg</title>
         <link rel="icon" href="/favicon.ico"/>
       </Head>
-      <BackgroundImage src="/alex-_ZfLlKxilpw-unsplash.jpg" alt="Background picture"/>
-      <StyledForm>
-        <StyledInput type="text" onChange={value => setQuery(value.target.value)} placeholder="Leita eftir nafni vöru"/>
-      </StyledForm>
+      <HeaderArea>
+        <Logo src="/Vistbók-07.png" alt="Vistbók logo" />
+        <InputWrapper>
+          <StyledInput type="text" onChange={value => setQuery(value.target.value)} placeholder="Leita eftir nafni vöru"/>
+          <InputSubmitButton>Leita</InputSubmitButton>
+        </InputWrapper>
+      </HeaderArea>
       <StyledContainer>
         <StyledLeft>
+          <FilterTop>
+            <FilterTitle>Sía</FilterTitle>
+            {/* <FilterClearButton onClick={() => clearAllFilters()}>Hreinsa síu</FilterClearButton> */}
+          </FilterTop>
           {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories}/>}
           {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates}/>}
         </StyledLeft>
         <StyledRight>
-          {filteredList && filteredList.map((product, index) => {
+          {filteredList && filteredList.map((product) => {
+            //TODO BETTER !!
+            const mappedCertificates = product.certificates.map(cert => cert.certificate.name )
+            var filteredCertificates = [];
+            mappedCertificates.forEach((item) => {
+              if(filteredCertificates.indexOf(item) < 0) {
+                filteredCertificates.push(item);
+              }
+            });
             return(
-              <ProductResult key={index} href={`/product/${product.productid}`}>
+              <ProductResult key={product.id} href={`/product/${product.productid}`}>
                 <ContentWrapper>
-                  <Image src={product.productimageurl} alt={`product image - ${product.title}`} height="100%" width="100%"/>
-                  <ProductTextItem><ProductTextBold>Nafn:</ProductTextBold><ProductText>{product.title}</ProductText></ProductTextItem>
-                  <ProductTextItem><ProductTextBold>Vörumerki: </ProductTextBold><ProductText>{product.brand}</ProductText></ProductTextItem>
-                  <ProductTextItem><ProductTextBold>Flokkar:</ProductTextBold><ProductText>{product.categories.map((category : Category, index : number) => {
-                    return (
-                      <span key={index}>{index === 0 ? category.name : `, ${category.name}`}</span>
-                    )
-                  })}</ProductText></ProductTextItem>
-                  <ProductTextItem><ProductTextBold>Vottanir:</ProductTextBold><ProductText>{product.certificates.map((certificate : ProductCertificate, index : number) => {
-                    return (
-                      <span key={index}>{index === 0 ? certificate.certificate.name : `, ${certificate.certificate.name}`}</span>
-                    )
-                  })}</ProductText></ProductTextItem>
-                  <ProductTextItem><ProductTextBold>Stutt lýsing:</ProductTextBold><ProductDescription dangerouslySetInnerHTML={{ __html: product.shortdescription }}/></ProductTextItem>
-                  <ProductTextItem><ProductTextBold>Fyrirtæki:</ProductTextBold><ProductText>{product.sellingcompany.name}</ProductText></ProductTextItem>
+                  <ProductTopContent>
+                    <ProductImage src={product.productimageurl} alt={`product image - ${product.title}`}/>
+                    <ProductInfo>
+                      <ProductCategory>{product.categories.map((category : Category, index : number) => {
+                          return (
+                            <span key={`${product.title} - ${category.name}`}>{index === 0 ? category.name : ` / ${category.name}`}</span>
+                          )
+                        })}
+                      </ProductCategory>
+                    <ProductTitle>{product.title}</ProductTitle>
+                    </ProductInfo>
+                  </ProductTopContent>
+                  <ProductBottomContent>
+                    <ProductCompanyLogoWrapper>
+                      {product.sellingcompany.name === 'Byko' &&<BykoLogoSvg style={{ width: 'max(3.47vw, 50px)' }}/>}
+                    </ProductCompanyLogoWrapper>
+
+                    <ProductCertificatesWrapper>{filteredCertificates.map((certificate : string) => {
+                      if(certificate === 'EPD'){
+                        return (
+                          <CertificateImage key={`${product.id} - ${certificate}`} src="/EPD_LOGO.jpg" alt="EPD LOGO" style={{ width: 'max(3.47vw, 50px)'}}/>
+                        )
+                      }
+                      if(certificate === 'FSC'){
+                        return (
+                          <CertificateImage key={`${product.id} - ${certificate}`} src="/FSC_LOGO.jpg" alt="FSC LOGO"/>
+                        )
+                      }
+                      if(certificate === 'VOC'){
+                        return (
+                          <StyledVocLogo key={`${product.id} - ${certificate}`}/>
+                        )
+                      }
+                      if(certificate === 'BREEAM'){
+                        return (
+                          <CertificateImage key={`${product.id} - ${certificate}`} src="/BREEAM_LOGO.png" alt="BREEAM LOGO" style={{ maxWidth: '30%' }}/>
+                        )
+                      }
+                      if(certificate === 'SV'){
+                        return (
+                          <StyledSvanurinnLogo key={`${product.id} - ${certificate}`} />
+                        )
+                      }
+                      if(certificate === 'SV_ALLOWED'){
+                        return (
+                          <CertificateImage key={`${product.id} - ${certificate}`} src="/leyfilegt-svansvottad.png" style={{ maxWidth: '40%' }}/>
+                        )
+                      }
+                    })}</ProductCertificatesWrapper>
+                  </ProductBottomContent>
                 </ContentWrapper>
               </ProductResult>
             )
@@ -150,38 +201,128 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
 
 export default Home
 
-const ContentWrapper = styled.div`
-  background-color: #fbefef;
-  padding: 20px;
-  box-shadow: 5px 5px 11px 1px rgb(210 182 182 / 80%);
-`
-
-const ProductTextBold = styled.p`
-  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
-  font-weight: bold;
-  margin-right:5px;
-`
-
-const ProductText = styled.p`
-  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
-`
-
-const ProductDescription = styled.div`
-  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
-`
-
-const ProductTextItem = styled.div`
+const FilterTop = styled.div`
   display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom:15px;
+  border-bottom:1px solid #e3e3e3;
 `
 
-const BackgroundImage = styled.img`
-  position: fixed;
-  width:100vw;
-  height:100vh;
-  object-fit: cover;
-  top:0;
-  left:0;
-  z-index: -1;
+const FilterTitle = styled.h2`
+  font-size:max(1.67vw, 24px);
+  color: #fff;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  font-weight: 400;
+`
+
+const FilterClearButton = styled.button`
+  font-size:max(1.25vw, 18px);
+  color: ${({ theme }) => theme.colors.highlight};
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  font-weight: 600;
+  background-color:transparent;
+  outline:none;
+  border:none;
+  cursor:pointer;
+`
+
+const ProductImage = styled.img`
+  height: max(5.55vw, 80px);
+  width: max(5.55vw, 80px);
+  border-radius: 50%;
+  object-fit: contain;
+  background-color:white;
+`
+
+const StyledVocLogo = styled(VocLogoSVG)`
+  min-width:20%;
+  max-width:20%;
+  margin-left:10px;
+`
+
+const StyledSvanurinnLogo = styled(SvanurinnLogoSVG)`
+  max-width:20%;
+  margin-left:10px;
+`
+
+const CertificateImage = styled.img`
+  max-width: 20%;
+  margin-left:10px;
+`
+
+const ProductCompanyLogoWrapper = styled.div`
+  flex:1;
+`
+
+const ProductCertificatesWrapper = styled.div`
+  flex:1;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items:center;
+`
+
+const ProductTitle = styled.h2`
+  font-size: max(1.67vw, 24px);
+  color: #fff;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  line-height:120%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+`
+
+const ProductCategory = styled.h3`
+  font-size: max(0.9vw, 13px);
+  color: #fff;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  line-height:110%;
+  margin-bottom:15px;
+  font-weight: 400;
+`
+
+const ProductTopContent = styled.div`
+  display:flex;
+  flex-direction:row;
+  margin-bottom:15px;
+`
+
+const ProductInfo = styled.div`
+  display:flex;
+  flex-direction:column;
+  padding-left:15px;
+`
+
+const ProductBottomContent = styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+`
+
+const HeaderArea = styled.div`
+  height: 170px;
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 20px;
+`
+
+const Logo = styled.img`
+  height:170px;
+`
+
+const ContentWrapper = styled.div`
+  padding: 20px 20px 10px 20px;
+  background-color: ${({ theme }) => theme.colors.secondary.base};
+  min-height:200px;
+  display: flex;
+  flex-direction: column;
+  border-radius:30px;
+  justify-content: space-between;
 `
 
 const StyledContainer = styled.div`
@@ -189,42 +330,62 @@ const StyledContainer = styled.div`
 `
 
 const StyledLeft = styled.div`
-  width:20%;
+  width:30vw;
   display: flex;
   flex-direction: column;
+  padding: 0 20px;
 `
 
 const StyledRight = styled.div`
-  width:80%;
+  width:70vw;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  background-color: #fff;
+  border-radius:30px;
+  padding: 10px;
+  margin-right: 20px;
 `
 
 const StyledPage = styled.div`
-  padding: 40px 15px;
+  background-color: ${({ theme }) => theme.colors.primary.base};
 `
 
 const ProductResult = styled.a`
-  padding:10px;
-  width:32%;
+  padding:5px;
+  width:50%;
+  
 
   @media(max-width: 1200px){
-    width: 50%;
+    width: 100%;
   }
 `
 
-const StyledForm = styled.div`
-  width:100vw;
-  display:flex;
-  flex-direction:row;
-  justify-content:center;
+const StyledInput = styled.input`
+  border-radius: 30px;
+  width:100%;
+  height:100%;
+  border:none;
+  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  padding-right: max(9.7vw, 135px);
+  padding-left:max(1.4vw, 20px);
 `
 
-const StyledInput = styled.input`
-  height:50px;
-  padding-left:20px;
-  width:50vw;
-  margin-bottom:20px;
+const InputWrapper = styled.div`
+  height:60px;
+  width:max(60vw, 250px);
+  position:relative;
+`
+
+const InputSubmitButton = styled.button`
+  background-color: ${({ theme }) => theme.colors.highlight};;
+  border-radius: 30px;
+  position: absolute;
+  width: max(9.7vw,135px);
+  outline: none;
+  border: none;
+  height: 54px;
+  top: 3px;
+  right: 3px;
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
 `

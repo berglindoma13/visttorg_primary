@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next"
-import prisma from '../../lib/prisma'
+import { prismaInstance } from '../../lib/prisma'
 import { ProductProps, Company, Category } from '../../types/products'
 import styled from 'styled-components'
 import Image from 'next/image'
@@ -8,7 +8,7 @@ import { ProductCertificate } from "../../types/certificates"
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
 
-  const uniqueProduct = await prisma.product.findUnique({
+  const uniqueProduct = await prismaInstance.product.findUnique({
     where: {
       productid: id
     },

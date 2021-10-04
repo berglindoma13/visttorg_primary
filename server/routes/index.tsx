@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import { InsertAllBykoProducts, TestProduct, GetAllCategories, DeleteAllProducts, DeleteAllProducCertificates } from '../controllers/BykoController';
+import { fileUpload } from '../controllers/ProductUploadController'
 
 function routes(app : any) {
   //COMPANY ID IN DATABASE IS 1
@@ -10,6 +11,8 @@ function routes(app : any) {
   app.get('/api/byko/deleteall/products', DeleteAllProducts);
   app.get('/api/byko/deleteall/productcertificates', DeleteAllProducCertificates);
   app.get('/api/byko/getallcategories', GetAllCategories);
+
+  app.post('/api/product/add', fileUpload)
 
   return router;
 };  

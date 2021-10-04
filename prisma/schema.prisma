@@ -28,6 +28,7 @@ model product {
   url              String
   brand            String
   productimageurl  String?
+  //productimageref attachedFile?
   certificates     productcertificate[]
 }
 
@@ -35,7 +36,7 @@ model productcertificate {
   id               Int         @id @default(autoincrement())
   certificateid    Int
   certificate      certificate @relation(fields: [certificateid], references: [id])
-  fileurl          String
+  fileurl          String?
   productid        String
   connectedproduct product    @relation(fields: [productid], references: [productid])
 }
@@ -51,3 +52,14 @@ model category {
   name     String @unique
   products product[] @relation("ConnectedCategory")
 }
+
+model manualProducts {
+  id       Int       @id @default(autoincrement())
+}
+
+// model attachedFile {
+//   id       Int       @id @default(autoincrement())
+//   connectedproduct product @relation(fields: [id], references: [id])
+//   filebytes Bytes
+//   filetype String
+// } 

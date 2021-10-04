@@ -9,34 +9,18 @@ const theme = {
     success: 'green',
 
     primary: {
-      base: '#00c3b3',
-      light: '#5FCDE3',
-      dark: '#209DB6',
+      base: '#3C6F72',
+      light: '',
+      dark: '',
     },
 
     secondary: {
-      base: '#553f23',
-      light: '#BB23AD',
-      dark: '#510F4B',
+      base: '#21333B',
+      light: '',
+      dark: '',
     },
 
-    third: {
-      base: '#A1CF1F',
-      light: '#5FCDE3',
-      dark: '#6E8D15',
-    },
-
-    fourth: {
-      base: '#F38901',
-      light: '#FE9E1E',
-      dark: '#E18101',
-    },
-
-    fifth: {
-      base: '#30302F',
-      light: '#696967',
-      dark: '#171717',
-    },
+    highlight: '#FBE35B'
   },
 
   fonts: {

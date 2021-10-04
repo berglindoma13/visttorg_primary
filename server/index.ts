@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
 import next from "next";
+import fileUpload from 'express-fileupload';
 
 const PORT = process.env.PORT || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
+
 const handle = app.getRequestHandler();
 
 app
@@ -13,6 +15,12 @@ app
     const CompanyRoutes = require("./routes/index.tsx");
 
     server.use(express.json())
+
+    // enable files upload
+    server.use(fileUpload({
+      createParentPath: true
+    }));
+
     server.use("/", CompanyRoutes(server));
 
     server.get("*", (req : Request, res : Response) => {
