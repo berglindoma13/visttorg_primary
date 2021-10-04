@@ -1,21 +1,21 @@
 import { GetServerSideProps } from 'next';
 import React from 'react'
-import prisma from '../lib/prisma'
+import {prismaInstance} from '../lib/prisma'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = 1
 
-  const allFiles = await prisma.attachedFile.findMany({})
-  console.log('allFiles', allFiles)
-  let b64
-  allFiles.map((file) => {
-    b64 = Buffer.from(file.filebytes).toString('base64')
-  })
+  // const allFiles = await prismaInstance.attachedFile.findMany({})
+  // console.log('allFiles', allFiles)
+  // let b64
+  // allFiles.map((file) => {
+  //   b64 = Buffer.from(file.filebytes).toString('base64')
+  // })
   
   return {
     props: {
       id,
-      b64
+      //b64
     },
   }
 }
@@ -23,7 +23,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const FileList = ({ b64 }) => {
   const mimeType = 'image/png'
   return(
-    <img src={`data:${mimeType};base64,${b64}`} />
+    // <img src={`data:${mimeType};base64,${b64}`} />
+    <div></div>
   )
 }
 
