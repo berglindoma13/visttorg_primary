@@ -30,6 +30,7 @@ model product {
   productimageurl  String?
   //productimageref attachedFile?
   certificates     productcertificate[]
+  // myProducts       myProducts[]
 }
 
 model productcertificate {
@@ -63,3 +64,9 @@ model manualProducts {
 //   filebytes Bytes
 //   filetype String
 // } 
+
+// model myProducts {
+//   id Int @id @default(autoincrement())
+//   productid        String
+//   connectedproduct product    @relation(fields: [productid], references: [productid])
+// }

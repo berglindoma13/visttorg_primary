@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 interface CheckboxProps {
@@ -21,7 +21,7 @@ interface CheckboxesProps {
 const Checkbox = ({ keyer, value, handleChange} : CheckboxComponentProps) => {
   return(
     <StyledLabel>
-      <StyledInput type="checkbox" value={value} onChange={event => handleChange(event)}/>
+      <StyledInput type="checkbox" value={value} onChange={event => handleChange(event)} className="checkbox"/>
       {keyer}
     </StyledLabel>
   )
@@ -40,7 +40,6 @@ const Checkboxes = ({ options, title, setActiveOptions, activeOptions, clearActi
         setActiveOptions([...activeOptions])
       }
     }
-
   }
 
   return (

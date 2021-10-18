@@ -5,9 +5,9 @@ const VocLogoSVG: React.FC<SVG> = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="100%"
-      height="100%"
-      viewBox="0 0 100 100"
+      width="50px"
+      height="50px"
+      viewBox="0 35 110 30"
       {...props}
     >
       <defs>

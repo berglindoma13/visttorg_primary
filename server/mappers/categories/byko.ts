@@ -35,7 +35,6 @@ export default {
   'Laus búnaður' : [
     'Ljós',
     'Handverkfæri',
-    'Heimilisvörur',
   ],
    
   'Frágangur utanhúss' : [
