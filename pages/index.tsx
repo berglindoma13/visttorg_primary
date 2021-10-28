@@ -2,19 +2,17 @@ import React, { useEffect, useState } from "react"
 import { GetStaticProps } from "next"
 import styled from 'styled-components'
 import { prismaInstance } from '../lib/prisma'
-import { ProductProps, Category } from '../types/products'
+import { ProductProps, Category, Company } from '../types/products'
 import { Certificate, ProductCertificate } from '../types/certificates'
 import Head from 'next/head'
 import Checkboxes from '../components/Inputs/checkboxes'
-import Image from 'next/image'
-import BykoLogoSvg from "../components/Svg/Logos/Byko"
-import SvanurinnLogoSVG from '../components/Svg/Logos/Svanurinn'
-import VocLogoSVG from '../components/Svg/Logos/Voc'
 import BykoCertificateMapper from '../mappers/byko'
 import { mediaMax } from '../constants/breakpoints'
 import { motion, useAnimation } from "framer-motion"
 import CloseIcon from '../components/Svg/Close'
 import { Star } from '../components/Svg/Star'
+import Fuse from 'fuse.js'
+import { SearchProducts } from "../utils/Search"
 
 export const getStaticProps: GetStaticProps = async () => {
 
@@ -32,29 +30,66 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const categories = await prismaInstance.category.findMany()
   const certificates = await prismaInstance.certificate.findMany()
+  const companies = await prismaInstance.company.findMany()
 
-  return { props: { productList, categories, certificates }}
+  const categoryCounts = []
+  categories.map(cat => {
+    const filteredList = productList.filter(product => {
+      const matched = product.categories.filter(prodCat => prodCat.name === cat.name)
+      return matched.length > 0
+    })
+    categoryCounts.push({ name: cat.name, count: filteredList.length})
+  })
+
+  const certificateCounts = []
+  certificates.map(cert => {
+    const filteredList = productList.filter(product => {
+      const matched = product.certificates.filter(prodCat => prodCat.certificate.name === cert.name)
+      return matched.length > 0
+    })
+    certificateCounts.push({ name: cert.name, count: filteredList.length})
+  })
+
+  const companyCounts = []
+  companies.map(comp => {
+    const filteredList = productList.filter(product => {
+      return product.sellingcompany.name === comp.name
+    })
+    companyCounts.push({ name: comp.name, count: filteredList.length})
+  })
+
+  return { props: { productList, categories, certificates, companies, categoryCounts, certificateCounts, companyCounts }}
+}
+
+interface Counter {
+  name: string
+  count: number
 }
 
 type HomeProps = {
   productList: ProductProps[]
   categories: Category[]
   certificates : Certificate[]
+  companies: Company[]
+  categoryCounts: Array<Counter>
+  certificateCounts: Array<Counter>
+  companyCounts: Array<Counter>
 }
-
 interface CheckboxProps {
   keyer : string
   value : string
 }
 
-const Home = ({ productList, categories, certificates } : HomeProps) => {
+const Home = ({ productList, categories, certificates, companies, categoryCounts, certificateCounts, companyCounts } : HomeProps) => {
   const [query, setQuery] = useState("");
-  const [filteredList, setFilteredList] = useState<Array<ProductProps>>([])
+  const [filteredList, setFilteredList] = useState<Fuse.FuseResult<ProductProps>[]>([])
   const [activeCategories, setActiveCategories] = useState<Array<string>>([])
   const [activeCertificates, setActiveCertificates] = useState<Array<string>>([])
-
+  const [activeCompanies, setActiveCompanies] = useState<Array<string>>([])
+  
   const [categoryOptions, setCategoryOptions] = useState<Array<CheckboxProps>>()
   const [certificateOptions, setCertificateOptions] = useState<Array<CheckboxProps>>()
+  const [companyOptions, setCompanyOptions] = useState<Array<CheckboxProps>>()
 
   const [isTop, setIsTop] = useState(true)
   useEffect(() => {
@@ -65,6 +100,31 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
       }
     })
   })
+
+  const options = {
+    // isCaseSensitive: false,
+    includeScore: true,
+    shouldSort: true,
+    // includeMatches: false,
+    // findAllMatches: false,
+    // minMatchCharLength: 1,
+    // location: 0,
+    threshold: 0.4,
+    // distance: 100,
+    // useExtendedSearch: false,
+    // ignoreLocation: false,
+    // ignoreFieldNorm: false,
+    keys: [
+      'title',
+      'description',
+      'shortdescription',
+      'brand',
+      'sellingcompany.name',
+      'categories.name',
+      'certificates.certificate.name'],
+  }
+  
+  const fuse = new Fuse(productList, options)
 
   const clearAllFilters = () => {
     setActiveCategories([])
@@ -85,41 +145,25 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
       const keyvalue = { keyer : BykoCertificateMapper[cat.name], value: cat.name }
       return keyvalue
     }))
+
+    setCompanyOptions(companies.map(company => {
+      const keyvalue = { keyer : company.name, value: company.name }
+      return keyvalue
+    }))
+
   },[])
-  
+
   useEffect(() => {
-    if(query != ""){
-      setFilteredList(productList.filter(product => product.title.toLowerCase().indexOf(query.toLowerCase()) != -1))
+    if(!query && activeCategories.length === 0 && activeCertificates.length === 0 && activeCompanies.length === 0){
+      const resultProducts: Fuse.FuseResult<ProductProps>[] = productList.map((product, index) => {
+        return { item : product, refIndex: index, score: 1}
+      })
+      setFilteredList(resultProducts)
     }else{
-      setFilteredList(productList)
+      const results = SearchProducts({fuseInstance: fuse, query, activeCategories, activeCertificates, activeCompanies })
+      setFilteredList(results)
     }
-  }, [query])
-
-
-  useEffect(() => {
-    setFilteredList(productList.filter(product => {
-      let found = false
-      product.categories.map(category => {
-        if(activeCategories.indexOf(category.name) > -1){
-          found = true 
-        } 
-      })
-      return found || activeCategories.length == 0
-    }))
-  },[activeCategories])
-
-
-  useEffect(() => {
-    setFilteredList(productList.filter(product => {
-      let found = false
-      product.certificates.map(certificate => {
-        if(activeCertificates.indexOf(certificate.certificate.name) > -1){
-          found = true 
-        } 
-      })
-      return found || activeCertificates.length == 0
-    }))
-  },[activeCertificates])
+  }, [query, activeCategories, activeCertificates, activeCompanies])
 
   const [showSideMenu, setShowSideMenu] = useState(false)
   const controls = useAnimation()
@@ -172,8 +216,9 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
           <FilterTitle>Sía</FilterTitle>
           <FilterClearButton onClick={() => clearAllFilters()}>Hreinsa síu</FilterClearButton>
         </FilterTop>
-        {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories}/>}
-        {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates}/>}
+        {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories} counters={categoryCounts}/>}
+        {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates} counters={certificateCounts} />}
+        {companyOptions && <Checkboxes options={companyOptions} title="Birgjar" setActiveOptions={setActiveCompanies} activeOptions={activeCompanies} counters={companyCounts} />}
       </SideFilterMenu>
       <SideFilterOverlay className={showSideMenu ? 'active': ''} onClick={() => setShowSideMenu(false)}/>
       <StyledContainer>
@@ -182,12 +227,15 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
             <FilterTitle>Sía</FilterTitle>
             <FilterClearButton onClick={() => clearAllFilters()}>Hreinsa síu</FilterClearButton>
           </FilterTop>
-          {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories}/>}
-          {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates}/>}
+          {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories} counters={categoryCounts}/>}
+          {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates} counters={certificateCounts} />}
+          {companyOptions && <Checkboxes options={companyOptions} title="Birgjar" setActiveOptions={setActiveCompanies} activeOptions={activeCompanies} counters={companyCounts} />}
         </StyledLeft>
         <StyledRight className={filteredList.length === 0 ? 'empty' : ''}>
-          {filteredList && filteredList.map((product) => {
-            //TODO BETTER !!
+          {filteredList && filteredList.map((resultItem : Fuse.FuseResult<ProductProps>) => {
+            
+            const product = resultItem.item
+
             const mappedCertificates = product.certificates.map(cert => cert.certificate.name)
             var filteredCertificates = [];
             mappedCertificates.forEach((item) => {
@@ -197,57 +245,30 @@ const Home = ({ productList, categories, certificates } : HomeProps) => {
             });
             return(
               <ProductResult key={product.id} href={`/product/${product.productid}`}>
-                <StyledStar variant="outline"/>
-                <ProductImage src={product.productimageurl} alt={`product image - ${product.title}`}/>
+                {/* <StyledStar variant="outline"/> */}
                 <ContentWrapper>
                   <ProductTopContent>
+                    <ProductImage src={product.productimageurl} alt={`product image - ${product.title}`}/>
                     <ProductInfo>
-                      <ProductCategory>{product.categories.map((category : Category, index : number) => {
-                          return (
-                            <span key={`${product.title} - ${category.name}`}>{index === 0 ? category.name : ` / ${category.name}`}</span>
-                          )
-                        })}
-                      </ProductCategory>
+                      <ProductCompany>
+                        {product.sellingcompany.name}
+                      </ProductCompany>
                     <ProductTitle>{product.title}</ProductTitle>
                     </ProductInfo>
                   </ProductTopContent>
-                  <ProductCompanyLogoWrapper>
-                    {product.sellingcompany.name === 'Byko' &&<BykoLogoSvg style={{ width: 'max(3.47vw, 50px)' }}/>}
-                  </ProductCompanyLogoWrapper>
                   <ProductBottomContent>
-
-                    <ProductCertificatesWrapper>{filteredCertificates.map((certificate : string) => {
-                      if(certificate === 'EPD'){
+                    <ProductTagsWrapper>
+                      {filteredCertificates.map((certificate : string) => {
                         return (
-                          <CertificateImage key={`${product.id} - ${certificate}`} src="/EPD_LOGO.jpg" alt="EPD LOGO" style={{ width: 'max(3.47vw, 50px)'}}/>
-                        )
+                          <ProductTag key={certificate}>{BykoCertificateMapper[certificate]}</ProductTag>
+                        )})
                       }
-                      if(certificate === 'FSC'){
+                      {product.categories.map((category : Category, index : number) => {
                         return (
-                          <CertificateImage key={`${product.id} - ${certificate}`} src="/FSC_LOGO.jpg" alt="FSC LOGO"/>
+                          <ProductTag key={category.name}>{category.name}</ProductTag>
                         )
-                      }
-                      if(certificate === 'VOC'){
-                        return (
-                          <StyledVocLogo key={`${product.id} - ${certificate}`}/>
-                        )
-                      }
-                      if(certificate === 'BREEAM'){
-                        return (
-                          <CertificateImage key={`${product.id} - ${certificate}`} src="/BREEAM_LOGO.png" alt="BREEAM LOGO" style={{ maxWidth: '30%' }}/>
-                        )
-                      }
-                      if(certificate === 'SV'){
-                        return (
-                          <StyledSvanurinnLogo key={`${product.id} - ${certificate}`} />
-                        )
-                      }
-                      if(certificate === 'SV_ALLOWED'){
-                        return (
-                          <CertificateImage key={`${product.id} - ${certificate}`} src="/leyfilegt-svansvottad.png" style={{ maxWidth: '40%' }}/>
-                        )
-                      }
-                    })}</ProductCertificatesWrapper>
+                       })}
+                    </ProductTagsWrapper>
                   </ProductBottomContent>
                 </ContentWrapper>
               </ProductResult>
@@ -351,27 +372,42 @@ const FilterTop = styled.div`
   display:flex;
   flex-direction:row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   padding-bottom:15px;
   border-bottom:1px solid #e3e3e3;
 `
 
 const FilterTitle = styled.h2`
-  font-size:max(1.67vw, 24px);
-  color: #fff;
+  font-size:max(1.27vw, 22px);
+  color: #3e3e3e;
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
   font-weight: 400;
 `
 
 const FilterClearButton = styled.button`
-  font-size:max(1.25vw, 18px);
-  color: ${({ theme }) => theme.colors.highlight};
+  font-size:max(1.1vw, 16px);
+  color: ${({ theme }) => theme.colors.secondary.base};
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
   font-weight: 600;
   background-color:transparent;
   outline:none;
   border:none;
   cursor:pointer;
+
+  &:hover{
+    text-decoration:underline;
+  }
+`
+
+const ProductTag = styled.div`
+  background-color:#fff;
+  border: 1px solid #e3e3e3;
+  padding: 5px 10px;
+  font-size: max(0.5vw, 11px);
+  margin-left:3px;
+  box-shadow:0 0 10px rgb(0 0 0 / 60%);
+  border-radius:30px;
+  margin-bottom: 10px;
 `
 
 const ProductImage = styled.img`
@@ -382,40 +418,13 @@ const ProductImage = styled.img`
   background-color:white;
 `
 
-const StyledVocLogo = styled(VocLogoSVG)`
-  margin-left:10px;
-  max-height:100%;
-`
-
-const StyledSvanurinnLogo = styled(SvanurinnLogoSVG)`
-  max-width:20%;
-  margin-left:10px;
-  max-height:100%;
-`
-
-const CertificateImage = styled.img`
-  width: max(10%, 60px);
-  margin-left:10px;
-  object-fit:contain;
-  max-height:100%;
-`
-
-const ProductCompanyLogoWrapper = styled.div`
-  flex:1;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  position:absolute;
-  left: 20px;
-  bottom: 2px;
-`
-
-const ProductCertificatesWrapper = styled.div`
+const ProductTagsWrapper = styled.div`
   flex:1;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items:center;
+  flex-wrap:wrap;
 `
 
 const ProductTitle = styled.h2`
@@ -429,12 +438,11 @@ const ProductTitle = styled.h2`
   overflow: hidden;
 `
 
-const ProductCategory = styled.h3`
+const ProductCompany = styled.h3`
   font-size: max(0.9vw, 13px);
   color: #fff;
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
   line-height:110%;
-  margin-bottom:15px;
   font-weight: 400;
 `
 
@@ -454,7 +462,8 @@ const ProductBottomContent = styled.div`
   display:flex;
   flex-direction:row;
   justify-content: space-between;
-  height:30px;
+  flex-wrap:wrap;
+  width: 100%;
 `
 
 const HeaderArea = styled.div`
@@ -464,7 +473,7 @@ const HeaderArea = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  background-color: ${({ theme }) => theme.colors.primary.base};
+  background-color: #EAE7DC;
   position: fixed;
   z-index: 10;
   width: 100%;
@@ -472,7 +481,7 @@ const HeaderArea = styled.div`
   
   &.onTheMove{
     box-shadow: 0 3px 5px rgba(57, 63, 72, 0.3);
-    background-color:#fff;
+    background-color: ${({ theme }) => theme.colors.primary.base};
     transform: all 0.1s ease-in;
   }
 
@@ -509,7 +518,7 @@ const StyledContainer = styled.div`
 `
 
 const StyledLeft = styled.div`
-  width:30vw;
+  width:min(30vw, 300px);
   display: flex;
   flex-direction: column;
   padding: 0 20px;
@@ -520,35 +529,41 @@ const StyledLeft = styled.div`
 `
 
 const StyledRight = styled.div`
-  width:70vw;
+  width:100%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   border-radius:30px;
   padding: 10px;
   margin-right: 20px;
+  justify-content: space-between;
   
   @media ${mediaMax.tablet}{
     width: 100%;
+    margin-right:0;
   }
 `
 
 const StyledPage = styled.div`
-  background-color: ${({ theme }) => theme.colors.primary.base};
+  /* background-color: ${({ theme }) => theme.colors.primary.base}; */
   min-height: 100vh;
+  background-color: #EAE7DC;
 `
 
 const ProductResult = styled.a`
   padding:5px;
-  width:100%;
+  width:49%;
   padding: 20px 20px 10px 20px;
-  background-color: ${({ theme }) => theme.colors.secondary.base};
-  height: 140px;
+  background-color: ${({ theme }) => theme.colors.primary.base};
   border-radius:30px;
   margin-bottom:15px;
   display:flex;
   flex-direction:row;
   position:relative;
+
+  @media ${mediaMax.tabletL}{
+    width:100%;
+  }
 `
 
 const StyledInput = styled.input`
@@ -559,14 +574,7 @@ const StyledInput = styled.input`
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
   padding-right: max(9.7vw, 135px);
   padding-left:max(1.4vw, 20px);
-
-  &.onTheMove{
-    background-color: ${({ theme }) => theme.colors.primary.base};
-
-    &::placeholder{
-      color:white;
-    }
-  }
+  border: 1px solid #e3e3e3;
 `
 
 const InputWrapper = styled.div`

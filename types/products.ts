@@ -19,7 +19,7 @@ export interface ProductProps {
 
 export interface Company{
   id : number,
-  name : String
+  name : string
 }
 
 export interface Category{

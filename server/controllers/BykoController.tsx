@@ -283,7 +283,11 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
   }
 
   //map the product category to vistbóks category dictionary
-  const mappedCategory: Array<ConnectedCategory> = await getMappedCategory(product.prodTypeParent)
+  const mappedCategory: Array<ConnectedCategory> = []
+  const prodTypeParentCategories = await getMappedCategory(product.prodTypeParent)
+  const prodTypeCategories = await getMappedCategory(product.prodType)
+  prodTypeCategories.map(cat => mappedCategory.push(cat))
+  prodTypeParentCategories.map(cat => mappedCategory.push(cat))
   
   //Product needs to fit into at least one of our allowed categories
   if(mappedCategory.length > 0){
