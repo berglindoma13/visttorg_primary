@@ -4,7 +4,7 @@ import axios from 'axios'
 import fs from 'fs'
 import BykoCategoryMapper from '../mappers/categories/byko'
 import { CertificateValidator } from '../helpers/CertificateValidator'
-import { Certificate } from '../types/Models'
+import { Certificate } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
 
 const prisma = new PrismaClient()
@@ -115,6 +115,7 @@ const ProcessForDatabase = async(data : BykoResponseData) => {
 // SV = 4
 // SV_ALLOWED = 5
 // BREEAM = 6
+// BLENGILL = 7
 const CreateProductCertificates = async(product : BykoProduct, productValidatedCertificates: Array<Certificate>) => {
   let certificateObjectList = [];
   await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
@@ -207,6 +208,21 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
         data: {
           certificate : {
             connect : { id : 6 }
+          },
+          connectedproduct : {
+            connect : { productid : product.axId },
+          }
+        }
+      }).then((prodcert) => {
+        const obj = { id : prodcert.id }
+        certificateObjectList.push(obj)
+      })
+    }
+    if(certificate.name === 'BLENGILL'){
+      return await prisma.productcertificate.create({
+        data: {
+          certificate : {
+            connect : { id : 7 }
           },
           connectedproduct : {
             connect : { productid : product.axId },

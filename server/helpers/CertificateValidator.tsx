@@ -1,4 +1,4 @@
-import { Certificate } from '../types/Models'
+import { Certificate } from '../types/models'
 
 interface CertificateValidatorProps {
   certificates: Array<Certificate>
@@ -30,6 +30,9 @@ export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl } : 
         break;
       case 'BREEAM':
         ValidCertificates.push({ name: 'BREEAM'})
+        break;
+      case 'BLENGILL':
+        ValidCertificates.push({ name: 'BLENGILL'})
         break;
       default:
         break;

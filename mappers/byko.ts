@@ -4,5 +4,6 @@ export default {
   VOC: 'VOC',
   SV_ALLOWED: 'Leyfilegt í svansvottað hús',
   SV: 'Svanurinn',
-  BREEAM: 'BREEAM'
+  BREEAM: 'BREEAM',
+  BLENGILL: 'Blái engillinn'
 }

@@ -38,23 +38,29 @@ interface ProductPageProps{
 const Product = ({ product} : ProductPageProps) => {
   return(
     <ContentWrapper>
-      <Image src={product.productimageurl} alt={`product image - ${product.title}`} height="100%" width="100%"/>
-      <ProductText>Nafn: {product.title}</ProductText>
-      <ProductText>Vörumerki: {product.brand}</ProductText>
-      <ProductText>Flokkar: {product.categories.map((category : Category, index : number) => {
-        return (
-          <span key={index}>{category.name}</span>
-        )
-      })}</ProductText>
-      <ProductText>Vottanir: {product.certificates.map((certificate : ProductCertificate, index : number) => {
-        return (
-          <span key={index}>{certificate.certificate.name}, </span>
-        )
-      })}</ProductText>
-      <ProductText>Löng lýsing: {product.description}</ProductText>
-      <ProductText>Stutt lýsing: {product.shortdescription}</ProductText>
-      <ProductText>Fyrirtæki: {product.sellingcompany.name}</ProductText>
-      <ProductText>Slóð: <a target="_blank" href={product.url}>{product.url}</a></ProductText>
+      <ProductTitle>{product.title}</ProductTitle>
+      <DetailWrapper>
+        <ImageWrapper>
+          <Image src={product.productimageurl} alt={`product image - ${product.title}`} height="100%" width="100%"/>
+        </ImageWrapper>
+        <ProductInfo>
+          <ProductText>Vörumerki: {product.brand}</ProductText>
+          <ProductText>Flokkar: {product.categories.map((category : Category, index : number) => {
+            return (
+              <span key={index}>{category.name}</span>
+            )
+          })}</ProductText>
+          <ProductText>Vottanir: {product.certificates.map((certificate : ProductCertificate, index : number) => {
+            return (
+              <span key={index}>{certificate.certificate.name}, </span>
+            )
+          })}</ProductText>
+          <ProductText>Löng lýsing: {product.description}</ProductText>
+          <ProductText>Stutt lýsing: {product.shortdescription}</ProductText>
+          <ProductText>Fyrirtæki: {product.sellingcompany.name}</ProductText>
+          <ProductText>Slóð: <a target="_blank" href={product.url}>{product.url}</a></ProductText>
+        </ProductInfo>
+      </DetailWrapper>
     </ContentWrapper>
   )
 }
@@ -66,6 +72,30 @@ const ContentWrapper = styled.div`
   padding:20px;
 `
 
+const DetailWrapper = styled.div`
+  display:flex;
+  flex-direction:row;
+`
+
+const ProductTitle = styled.h1`
+  margin-bottom:20px;
+`
+
 const ProductText = styled.p`
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+`
+
+const ProductInfo = styled.div`
+
+`
+
+const ImageWrapper = styled.div`
+  height: 30vw;
+  width: 30vw;
+  display:flex;
+  flex-direction:row;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 5px 2px 1px rgba(0, 0, 255, .2);
+  margin-right: 30px;
 `
