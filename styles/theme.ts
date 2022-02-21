@@ -1,12 +1,22 @@
 const theme = {
   colors: {
-    black: '#303030',
     white: '#fff',
     warning: '#F03434',
     grayLight: '#f0efeb',
 
     // TODO: Find a better color.
     success: 'green',
+
+    //Vistorg colors
+    green: '#ABC5A1',
+    black: '#000000;',
+    grey_one: '#FAFAFA',
+    grey_two: '#EEEEEE',
+    grey_four: '#757575',
+    grey_five: '#424242',
+    orange: '#F67147',
+    purple: '#A399FA',
+    beige: '#F6F3EE',
 
     primary: {
       base: '#3C6F72',
@@ -25,7 +35,8 @@ const theme = {
 
   fonts: {
     // TODO: We need to add some fallback fonts.
-    fontFamilyPrimary: 'Roboto',
+    fontFamilyPrimary: 'Space Mono',
+    fontFamilySecondary: 'Roboto',
   },
 }
 

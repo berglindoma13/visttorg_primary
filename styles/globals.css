@@ -45,3 +45,18 @@ body #nprogress .spinner-icon {
 	font-style:normal;
 	font-display:swap;
 }
+
+@font-face {
+	font-family : 'Space Mono';
+	src: url('/fonts/Space_Mono/SpaceMono-Regular.ttf');
+	font-weight:normal;
+	font-style:normal;
+	font-display:swap;
+}
+@font-face {
+	font-family : 'Space Mono';
+	src: url('/fonts/Space_Mono/SpaceMono-Bold.ttf');
+	font-weight:bold;
+	font-style:normal;
+	font-display:swap;
+}

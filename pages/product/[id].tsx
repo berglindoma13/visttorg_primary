@@ -3,7 +3,21 @@ import { prismaInstance } from '../../lib/prisma'
 import { ProductProps, Company, Category } from '../../types/products'
 import styled from 'styled-components'
 import Image from 'next/image'
-import { ProductCertificate } from "../../types/certificates"
+import { Certificate, ProductCertificate } from "../../types/certificates"
+import certificateMapper from '../../mappers/certificates'
+import { Footer } from "../../components/Footer"
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/swiper.min.css';
+import 'swiper/components/pagination/pagination.min.css'
+import SwiperCore, { Pagination } from 'swiper';
+import { Header } from "../../components/Header"
+import { Tag } from "../../components/Tag"
+import { Heading1, Heading3, Heading4, UIBig } from "../../components/Typography"
+import { MainButton, MainButtonText } from "../../components/Buttons"
+import SvanurinnLogoSVG from "../../components/Svg/Logos/Svanurinn"
+import VocLogoSVG from "../../components/Svg/Logos/Voc"
+import { mediaMax } from "../../constants/breakpoints"
+
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
@@ -36,66 +50,231 @@ interface ProductPageProps{
 }
 
 const Product = ({ product} : ProductPageProps) => {
+
+  //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
+  const showSwiper = false
+  SwiperCore.use([Pagination])
+
+  const getCertImage = (cert: string) => {
+    switch(cert){
+      case 'EPD':
+        return <CertImageWrapper><Image src='/epdLogo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+      case 'FSC':
+        return <CertImageWrapper><Image src='/FSC_LOGO.jpg' layout="fill" objectFit="contain" /></CertImageWrapper>
+      case 'BREEAM':
+        return <CertImageWrapper><Image src='/BREEAM_LOGO.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+      case 'SV':
+        return <CertImageWrapper><SvanurinnLogoSVG /></CertImageWrapper>
+      case 'VOC':
+        return <CertImageWrapper><VocLogoSVG /></CertImageWrapper>
+      case 'SV_ALLOWED':
+        return <CertImageWrapper><Image src='/leyfilegt-svansvottad.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+    }
+  }
+
   return(
-    <ContentWrapper>
-      <ProductTitle>{product.title}</ProductTitle>
-      <DetailWrapper>
-        <ImageWrapper>
-          <Image src={product.productimageurl} alt={`product image - ${product.title}`} height="100%" width="100%"/>
-        </ImageWrapper>
+    <Page>
+      <PageContainer>
+        <StyledHeader showSearch={true}/>
         <ProductInfo>
-          <ProductText>Vörumerki: {product.brand}</ProductText>
-          <ProductText>Flokkar: {product.categories.map((category : Category, index : number) => {
-            return (
-              <span key={index}>{category.name}</span>
-            )
-          })}</ProductText>
-          <ProductText>Vottanir: {product.certificates.map((certificate : ProductCertificate, index : number) => {
-            return (
-              <span key={index}>{certificate.certificate.name}, </span>
-            )
-          })}</ProductText>
-          <ProductText>Löng lýsing: {product.description}</ProductText>
-          <ProductText>Stutt lýsing: {product.shortdescription}</ProductText>
-          <ProductText>Fyrirtæki: {product.sellingcompany.name}</ProductText>
-          <ProductText>Slóð: <a target="_blank" href={product.url}>{product.url}</a></ProductText>
+          <ProductInfoLeft>
+            {showSwiper ? (
+               <Swiper
+                spaceBetween={50}
+                slidesPerView={1}
+                onSlideChange={() => console.log('slide change')}
+                onSwiper={(swiper) => console.log(swiper)}
+                pagination
+              >
+              <SwiperSlide>
+                <ImageWrapper>
+                  <Image
+                    src={product.productimageurl} 
+                    alt={`product image - ${product.title}`} 
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </ImageWrapper>
+              </SwiperSlide>
+              <SwiperSlide>
+                <ImageWrapper>
+                  <Image
+                    src={product.productimageurl} 
+                    alt={`product image - ${product.title}`} 
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </ImageWrapper>
+              </SwiperSlide>
+              <SwiperSlide>
+                <ImageWrapper>
+                  <Image
+                    src={product.productimageurl} 
+                    alt={`product image - ${product.title}`} 
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </ImageWrapper>
+              </SwiperSlide>
+              </Swiper>
+            ) : (
+              <ImageWrapper>
+                <Image
+                  src={product.productimageurl} 
+                  alt={`product image - ${product.title}`} 
+                  layout="fill"
+                  objectFit="contain"
+                />
+              </ImageWrapper>
+            )}
+          </ProductInfoLeft>
+          <ProductInfoRight style={{ marginRight: 160 }}>
+            <Tag title={product.brand} style={{marginBottom: 8}}/>
+            <Heading1 style={{marginTop: 23, marginBottom: 70 }}>{product.title}</Heading1> 
+              <div style={{display:'flex'}}>
+                <div style={{flex:1}}>
+                  <UIBig style={{marginBottom: 15}}>Flokkar</UIBig>
+                  <ProductCategories>
+                    {product.categories.map((category : Category, index : number) => {
+                      return (
+                        <Tag key={index} title={category.name} style={{marginBottom: 8}} />
+                      )
+                    })}
+                  </ProductCategories>
+                </div>
+                {product.epdUrl || product.fscUrl && 
+                  <div style={{flex:1}}>
+                    <UIBig style={{marginBottom: 15}}>Fylgiskjöl</UIBig>
+                  </div>
+                }
+              </div>
+              <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description}</Heading4>
+              <MainButton 
+                text={product.sellingcompany.name} 
+                isLink
+                href={product.url}
+              />
+          </ProductInfoRight>
         </ProductInfo>
-      </DetailWrapper>
-    </ContentWrapper>
+        <ProductCertifications>
+           <Heading3 style={{marginBottom: 43}}>Vottanir</Heading3>
+          <CertificateList>
+            {product.certificates.map((certificate : ProductCertificate, index : number) => {
+              return (
+                <SingleCertificateItem key={index}>
+                  {getCertImage(certificate.certificate.name)}
+                  <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} />
+                </SingleCertificateItem>
+              )
+            })}
+          </CertificateList>  
+        </ProductCertifications>
+      </PageContainer>
+      <Footer />
+    </Page>
   )
 }
 
 export default Product
 
-const ContentWrapper = styled.div`
-  background-color: rgba(255,255,255, 0.5);
-  padding:20px;
+const CertImageWrapper = styled.div`
+  position: relative;
+  height: 80px;
+  width: 100%;
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 `
 
-const DetailWrapper = styled.div`
+const SingleCertificateItem = styled.div`
+  display:flex;
+  flex-direction:column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px;
+
+  @media ${mediaMax.tablet}{
+    margin-bottom:60px;
+  }
+`
+
+const ProductCertifications = styled.div`
+  width:100%;
+  background-color: ${({ theme }) => theme.colors.beige};
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  padding: 35px 0 45px 0;
+  margin-top:150px;
+`
+
+const CertificateList = styled.div`
   display:flex;
   flex-direction:row;
+
+  @media ${mediaMax.tablet}{
+    flex-direction:column;
+  }
 `
 
-const ProductTitle = styled.h1`
-  margin-bottom:20px;
+const ProductCategories = styled.div`
+  display:flex;
+  flex-direction:column;
+`
+
+const PageContainer = styled.div`
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-bottom:200px;
+`
+
+const StyledHeader = styled(Header)`
+  margin-bottom:225px;
+`
+
+const Page = styled.div`
+  min-height:100vh;
+  background-color: ${({ theme }) => theme.colors.grey_one};
+`
+
+const ProductInfo = styled.div`
+  width: 100%;
+  display:flex;
+  flex-direction:row;
+  
+  @media ${mediaMax.tablet}{
+    flex-direction:column;
+    padding: 0 20px;
+  }
+`
+
+const ProductInfoLeft = styled.div`
+  width:50%;
+
+  @media ${mediaMax.tablet}{
+    width: 100%;
+    margin-bottom: 40px;
+  }
+`
+
+const ProductInfoRight = styled.div`
+  width:50%;
+
+  @media ${mediaMax.tablet}{
+    width: 100%;
+  }
 `
 
 const ProductText = styled.p`
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
 `
 
-const ProductInfo = styled.div`
-
-`
 
 const ImageWrapper = styled.div`
-  height: 30vw;
-  width: 30vw;
-  display:flex;
-  flex-direction:row;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 5px 5px 2px 1px rgba(0, 0, 255, .2);
-  margin-right: 30px;
+  height: 430px;
+  width:80%;
+  margin: 0 auto;
+  position:relative;
 `

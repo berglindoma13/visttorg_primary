@@ -1,10 +1,6 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import Checkbox from '@mui/material/Checkbox'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { orange } from '@mui/material/colors';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { theme } from '../../styles/theme'
+import { theme } from '../../../styles/theme'
 interface CheckboxProps {
   keyer : string
   value : string
@@ -30,39 +26,40 @@ interface CheckboxesProps {
 
 const SingleCheckbox = ({ keyer, value, handleChange} : CheckboxComponentProps) => {
   
-  const CheckboxTheme = createTheme({
-    palette: {
-      primary: { main: '#3C6F72', dark: '#2a4d4f', light: '#638b8e'},
-      text: {
-        primary: '#000',
-        secondary: '#000'
-      }
-    }
-  });
+  // const CheckboxTheme = createTheme({
+  //   palette: {
+  //     primary: { main: '#3C6F72', dark: '#2a4d4f', light: '#638b8e'},
+  //     text: {
+  //       primary: '#000',
+  //       secondary: '#000'
+  //     }
+  //   }
+  // });
   return(
-    <ThemeProvider theme={CheckboxTheme}>
-      <FormControlLabel control={<Checkbox value={value} onChange={event => handleChange(event)} color="primary" />} label={keyer} />
-    </ThemeProvider>
+    // <ThemeProvider theme={CheckboxTheme}>
+    //   <FormControlLabel control={<Checkbox value={value} onChange={event => handleChange(event)} color="primary" />} label={keyer} />
+    // </ThemeProvider>
+    <div></div>
   )
 }
 
 const Checkboxes = ({ options, title, setActiveOptions, activeOptions, clearActiveOptions, counters } : CheckboxesProps) => {
-  const handleChange = (event : ChangeEvent<HTMLInputElement>) => {
+  // const handleChange = (event : ChangeEvent<HTMLInputElement>) => {
     
-    if(event.target.checked){
-      setActiveOptions([...activeOptions, event.target.value])
-    }else{
-      const index = activeOptions.indexOf(event.target.value)
-      if (index > -1) {
-        activeOptions.splice(index, 1);
-        setActiveOptions([...activeOptions])
-      }
-    }
-  }
+  //   if(event.target.checked){
+  //     setActiveOptions([...activeOptions, event.target.value])
+  //   }else{
+  //     const index = activeOptions.indexOf(event.target.value)
+  //     if (index > -1) {
+  //       activeOptions.splice(index, 1);
+  //       setActiveOptions([...activeOptions])
+  //     }
+  //   }
+  // }
 
   return (
     <Container>
-      <CheckboxListTitle>{title}</CheckboxListTitle>
+      {/* <CheckboxListTitle>{title}</CheckboxListTitle>
       <ChecboxList>
         {options.map(option => {
           
@@ -72,7 +69,7 @@ const Checkboxes = ({ options, title, setActiveOptions, activeOptions, clearActi
             <SingleCheckbox keyer={`${option.keyer} (${counter})`} key={option.keyer} value={option.value} handleChange={(event) => handleChange(event)}/>
           )
         })}
-      </ChecboxList>
+      </ChecboxList> */}
     </Container>
   )
 }

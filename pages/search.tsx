@@ -5,7 +5,7 @@ import { prismaInstance } from '../lib/prisma'
 import { ProductProps, Category, Company } from '../types/products'
 import { Certificate, ProductCertificate } from '../types/certificates'
 import Head from 'next/head'
-import Checkboxes from '../components/Inputs/checkboxes'
+import Checkboxes from '../components/Inputs/Checkbox/Checkbox'
 import BykoCertificateMapper from '../server/mappers/certificates/byko'
 import { mediaMax } from '../constants/breakpoints'
 import { motion, useAnimation } from "framer-motion"
@@ -246,9 +246,9 @@ const Home = ({ productList, categories, certificates, companies, categoryCounts
           <FilterTitle>Sía</FilterTitle>
           <FilterClearButton onClick={() => clearAllFilters()}>Hreinsa síu</FilterClearButton>
         </FilterTop>
-        {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories} counters={categoryCounts}/>}
+        {/* {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories} counters={categoryCounts}/>}
         {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates} counters={certificateCounts} />}
-        {companyOptions && <Checkboxes options={companyOptions} title="Birgjar" setActiveOptions={setActiveCompanies} activeOptions={activeCompanies} counters={companyCounts} />}
+        {companyOptions && <Checkboxes options={companyOptions} title="Birgjar" setActiveOptions={setActiveCompanies} activeOptions={activeCompanies} counters={companyCounts} />} */}
       </SideFilterMenu>
       <SideFilterOverlay className={showSideMenu ? 'active': ''} onClick={() => setShowSideMenu(false)}/>
       <StyledContainer>
@@ -257,9 +257,9 @@ const Home = ({ productList, categories, certificates, companies, categoryCounts
             <FilterTitle>Sía</FilterTitle>
             <FilterClearButton onClick={() => clearAllFilters()}>Hreinsa síu</FilterClearButton>
           </FilterTop>
-          {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories} counters={categoryCounts}/>}
+          {/* {categoryOptions && <Checkboxes options={categoryOptions} title="Flokkar" setActiveOptions={setActiveCategories} activeOptions={activeCategories} counters={categoryCounts}/>}
           {certificateOptions && <Checkboxes options={certificateOptions} title="Vottanir" setActiveOptions={setActiveCertificates} activeOptions={activeCertificates} counters={certificateCounts} />}
-          {companyOptions && <Checkboxes options={companyOptions} title="Birgjar" setActiveOptions={setActiveCompanies} activeOptions={activeCompanies} counters={companyCounts} />}
+          {companyOptions && <Checkboxes options={companyOptions} title="Birgjar" setActiveOptions={setActiveCompanies} activeOptions={activeCompanies} counters={companyCounts} />} */}
         </StyledLeft>
         <StyledRight className={filteredList.length === 0 ? 'empty' : ''}>
           {filteredList && filteredList.map((resultItem : Fuse.FuseResult<ProductProps>) => {

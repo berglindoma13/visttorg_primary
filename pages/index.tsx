@@ -1,91 +1,144 @@
-import react, { useState } from 'react'
+import { GetStaticProps } from 'next'
+import React from 'react'
 import styled from 'styled-components'
-import Forest from '../components/Svg/Forest'
-import VistbokLogo from '../components/Svg/VistbokLogo'
-import Link from 'next/link'
+import { Banner } from '../components/Banner'
+import { FrontpageCatBox } from '../components/FrontpageCatBox'
+import { Header } from '../components/Header'
+import { mediaMax } from '../constants/breakpoints'
+import { Certificate } from '../types/certificates'
+import { Category, Company, ProductProps } from '../types/products'
+import { prismaInstance } from '../lib/prisma'
+import BykoCertificateMapper from '../server/mappers/certificates/byko'
+import { SearchPage } from '../components/SearchPage'
+import { Footer } from '../components/Footer'
 
-const Home = () => {
+export const getStaticProps: GetStaticProps = async () => {
 
-  const [query, setQuery] = useState('')
+  const productList = await prismaInstance.product.findMany({
+    include: {
+      sellingcompany: true,
+      categories : true,
+      certificates: {
+        include: {
+          certificate : true
+        }
+      }
+    },
+  });
 
+
+  const categories = await prismaInstance.category.findMany()
+  const certificates = await prismaInstance.certificate.findMany()
+  const companies = await prismaInstance.company.findMany()
+
+  // const categoryCounts = []
+  // categories.map(cat => {
+  //   const filteredList = productList.filter(product => {
+  //     const matched = product.categories.filter(prodCat => prodCat.name === cat.name)
+  //     return matched.length > 0
+  //   })
+  //   categoryCounts.push({ name: cat.name, count: filteredList.length})
+  // })
+
+  // const certificateCounts = []
+  // certificates.map(cert => {
+  //   const filteredList = productList.filter(product => {
+  //     const matched = product.certificates.filter(prodCat => {
+  //       return prodCat.certificate.name === cert.name
+  //     })
+  //     return matched.length > 0
+  //   })
+  //   certificateCounts.push({ name: BykoCertificateMapper[cert.name], count: filteredList.length})
+  // })
+
+  // const companyCounts = []
+  // companies.map(comp => {
+  //   const filteredList = productList.filter(product => {
+  //     return product.sellingcompany.name === comp.name
+  //   })
+  //   companyCounts.push({ name: comp.name, count: filteredList.length})
+  // })
+
+  return { props: { productList, categories, certificates, companies }}
+}
+
+interface Counter {
+  name: string
+  count: number
+}
+
+type HomeProps = {
+  productList: ProductProps[]
+  categories: Category[]
+  certificates : Certificate[]
+  companies: Company[]
+  categoryCounts: Array<Counter>
+  certificateCounts: Array<Counter>
+  companyCounts: Array<Counter>
+}
+interface CheckboxProps {
+  keyer : string
+  value : string
+}
+
+const Home = ({ productList = [], categories, certificates = [], companies = [], categoryCounts, certificateCounts, companyCounts } : HomeProps) => {
+  
   return(
-    <PageWrapper>
-      <LeftSide>
-        <VistbokLogo />
-        <AboutUs>Gagnabanki vistvottaðra byggingarefna</AboutUs>
-        <InputWrapper>
-          <StyledInput type="text" onChange={value => setQuery(value.target.value)} placeholder="Leita eftir nafni vöru" />
-          <Link href={`/search?query=${query}`} passHref >
-            <InputSubmitButton>Leita</InputSubmitButton>
-          </Link>
-        </InputWrapper>
-      </LeftSide>
-      <RightSide>
-        <Forest />
-      </RightSide>
-    </PageWrapper>
+    <Page>
+      <PageContainer>
+        <StyledHeader showSearch={false}/>
+        <StyledBanner />
+        <CategoryBoxes>
+          <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/search?cat=bathroom'/>
+          <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/search?cat=floors'/>
+          <FrontpageCatBox color='purple' iconImage='PaintBucket' title='Málning' url='/search?cat=paint'/>
+        </CategoryBoxes>
+        <SearchPage 
+          products={productList} 
+          certificates={certificates} 
+          companies={companies} 
+        />
+      </PageContainer>
+      <Footer />
+    </Page>
   )
 }
 
 export default Home
 
-const PageWrapper = styled.div`
-  height:100vh;
-  width: 100%;
+const PageContainer = styled.div`
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-bottom:200px;
+`
+
+const Page = styled.div`
+  min-height:100vh;
+  background-color: ${({ theme }) => theme.colors.grey_one};
+`
+
+const StyledHeader = styled(Header)`
+  margin-bottom:50px;
+`
+
+const StyledBanner = styled(Banner)`
+  margin-bottom:155px;
+
+  @media ${mediaMax.tablet}{
+    margin-bottom:95px;
+  }
+`
+
+const CategoryBoxes = styled.div`
   display:flex;
   flex-direction:row;
+  justify-content: space-around;
   align-items: center;
-  justify-content: space-between;
-  background-color: ${({ theme }) => theme.colors.grayLight};
-`
+  padding: 0 7.5%;
+  margin-bottom:120px;
 
-const RightSide = styled.div`
-  width: 50%;
-  padding: 0 30px 0 0;
-`
-
-const LeftSide = styled.div`
-  width: 50%;
-  padding: 0 5vw 0 30px;
-`
-
-const AboutUs = styled.h2`
-  font-size: max(2.9vw, 20px);
-  margin-bottom: 25px;
-`
-
-const StyledInput = styled.input`
-  border-radius: 5px;
-  width:100%;
-  height:100%;
-  border:none;
-  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
-  padding-right: max(9.7vw, 135px);
-  padding-left:max(1.4vw, 20px);
-  border: 1px solid #e3e3e3;
-  font-size:max(0.97vw, 20px);
-`
-
-const InputWrapper = styled.div`
-  height:60px;
-  width:100%;
-  position:relative;
-`
-
-const InputSubmitButton = styled.div`
-  background-color: ${({ theme }) => theme.colors.highlight};;
-  border-radius: 5px;
-  position: absolute;
-  width: max(9.7vw,135px);
-  outline: none;
-  border: none;
-  height: 54px;
-  top: 3px;
-  right: 3px;
-  font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
-  font-size:max(0.97vw, 20px);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  @media ${mediaMax.tablet}{
+    flex-direction: column;
+    margin-bottom:90px;
+  }
 `
