@@ -14,8 +14,7 @@ import { Pagination } from '../Pagination'
 import { useRouter } from 'next/router'
 import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
 import Close from '../Svg/Close'
-
-
+import certificateMapper from '../../mappers/certificates'
 interface SearchPageProps{
   products: Array<ProductProps>
   certificates : Array<Certificate>
@@ -86,9 +85,17 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
   
   //This checks the pagination status and updates current status
   useEffect(() => {
-    const { page } = router.query
+    const { page, query, cat } = router.query
     if(!!page){
       setPaginationNumber(parseInt(page.toString()))
+    }
+
+    if(!!query){
+      setQuery(query.toString())
+    }
+
+    if(!!cat){
+      toggleFilters('categories', cat.toString())
     }
   }, [router])
 
@@ -200,6 +207,8 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
         onChange={(input) => {
           setQuery(input.target.value)
         }}
+        onSubmit={() => {}}
+        value={query}
       />
 
       <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>
@@ -207,11 +216,11 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
         <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
         {/* <MainButton text='Baðherbergi' onClick={() => {toggleFilters('categories', 'Baðherbergi')}} active={false} /> */}
         <StyledMainButton 
-          text='Raflagnir' 
+          text='Lýsing og rafmagn' 
           onClick={() => {
-            toggleFilters('categories', 'Raflagnir')
+            toggleFilters('categories', 'Lýsing og rafmagn')
           }} 
-          active={filters.categories.includes('Raflagnir')} 
+          active={filters.categories.includes('Lýsing og rafmagn')} 
         />
         <StyledMainButton 
           text='Eldhús' 
@@ -221,41 +230,27 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
           active={filters.categories.includes('Eldhús')} 
         />
         <StyledMainButton 
-          text='Lóð' 
+          text='Baðherbergi' 
           onClick={() => {
-            toggleFilters('categories', 'Lóð')
+            toggleFilters('categories', 'Baðherbergi')
           }} 
-          active={filters.categories.includes('Lóð')} 
+          active={filters.categories.includes('Baðherbergi')} 
         />
         <StyledMainButton 
-          text='Stofa' 
+          text='Gólfefni' 
           onClick={() => {
-            toggleFilters('categories', 'Stofa')
+            toggleFilters('categories', 'Gólfefni')
           }} 
-          active={filters.categories.includes('Stofa')} 
+          active={filters.categories.includes('Gólfefni')} 
         />
         <StyledMainButton 
-          text='Bílskúr' 
+          text='Garðurinn' 
           onClick={() => {
-            toggleFilters('categories', 'Bílskúr')
+            toggleFilters('categories', 'Garðurinn')
           }} 
-          active={filters.categories.includes('Bílskúr')} 
+          active={filters.categories.includes('Garðurinn')} 
         />
-        <StyledMainButton 
-          text='Húsgögn' 
-          onClick={() => {
-            toggleFilters('categories', 'Húsgögn')
-          }} 
-          active={filters.categories.includes('Húsgögn')} 
-        />
-        <StyledMainButton 
-          text='Málning' 
-          onClick={() => {
-            toggleFilters('categories', 'Málning')
-          }} 
-          active={filters.categories.includes('Málning')} 
-        />
-        <StyledMainButton 
+        <StyledMainButton
           text='Gluggar' 
           onClick={() => {
             toggleFilters('categories', 'Gluggar')
@@ -295,14 +290,123 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
                 return(
                   <FilterItem 
                     key={certificate.id}
-                    text={certificate.name} 
+                    text={certificateMapper[certificate.name]} 
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
                     }} 
-                    active={filters.certificates.includes(certificate.name)} 
+                    active={filters.certificates.includes(certificate.name)}
                   />
                 )
               })}
+            </FilterItems>
+          </FilterGroup>
+          <FilterGroup>
+            <FilterGroupTitle>Flokkar</FilterGroupTitle>
+            <FilterItems>
+              <FilterItem 
+                key='Burðavirki'
+                text='Burðavirki' 
+                onClick={() => {
+                  toggleFilters('categories', 'Burðavirki')
+                }} 
+                active={filters.categories.includes('Burðavirki')}
+              />
+              <FilterItem 
+                key='Burðavirki'
+                text='Burðavirki' 
+                onClick={() => {
+                  toggleFilters('categories', 'Burðavirki')
+                }} 
+                active={filters.categories.includes('Burðavirki')}
+              />
+              <FilterItem 
+                key='Loftaefni'
+                text='Loftaefni' 
+                onClick={() => {
+                  toggleFilters('categories', 'Loftaefni')
+                }} 
+                active={filters.categories.includes('Loftaefni')}
+              />
+              <FilterItem 
+                key='Hurðir'
+                text='Hurðir' 
+                onClick={() => {
+                  toggleFilters('categories', 'Hurðir')
+                }} 
+                active={filters.categories.includes('Hurðir')}
+              />
+              <FilterItem 
+                key='Lagnir'
+                text='Lagnir' 
+                onClick={() => {
+                  toggleFilters('categories', 'Lagnir')
+                }} 
+                active={filters.categories.includes('Lagnir')}
+              />
+              <FilterItem 
+                key='Textíll'
+                text='Textíll' 
+                onClick={() => {
+                  toggleFilters('categories', 'Textíll')
+                }} 
+                active={filters.categories.includes('Textíll')}
+              />
+              <FilterItem 
+                key='Lyftur'
+                text='Lyftur' 
+                onClick={() => {
+                  toggleFilters('categories', 'Lyftur')
+                }} 
+                active={filters.categories.includes('Lyftur')}
+              />
+              <FilterItem 
+                key='Öryggi og merkingar'
+                text='Öryggi og merkingar' 
+                onClick={() => {
+                  toggleFilters('categories', 'Öryggi og merkingar')
+                }} 
+                active={filters.categories.includes('Öryggi og merkingar')}
+              />
+              <FilterItem 
+                key='Vélbúnaður'
+                text='Vélbúnaður' 
+                onClick={() => {
+                  toggleFilters('categories', 'Vélbúnaður')
+                }} 
+                active={filters.categories.includes('Vélbúnaður')}
+              />
+              <FilterItem 
+                key='Húsgögn'
+                text='Húsgögn' 
+                onClick={() => {
+                  toggleFilters('categories', 'Húsgögn')
+                }} 
+                active={filters.categories.includes('Húsgögn')}
+              />
+              <FilterItem 
+                key='Heimilistæki'
+                text='Heimilistæki' 
+                onClick={() => {
+                  toggleFilters('categories', 'Heimilistæki')
+                }} 
+                active={filters.categories.includes('Heimilistæki')}
+              />
+              <FilterItem 
+                key='Veggir'
+                text='Veggir' 
+                onClick={() => {
+                  toggleFilters('categories', 'Veggir')
+                }} 
+                active={filters.categories.includes('Veggir')} 
+              />
+              <FilterItem 
+                key='Málningarvörur'
+                text='Málningarvörur' 
+                onClick={() => {
+                  toggleFilters('categories', 'Málningarvörur')
+                }} 
+                active={filters.categories.includes('Málningarvörur')} 
+              />
             </FilterItems>
           </FilterGroup>
         </FilterWrapper>
@@ -367,6 +471,7 @@ const FilterWrapper = styled(motion.div)`
   margin-left:20px;
   padding: 35px 35px 50px 35px;
   height:fit-content;
+  border-radius: 16px;
 
   @media ${mediaMax.tablet}{
     position: fixed;
@@ -446,7 +551,9 @@ const ProductCountText = styled(UIMedium)`
   text-align:center;
 `
 
-const StyledMainButton = styled(MainButton)``
+const StyledMainButton = styled(MainButton)`
+  margin: 0 5px;
+`
 const StyledFilterButton = styled(FilterButton)``
 
 const CategoryFilters = styled.div`

@@ -3,11 +3,20 @@ import styled from 'styled-components'
 interface TagProps{
   title: string
   style?: any
+  clickable: boolean
+  onClick?: () => void
+  children: any 
 }
-export const Tag = ({ title, style }: TagProps) => {
-  return(
-    <CustomTag style={style}>{title}</CustomTag>
-  ) 
+export const Tag = ({ title, style, clickable, onClick, children }: TagProps) => {
+  if(clickable){
+    return(
+      <CustomTag style={style} onClick={onClick}>{children}</CustomTag> 
+    )
+  }else{
+    return(
+      <CustomTag style={style}>{title}</CustomTag>
+    ) 
+  }
 }
 
 const CustomTag = styled.div`

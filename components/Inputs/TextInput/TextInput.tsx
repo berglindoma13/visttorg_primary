@@ -5,10 +5,11 @@ interface TextInputProps {
   placeholder: string
   onSubmit: () => void
   className?: string
-  onChange: () => void
+  onChange: (e) => void
+  value?: string
 }
 
-export const TextInput = ({ placeholder, onSubmit, className, onChange }: TextInputProps) => {
+export const TextInput = ({ placeholder, onSubmit, className, onChange, value }: TextInputProps) => {
   
   const _onSubmit = (e) => {
     if (e.which === 13) {
@@ -19,7 +20,7 @@ export const TextInput = ({ placeholder, onSubmit, className, onChange }: TextIn
   return(
     <InputWrapper className={className} onChange={onChange}>
       <StyledMagnifyingGlass />
-      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit}/>
+      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} />
     </InputWrapper>
   )
 }

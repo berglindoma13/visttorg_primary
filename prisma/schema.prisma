@@ -31,6 +31,7 @@ model product {
   //productimageref attachedFile?
   certificates     productcertificate[]
   // myProducts       myProducts[]
+  approved        Boolean?
 }
 
 model productcertificate {

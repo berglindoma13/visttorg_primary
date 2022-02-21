@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import VistbokLogo from '../Svg/VistbokLogo'
 import Link from 'next/link'
 import { TextInput } from '../Inputs/TextInput/TextInput'
 import MagnifyingGlass from '../Svg/MagnifyingGlass'
 import { mediaMax } from '../../constants/breakpoints'
+import { useRouter } from 'next/router'
 
 interface HeaderProps{
   showSearch: boolean
@@ -12,6 +13,13 @@ interface HeaderProps{
 }
 
 export const Header = ({ showSearch, className }: HeaderProps) => {
+  const router = useRouter()
+  const [search, setSearch] = useState<string>('')
+
+  const Submit = () => {
+    router.push(`/?query=${search}#search`)
+  }
+
   return(
     <HeaderWrapper className={className}>
       <Link href="/"><VistbokLogo style={{cursor:'pointer'}} width="150px"/></Link>
@@ -19,10 +27,10 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
         <>
           {/* DESKTOP */}     
           <TextInputWrapper>
-            <TextInput placeholder='Leita eftir nafni vöru' onSubmit={() => console.log('submitting textinput in header')} onChange={() => console.log('editing')}/>
+            <TextInput placeholder='Leita eftir nafni vöru' onSubmit={Submit} onChange={(e) => setSearch(e.target.value)}/>
           </TextInputWrapper>
           {/* MOBILE */}
-          <Link href='/search' passHref>
+          <Link href='/#search' passHref>
             <MobileSearchButton>
               <MagnifyingGlass />
             </MobileSearchButton>

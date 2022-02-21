@@ -279,6 +279,7 @@ const getMappedCategory = (category: string) => {
     for (const cat in BykoCategoryMapper) {
       for(const productCategory in categoryList){
         if(BykoCategoryMapper[cat].includes(categoryList[productCategory])){
+          console.log('cat', cat)
           matchedCategory.push({name: cat})
         }
       }

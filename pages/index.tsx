@@ -89,9 +89,9 @@ const Home = ({ productList = [], categories, certificates = [], companies = [],
         <StyledHeader showSearch={false}/>
         <StyledBanner />
         <CategoryBoxes>
-          <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/search?cat=bathroom'/>
-          <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/search?cat=floors'/>
-          <FrontpageCatBox color='purple' iconImage='PaintBucket' title='Málning' url='/search?cat=paint'/>
+          <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/?cat=Baðherbergi#search'/>
+          <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/?cat=Gólfefni#search'/>
+          <FrontpageCatBox color='purple' iconImage='PaintBucket' title='Málning' url='/?cat=Málningarvörur#search'/>
         </CategoryBoxes>
         <SearchPage 
           products={productList} 

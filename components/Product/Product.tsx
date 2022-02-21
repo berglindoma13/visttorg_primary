@@ -32,7 +32,7 @@ export const Product = ({
   return(
     <Link href={`/product/${productId}`}>
       <StyledProduct className={className}>
-        <StyledFavoritesButton 
+        {/* <StyledFavoritesButton 
           onClick={() => { 
             if(myProducts.includes(productId)){
               dispatch(removeFromFavorites(productId))
@@ -40,7 +40,7 @@ export const Product = ({
               dispatch(addToFavorites(productId))
             }
           }}
-          status={myProducts.includes(productId) ? 'enabled' : 'disabled'} />
+          status={myProducts.includes(productId) ? 'enabled' : 'disabled'} /> */}
         <ProductImage>
           <Image
             src={productimageurl}
@@ -72,6 +72,7 @@ const StyledProduct = styled.div`
   padding: 12px;
   position:relative;
   transition: box-shadow 0.2s ease-in;
+  cursor: pointer;
 
   &:hover{
     box-shadow: 0px 4px 44px 4px rgba(132, 132, 132, 0.55);

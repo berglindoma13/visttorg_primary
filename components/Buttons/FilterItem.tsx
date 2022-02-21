@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { MainButtonText, StyledMainButton } from './MainButton'
+import { MainButtonText } from './MainButton'
+import { Tag } from '../Tag'
 import CloseIcon from '../Svg/Close'
 
 interface FilterItemProps {
@@ -20,28 +21,43 @@ export const FilterItem = ({ text, onClick, active, className }: FilterItemProps
 }
 
 const ModifiedMainButtonText = styled(MainButtonText)`
-  color: ${({ theme }) => theme.colors.green};
+  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 104%;
+  letter-spacing: 0.09em;
+  font-variant: small-caps;
+  color: #000000;
 `
 
 const StyledCloseIcon = styled(CloseIcon)`
   margin-left:13px;
 `
 
-const ModifiedMainButton = styled(StyledMainButton)`
+const ModifiedMainButton = styled.div`
+  background-color: ${({ theme }) => theme.colors.grey_two};
+  border-radius: 999px;
   display:flex;
   flex-direction:row;
-  align-items:center;
+  justify-content: center;
+  align-items: center;
+  padding: 7px 15px 8px;
+  width: fit-content;
+  cursor:pointer;
   height: 40px;
   margin-bottom:15px;
   margin-right:15px;
 
   &:hover{
-    border: 1px solid ${({ theme }) => theme.colors.green};
+    background-color: ${({ theme }) => theme.colors.green};
+
+    ${ModifiedMainButtonText}{
+      color:#fff;
+    }
   }
 
   &.active{
     background-color: ${({ theme }) => theme.colors.green};
-    border: 1px solid ${({ theme }) => theme.colors.green};
 
     ${ModifiedMainButtonText}{
       color: #fff;
