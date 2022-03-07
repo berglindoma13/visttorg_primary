@@ -3,6 +3,7 @@ export interface BykoCertificate {
 }
 
 export interface BykoProduct{
+  id: string
   axId : string,
   prodName : string,
   shortDescription : string,

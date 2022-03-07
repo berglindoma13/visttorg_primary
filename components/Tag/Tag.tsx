@@ -5,7 +5,7 @@ interface TagProps{
   style?: any
   clickable: boolean
   onClick?: () => void
-  children: any 
+  children?: any 
 }
 export const Tag = ({ title, style, clickable, onClick, children }: TagProps) => {
   if(clickable){

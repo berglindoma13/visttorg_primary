@@ -7,6 +7,8 @@ import { CertificateValidator } from '../helpers/CertificateValidator'
 import { Certificate } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
 
+// BYKO COMPANY ID = 1
+
 const prisma = new PrismaClient()
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env"
 
@@ -40,8 +42,13 @@ export const InsertAllBykoProducts = async(req, res) => {
   const bykoData : BykoResponseData = await requestBykoApi(1);
 
   //delete all productcertificates so they wont be duplicated and so they are up to date
-  //TODO - only delete byko productCertificates
-  await prisma.productcertificate.deleteMany({})
+  await prisma.productcertificate.deleteMany({
+    where: {
+      connectedproduct: {
+        companyid: 1
+      }
+    }
+  })
   
   //process all data and insert into database
   await ProcessForDatabase(bykoData)
@@ -70,8 +77,11 @@ export const GetAllCategories = async(req,res) => {
 }
 
 export const DeleteAllProducts = async(req,res) => {
-  await prisma.product.deleteMany({})
-  //TODO - only delete byko products
+  await prisma.product.deleteMany({
+    where: {
+      companyid: 1
+    }
+  })
   res.end("All deleted");
 }
 
@@ -82,9 +92,15 @@ export const DeleteAllCategories = async(req, res) => {
 }
 
 export const DeleteAllProducCertificates = async(req,res) => {
-  //TODO - Only delete byko product certificates
-  await prisma.productcertificate.deleteMany({})
-  res.end("All deleted");
+  await prisma.productcertificate.deleteMany({
+    where: {
+      connectedproduct: {
+        companyid: 1
+      }
+    }
+  })
+  
+  res.end("All Byko product certificates deleted");
 }
 
 const requestBykoApi = async(pageNr : number) => {
@@ -127,7 +143,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 1 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           },
           fileurl : product.epdUrl
         }
@@ -144,7 +160,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 2 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           },
           fileurl : product.fscUrl
         }
@@ -161,7 +177,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 3 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           },
           fileurl : product.vocUrl
         }
@@ -178,7 +194,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 4 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           }
         }
       }).then((prodcert) => {
@@ -194,7 +210,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 5 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           }
         }
       }).then((prodcert) => {
@@ -210,7 +226,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 6 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           }
         }
       }).then((prodcert) => {
@@ -225,7 +241,7 @@ const CreateProductCertificates = async(product : BykoProduct, productValidatedC
             connect : { id : 7 }
           },
           connectedproduct : {
-            connect : { productid : product.axId },
+            connect : { productid : product.id },
           }
         }
       }).then((prodcert) => {
@@ -279,7 +295,6 @@ const getMappedCategory = (category: string) => {
     for (const cat in BykoCategoryMapper) {
       for(const productCategory in categoryList){
         if(BykoCategoryMapper[cat].includes(categoryList[productCategory])){
-          console.log('cat', cat)
           matchedCategory.push({name: cat})
         }
       }
@@ -311,11 +326,11 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
     //add or edit the product in the database
     await prisma.product.upsert({
       where: {
-        productid : product.axId
+        productid : product.id
       },
       update: {
         title: product.prodName,
-        productid : product.axId,
+        productid : product.id,
         sellingcompany: {
           connect: { id : 1}
         },
@@ -326,11 +341,12 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         shortdescription : product.shortDescription,
         productimageurl : `https://byko.is/${product.prodImage}`,
         url : product.url,
-        brand : product.brand
+        brand : product.brand,
+        updatedAt: new Date()
       },
       create: {
         title: product.prodName,
-        productid : product.axId,
+        productid : product.id,
         sellingcompany: {
           connect: { id : 1}
         },
@@ -341,7 +357,8 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         shortdescription : product.shortDescription,
         productimageurl : `https://byko.is/${product.prodImage}`,
         url : product.url,
-        brand : product.brand
+        brand : product.brand,
+        createdAt: new Date()
       }
     })
 

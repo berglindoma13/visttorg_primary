@@ -180,7 +180,7 @@ const Box = styled.div<BoxProps>`
   width:50%;
   min-height: 675px;
   display:flex;
-  flex-direction:row;
+  flex-direction:column;
   justify-content: center;
   align-items: center;
 

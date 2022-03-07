@@ -11,6 +11,7 @@ import { prismaInstance } from '../lib/prisma'
 import BykoCertificateMapper from '../server/mappers/certificates/byko'
 import { SearchPage } from '../components/SearchPage'
 import { Footer } from '../components/Footer'
+import superjson from 'superjson'
 
 export const getStaticProps: GetStaticProps = async () => {
 
@@ -25,7 +26,6 @@ export const getStaticProps: GetStaticProps = async () => {
       }
     },
   });
-
 
   const categories = await prismaInstance.category.findMany()
   const certificates = await prismaInstance.certificate.findMany()
@@ -59,7 +59,9 @@ export const getStaticProps: GetStaticProps = async () => {
   //   companyCounts.push({ name: comp.name, count: filteredList.length})
   // })
 
-  return { props: { productList, categories, certificates, companies }}
+  const productListString = superjson.stringify(productList)
+
+  return { props: { productListString , categories, certificates, companies }}
 }
 
 interface Counter {
@@ -68,7 +70,7 @@ interface Counter {
 }
 
 type HomeProps = {
-  productList: ProductProps[]
+  productListString: string
   categories: Category[]
   certificates : Certificate[]
   companies: Company[]
@@ -76,13 +78,9 @@ type HomeProps = {
   certificateCounts: Array<Counter>
   companyCounts: Array<Counter>
 }
-interface CheckboxProps {
-  keyer : string
-  value : string
-}
 
-const Home = ({ productList = [], categories, certificates = [], companies = [], categoryCounts, certificateCounts, companyCounts } : HomeProps) => {
-  
+const Home = ({ productListString, categories, certificates = [], companies = [], categoryCounts, certificateCounts, companyCounts } : HomeProps) => {
+  const productList: Array<ProductProps> = superjson.parse(productListString)
   return(
     <Page>
       <PageContainer>

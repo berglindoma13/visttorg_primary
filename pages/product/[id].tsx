@@ -17,7 +17,7 @@ import { MainButton, MainButtonText } from "../../components/Buttons"
 import SvanurinnLogoSVG from "../../components/Svg/Logos/Svanurinn"
 import VocLogoSVG from "../../components/Svg/Logos/Voc"
 import { mediaMax } from "../../constants/breakpoints"
-
+import superjson from 'superjson'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
@@ -37,19 +37,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
+  const uniqueProductString = superjson.stringify(uniqueProduct)
+
   return {
     props: {
       id,
-      product: uniqueProduct
+      productString: uniqueProductString
     },
   }
 }
 
 interface ProductPageProps{
-  product: ProductProps
+  productString: string
 }
 
-const Product = ({ product} : ProductPageProps) => {
+const Product = ({ productString } : ProductPageProps) => {
+  
+  const product: ProductProps = superjson.parse(productString)
 
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
@@ -129,7 +133,7 @@ const Product = ({ product} : ProductPageProps) => {
             )}
           </ProductInfoLeft>
           <ProductInfoRight style={{ marginRight: 160 }}>
-            <Tag title={product.brand} style={{marginBottom: 8}}/>
+            <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>
             <Heading1 style={{marginTop: 23, marginBottom: 70 }}>{product.title}</Heading1> 
               <div style={{display:'flex'}}>
                 <div style={{flex:1}}>
@@ -137,7 +141,7 @@ const Product = ({ product} : ProductPageProps) => {
                   <ProductCategories>
                     {product.categories.map((category : Category, index : number) => {
                       return (
-                        <Tag key={index} title={category.name} style={{marginBottom: 8}} />
+                        <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={false} />
                       )
                     })}
                   </ProductCategories>
@@ -163,7 +167,7 @@ const Product = ({ product} : ProductPageProps) => {
               return (
                 <SingleCertificateItem key={index}>
                   {getCertImage(certificate.certificate.name)}
-                  <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} />
+                  <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} clickable={false} />
                 </SingleCertificateItem>
               )
             })}

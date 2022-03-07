@@ -4,6 +4,7 @@ import { prismaInstance } from '../lib/prisma'
 import { ProductProps } from '../types/products';
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { addToFavorites, getFavorites } from '../app/features/favorites/favoriteSlice'
+import superjson from 'superjson'
 
 export const getStaticProps: GetStaticProps = async () => {
 
@@ -19,15 +20,17 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   });
 
+  const productListString = superjson.stringify(productList)
 
-  return { props: { productList }}
+  return { props: { productListString }}
 }
 
 interface MyFavoritesProps {
-  productList: ProductProps[]
+  productListString: string
 }
 
-const MyFavorites = ({ productList }: MyFavoritesProps) => {
+const MyFavorites = ({ productListString }: MyFavoritesProps) => {
+  const productList: Array<ProductProps> = superjson.parse(productListString)
 
   const myProducts = useAppSelector((state) => state.favorites.products)
   const dispatch = useAppDispatch()

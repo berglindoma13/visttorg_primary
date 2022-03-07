@@ -110,7 +110,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
       const results = SearchProducts({
         fuseInstance, 
         query, 
-        activeCategories: filters.categories, 
+        activeCategories: filters.categories,
         activeCertificates: filters.certificates, 
         activeCompanies: filters.companies
       })
@@ -303,14 +303,6 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
           <FilterGroup>
             <FilterGroupTitle>Flokkar</FilterGroupTitle>
             <FilterItems>
-              <FilterItem 
-                key='Burðavirki'
-                text='Burðavirki' 
-                onClick={() => {
-                  toggleFilters('categories', 'Burðavirki')
-                }} 
-                active={filters.categories.includes('Burðavirki')}
-              />
               <FilterItem 
                 key='Burðavirki'
                 text='Burðavirki' 

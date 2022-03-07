@@ -72,6 +72,7 @@ const BoxWrapper = styled.div<BoxWrapperProps>`
   flex-direction:column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 
   @media ${mediaMax.tablet}{
     width: 270px;

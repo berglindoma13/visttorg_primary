@@ -14,6 +14,7 @@ import { Star } from '../components/Svg/Star'
 import Fuse from 'fuse.js'
 import { SearchProducts } from "../utils/Search"
 import { useRouter } from "next/router"
+import superjson from 'superjson'
 
 export const getStaticProps: GetStaticProps = async () => {
 
@@ -61,7 +62,9 @@ export const getStaticProps: GetStaticProps = async () => {
     companyCounts.push({ name: comp.name, count: filteredList.length})
   })
 
-  return { props: { productList, categories, certificates, companies, categoryCounts, certificateCounts, companyCounts }}
+  const productListString = superjson.stringify(productList)
+
+  return { props: { productListString, categories, certificates, companies, categoryCounts, certificateCounts, companyCounts }}
 }
 
 interface Counter {
@@ -70,7 +73,7 @@ interface Counter {
 }
 
 type HomeProps = {
-  productList: ProductProps[]
+  productListString: string
   categories: Category[]
   certificates : Certificate[]
   companies: Company[]
@@ -83,7 +86,8 @@ interface CheckboxProps {
   value : string
 }
 
-const Home = ({ productList, categories, certificates, companies, categoryCounts, certificateCounts, companyCounts } : HomeProps) => {
+const Home = ({ productListString, categories, certificates, companies, categoryCounts, certificateCounts, companyCounts } : HomeProps) => {
+  const productList: Array<ProductProps> = superjson.parse(productListString)
   const [query, setQuery] = useState("");
   const [filteredList, setFilteredList] = useState<Fuse.FuseResult<ProductProps>[]>([])
   const [activeCategories, setActiveCategories] = useState<Array<string>>([])
@@ -167,7 +171,6 @@ const Home = ({ productList, categories, certificates, companies, categoryCounts
   },[])
 
   useEffect(() => {
-    console.log('running this')
     if(!query && activeCategories.length === 0 && activeCertificates.length === 0 && activeCompanies.length === 0){
       const resultProducts: Fuse.FuseResult<ProductProps>[] = productList.map((product, index) => {
         return { item : product, refIndex: index, score: 1}

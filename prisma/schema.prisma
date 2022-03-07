@@ -32,6 +32,8 @@ model product {
   certificates     productcertificate[]
   // myProducts       myProducts[]
   approved        Boolean?
+  createdAt       DateTime?
+  updatedAt       DateTime?
 }
 
 model productcertificate {
