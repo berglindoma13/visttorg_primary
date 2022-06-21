@@ -12,7 +12,7 @@ function routes(app : any) {
   app.get('/api/byko/deleteall/productcertificates', DeleteAllProducCertificates);
   app.get('/api/byko/getallcategories', GetAllCategories);
 
-  app.post('/api/product/add', fileUpload)
+  // app.post('/api/product/add', fileUpload)
 
   return router;
 };  

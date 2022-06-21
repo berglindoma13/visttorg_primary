@@ -3,9 +3,8 @@ import { GetStaticProps } from "next"
 import styled from 'styled-components'
 import { prismaInstance } from '../lib/prisma'
 import { ProductProps, Category, Company } from '../types/products'
-import { Certificate, ProductCertificate } from '../types/certificates'
+import { Certificate } from '../types/certificates'
 import Head from 'next/head'
-import Checkboxes from '../components/Inputs/Checkbox/Checkbox'
 import BykoCertificateMapper from '../server/mappers/certificates/byko'
 import { mediaMax } from '../constants/breakpoints'
 import { motion, useAnimation } from "framer-motion"
