@@ -89,7 +89,7 @@ const Home = ({ productListString, categories, certificates = [], companies = []
       <PageContainer>
         <StyledHeader showSearch={false}/>
         <StyledBanner />
-        <SplitBoxes>
+        {/* <SplitBoxes>
           <SmallerBox color={theme.colors.green}>
             <FakeH1>
               Verkefnið er styrkt af
@@ -103,7 +103,7 @@ const Home = ({ productListString, categories, certificates = [], companies = []
               Ask Mannvirkjarannsóknarsjóð
             </Heading3>
           </Box>
-        </SplitBoxes>
+        </SplitBoxes> */}
         <CategoryBoxes>
           <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/?cat=Baðherbergi#search'/>
           <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/?cat=Gólfefni#search'/>
