@@ -11,7 +11,7 @@ export const Banner = (props) => {
     <HeaderWrapper {...props}>
       <HeaderLeftContent>
         <StyledHeading1>Við spörum þér leitina</StyledHeading1>
-        <StyledHeading4>Umhverfisvottaðar byggingarvörur á einum stað</StyledHeading4>
+        <StyledHeading4>Umhverfisvænar byggingarvörur á einum stað</StyledHeading4>
         <FakeInputWrapper>
           <StyledMagnifyingGlass />
           <FakeTextInputButton href='#search'>
