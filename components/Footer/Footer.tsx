@@ -15,7 +15,7 @@ export const Footer = () => {
         <BottomContent>
           <BottomContentLeft>2021©</BottomContentLeft>
           <BottomContentRight>
-            <a href='https://www.facebook.com/Visttorg' target='_blank'><FacebookIcon /></a>
+            <a href='https://www.facebook.com/Vistbok' target='_blank'><FacebookIcon /></a>
           </BottomContentRight>
         </BottomContent>
       </FooterContent>

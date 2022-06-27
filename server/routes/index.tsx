@@ -20,6 +20,7 @@ function routes(app : any) {
   // app.get('/api/testnewindatabase', ProcessNewInDatabase)
   
   app.post('/api/product/add', fileUpload)
+  // app.post('/api/product/add', fileUpload)
 
   return router;
 };  

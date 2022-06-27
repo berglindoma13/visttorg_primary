@@ -41,6 +41,7 @@ export const Product = ({
             }
           }}
           status={myProducts.includes(productId) ? 'enabled' : 'disabled'} /> */}
+        {productimageurl && 
         <ProductImage>
           <Image
             src={productimageurl}
@@ -48,7 +49,7 @@ export const Product = ({
             layout='fill'
             objectFit='contain'
           />
-        </ProductImage>
+        </ProductImage>}
         <ProductDetails>
           <ProductCompany>{sellingcompany}</ProductCompany>
           <ProductTitle>{title}</ProductTitle>

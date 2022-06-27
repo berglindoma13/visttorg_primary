@@ -203,7 +203,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
       </div>
       <StyledTitle>Taktu grænni skref</StyledTitle>
       <StyledInput 
-        placeholder='Leitaðu eftir nafni vöru' 
+        placeholder='Leitaðu eftir vöru' 
         onChange={(input) => {
           setQuery(input.target.value)
         }}

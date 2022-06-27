@@ -26,7 +26,7 @@ const UmOkkur = () => {
             <ImageWrapperSmall>
               <Image 
                 src={PaintBucket} 
-                alt='Paint bucket icon' 
+                alt='Paint bucket icon'
                 layout="fill"
                 objectFit='contain'
               />
@@ -46,7 +46,7 @@ const UmOkkur = () => {
           </SmallerBox>
           <Box color="transparent">
             <Heading4>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+              Umhverfisvottanir eru staðfestingar á því að ströngum og skýrum kröfum um gæði og umhverfisþætti hefur verið fylgt í framleiðsluferli byggingarvöru. Í sumum vottunum er einnig komið í veg fyrir að varan hafi skaðleg áhrif á heilsu íbúa mannvirkis og enn aðrar vottanir gefa til kynna umhverfisáhrif yfir líftíma vörunnar.
             </Heading4>
           </Box>
         </SplitBoxes>
@@ -163,7 +163,6 @@ const SmallerBox = styled.div`
   flex-direction:row;
   justify-content: center;
   align-items: center;
-
   >*{
     max-width: 60%;
   }
