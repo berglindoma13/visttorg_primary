@@ -14,6 +14,8 @@ function routes(app : any) {
 
   // app.post('/api/product/add', fileUpload)
 
+  // app.get('api/egs/importfile', bla)
+
   return router;
 };  
 

@@ -13,7 +13,7 @@ const prisma = new PrismaClient()
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env"
 
 const mockProduct = {
-  id: '200907',
+  id: '12345',
   axId: '',
   retailer: 'BYKO',
   brand: 'Önnur vörumerki',
@@ -65,7 +65,44 @@ export const InsertAllBykoProducts = async(req, res) => {
 };
 
 export const TestProduct = async(req, res) => {
-  await UpsertProductInDatabase(mockProduct)
+  // await UpsertProductInDatabase(mockProduct)
+
+  const products = await prisma.product.findMany({
+    where:{ productid : "12345" },
+    include: {
+      sellingcompany: true,
+      categories : true,
+      certificates: {
+        include: {
+          certificate : true
+        }
+      }
+    },
+  });
+
+  const certs = await prisma.productcertificate.findFirst({
+    where: {
+      productid: "12345"
+    }
+  })
+
+  console.log('certs', certs)
+  const allProducts = await prisma.product.findMany({
+    where:{ productid : mockProduct.id },
+    include: {
+      sellingcompany: true,
+      categories : true,
+      certificates: {
+        include: {
+          certificate : true
+        }
+      }
+    },
+  });
+  console.log('products', products)
+  console.log('allProducts', allProducts)
+
+
   return res.end('WHOOP')
 }
 
@@ -342,7 +379,7 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         productimageurl : `https://byko.is/${product.prodImage}`,
         url : product.url,
         brand : product.brand,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       create: {
         title: product.prodName,
@@ -358,7 +395,8 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         productimageurl : `https://byko.is/${product.prodImage}`,
         url : product.url,
         brand : product.brand,
-        createdAt: new Date()
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     })
 
