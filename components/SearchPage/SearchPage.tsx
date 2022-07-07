@@ -15,10 +15,13 @@ import { useRouter } from 'next/router'
 import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
 import Close from '../Svg/Close'
 import certificateMapper from '../../mappers/certificates'
+
 interface SearchPageProps{
   products: Array<ProductProps>
   certificates : Array<Certificate>
   companies: Array<Company>
+  companyCounts: Array<Counter>
+  certificateCounts: Array<Counter>
 }
 
 interface FilterProps{
@@ -28,7 +31,12 @@ interface FilterProps{
   categories: Array<string>
 }
 
-export const SearchPage = ({ products = [], certificates, companies }: SearchPageProps) => {
+interface Counter {
+  name: string
+  count: number
+}
+
+export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {
   const [query, setQuery] = useState("");
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
   
@@ -67,7 +75,21 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
       'categories.name',
       'certificates.certificate.name'],
   }
-  
+
+  const flokkar = [
+    {name: "Burðavirki", items: ["Húsgögn", "Heimilistæki"]},
+    {name: "Loftaefni", items: ["Veggir", "Málningarvörur"]},
+    {name: "Hurðir", items: ["hur1", "hur2", "hur3"]},
+    {name: "Lagnir", items: ["lag", "lag2", "lag3"]},
+    {name: "Textíll", items: ["tex1", "tex2", "tex3"]},
+    {name: "Lyftur", items: ["lyf1", "lyf2", "lyf3"]},
+    {name: "Öryggi og merkingar", items: ["öry1", "öry2", "öry3"]},
+    {name: "Vélbúnaður", items: ["Heimilistæki", "Húsgögn"]},
+    // {name: "Húsgögn", items: ["hús1", "hús2", "hús3"]},
+    // {name: "Heimilistæki", items: ["hei1", "hei2", "hei3"]},
+    // {name: "Veggir", items: ["veg1", "veg2", "veg3"]},
+    // {name: "Málningarvörur", items: ["mál1", "mál2", "mál3"]}
+  ]
 
   const fuseInstance = new Fuse(products, options)
 
@@ -111,6 +133,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
         fuseInstance, 
         query, 
         activeCategories: filters.categories,
+        // activeCategories: ["Burðavirki"],
         activeCertificates: filters.certificates, 
         activeCompanies: filters.companies
       })
@@ -137,6 +160,24 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
   const onChangePagination = (number: number) => {
     setPaginationNumber(number)
     router.push(`/?page=${number}`, undefined, { shallow: true })
+  }
+
+  const getCompanyCounts = (comp) => { var val = 0
+    companyCounts.map(compcount => { 
+      if(compcount.name === comp) {
+        val = compcount.count
+      }
+    })
+    return val
+  }
+
+  const getCertificateCounts = (cert) => { var val = 0
+    certificateCounts.map(certcount => {
+      if(certcount.name === cert) {
+        val = certcount.count
+      }
+    })
+    return val
   }
 
   //Framer motion controls for showing and hiding filter drawer
@@ -271,14 +312,18 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
             <FilterItems>
               {companies.map(company => {
                 return(
+                  <>
+                  {/* {console.log(companyNumberList.name == company.name)} */}
                   <FilterItem 
                     key={company.id}
-                    text={company.name} 
+                    text={company.name}
+                    num={getCompanyCounts(company.name)} 
                     onClick={() => {
                       toggleFilters('companies', company.name)
                     }} 
                     active={filters.companies.includes(company.name)} 
                   />
+                  </>
                 )
               })}
             </FilterItems>
@@ -291,6 +336,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
                   <FilterItem 
                     key={certificate.id}
                     text={certificateMapper[certificate.name]} 
+                    num={getCertificateCounts(certificate.name)} 
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
                     }} 
@@ -300,7 +346,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
               })}
             </FilterItems>
           </FilterGroup>
-          <FilterGroup>
+          {/* <FilterGroup>
             <FilterGroupTitle>Flokkar</FilterGroupTitle>
             <FilterItems>
               <FilterItem 
@@ -400,9 +446,211 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
                 active={filters.categories.includes('Málningarvörur')} 
               />
             </FilterItems>
+          </FilterGroup> */}
+          <FilterGroup>
+            <FilterGroupTitle>Flokkar</FilterGroupTitle>
+            <FilterItems>
+              {flokkar.map(item => {
+                return(
+                  <>
+                  <FilterItem 
+                    key={item.name}
+                    text={item.name} 
+                    onClick={() => {
+                      toggleFilters('categories', item.name)
+                    }} 
+                    active={filters.categories.includes(item.name)}
+                  />
+                  {/* {filters.categories.includes(item.name) && 
+                    flokkar[0].things.map(item => {
+                      return(
+                        <>bla</>
+                      )
+                    })
+                  } */}
+                  </>
+                )
+              })}
+            </FilterItems>
+          </FilterGroup>
+          <FilterGroup>
+            { filters.categories.length !== 0 && <>
+            <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
+            <FilterItems>
+              {filters.categories.includes("Burðavirki") &&
+                flokkar[0].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Loftaefni") &&
+                flokkar[1].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Hurðir") &&
+                flokkar[2].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Lagnir") &&
+                flokkar[3].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Textíll") &&
+                flokkar[4].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Lyftur") &&
+                flokkar[5].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Öryggi og merkingar") &&
+                flokkar[6].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Vélbúnaður") &&
+                flokkar[7].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {/* {filters.categories.includes("Húsgögn") &&
+                flokkar[8].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              }
+              {filters.categories.includes("Heimilistæki") &&
+                flokkar[9].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                }) 
+              }
+              {filters.categories.includes("Veggir") &&
+                flokkar[10].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                }) 
+              }
+              {filters.categories.includes("Málningarvörur") &&
+                flokkar[11].items.map(item => {
+                  return(
+                    <FilterItem 
+                      key={item}
+                      text={item} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.includes(item)}
+                    />
+                  )
+                })
+              } */}
+            </FilterItems>
+            </>}
           </FilterGroup>
         </FilterWrapper>
         <ProductList>
+          {filteredProductList.length === 0 && <NoResults>Engar vörur fundust</NoResults>}
           {filteredProductList.map((product, index) => {
             if(index >= (paginationNumber - 1) * paginationPageSize && index < paginationNumber * paginationPageSize){
               const thisProduct = product.item
@@ -422,13 +670,14 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
           })}
         </ProductList>
       </ProductsAndFilter>
+      {filteredProductList.length !== 0 &&
       <Pagination 
         currentPage={paginationNumber}
         setCurrentPage={onChangePagination}
         queryParamName='productPage'
         total={filteredProductList.length}
         pageSize={paginationPageSize}
-      />
+      />}
     </SearchPageContainer>
   )
 }
@@ -579,4 +828,11 @@ const CategoryFilters = styled.div`
     height: 117px;
     
   }
+`
+const NoResults = styled.div`
+  width: 100%;
+  font-size: max(1.52vw, 22px);
+  text-align: center;
+  padding-top: 20px;
+  color: black;
 `

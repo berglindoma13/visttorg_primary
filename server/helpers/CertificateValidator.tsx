@@ -5,9 +5,10 @@ interface CertificateValidatorProps {
   epdUrl?: string
   fscUrl?: string
   vocUrl?: string
+  ceUrl?: string
 }
 
-export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl } : CertificateValidatorProps) : Array<Certificate> => {
+export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl } : CertificateValidatorProps) : Array<Certificate> => {
 
   const ValidCertificates: Array<Certificate> = []
 
@@ -34,6 +35,12 @@ export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl } : 
       case 'BLENGILL':
         ValidCertificates.push({ name: 'BLENGILL'})
         break;
+      case 'EV':
+        ValidCertificates.push({ name: 'EV'})
+        break;
+      case 'CE':
+          if(!!ceUrl){ValidCertificates.push({ name: 'CE'})}
+          break;
       default:
         break;
     }

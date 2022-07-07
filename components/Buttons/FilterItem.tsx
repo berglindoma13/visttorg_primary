@@ -6,15 +6,17 @@ import CloseIcon from '../Svg/Close'
 
 interface FilterItemProps {
   text: string
+  num?: number 
   onClick: () => void
   active: boolean
   className?: string
 }
 
-export const FilterItem = ({ text, onClick, active, className }: FilterItemProps) => {
+export const FilterItem = ({ text, num, onClick, active, className }: FilterItemProps) => {
   return (
     <ModifiedMainButton onClick={onClick} className={[active ? 'active': '', className]}>
-      <ModifiedMainButtonText>{text}</ModifiedMainButtonText>
+      {num === undefined ? <ModifiedMainButtonText>{text}</ModifiedMainButtonText> 
+        : <ModifiedMainButtonText>{text} ({num})</ModifiedMainButtonText> }
       {active && <StyledCloseIcon fill='#fff' width='10px' height='10px'/>}
     </ModifiedMainButton>
   )

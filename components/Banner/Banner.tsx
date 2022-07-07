@@ -2,7 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import MagnifyingGlass from '../Svg/MagnifyingGlass'
 import { Heading1, Heading4 } from '../Typography'
-import EarthImage from '../../public/Earth.png'
+// import EarthImage from '../../public/Earth.png'
+import EarthImage from '../../public/Earth.svg'
 import Image from 'next/image'
 import { mediaMax } from '../../constants/breakpoints'
 
@@ -15,7 +16,7 @@ export const Banner = (props) => {
         <FakeInputWrapper>
           <StyledMagnifyingGlass />
           <FakeTextInputButton href='#search'>
-            <FakeTextInputText>Leita eftir nafni vöru</FakeTextInputText>
+            <FakeTextInputText>Leita eftir vöru</FakeTextInputText>
           </FakeTextInputButton>
         </FakeInputWrapper>
       </HeaderLeftContent>

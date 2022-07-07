@@ -358,7 +358,8 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         productimageurl : `https://byko.is/${product.prodImage}`,
         url : product.url,
         brand : product.brand,
-        createdAt: new Date() // updatedAt líka hér held að begga hafi gert það
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     })
 

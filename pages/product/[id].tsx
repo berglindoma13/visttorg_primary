@@ -73,6 +73,12 @@ const Product = ({ productString } : ProductPageProps) => {
         return <CertImageWrapper><VocLogoSVG /></CertImageWrapper>
       case 'SV_ALLOWED':
         return <CertImageWrapper><Image src='/leyfilegt-svansvottad.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+      case 'EV':
+        return <CertImageWrapper><Image src='/Euroblume_logo.svg.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+      case 'CE':
+        return <CertImageWrapper><Image src='/ce_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+      case 'BLENGILL':
+        return <CertImageWrapper><Image src='/blue_angel_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
     }
   }
 
@@ -152,12 +158,16 @@ const Product = ({ productString } : ProductPageProps) => {
                   </div>
                 }
               </div>
-              <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description}</Heading4>
-              <MainButton 
-                text={product.sellingcompany.name} 
-                isLink
-                href={product.url}
-              />
+              <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description.replace(/<[^>]+>/g, '')}</Heading4>
+              {console.log("product url", product.url)}
+              {product.url && <>
+                <UIBig style={{ marginBottom: 15 }}>Sjá vöru á vef</UIBig>
+                <MainButton
+                  text={product.sellingcompany.name + ".is"}
+                  isLink
+                  href={product.url}
+                />
+              </>}
           </ProductInfoRight>
         </ProductInfo>
         <ProductCertifications>
