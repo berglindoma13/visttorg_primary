@@ -40,7 +40,6 @@ const mockProduct = {
 
 export const InsertAllBykoProducts = async(req, res) => {
   const bykoData : BykoResponseData = await requestBykoApi(1);
-
   //delete all productcertificates so they wont be duplicated and so they are up to date
   await prisma.productcertificate.deleteMany({
     where: {
@@ -366,6 +365,7 @@ const UpsertProductInDatabase = async(product : BykoProduct) => {
         productid : product.id
       },
       update: {
+        // approved = false
         title: product.prodName,
         productid : product.id,
         sellingcompany: {

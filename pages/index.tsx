@@ -29,7 +29,7 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   });
 
-  
+  console.log(productList)
 
   const categories = await prismaInstance.category.findMany()
   const certificates = await prismaInstance.certificate.findMany()
