@@ -5,10 +5,11 @@ interface SearchProductsProps {
   fuseInstance: Fuse<ProductProps>
   query?: string
   activeCategories?: Array<string>
+  activeSubCategories?: Array<string>
   activeCertificates?: Array<string>
   activeCompanies?: Array<string>
 }
-export const SearchProducts = ({ fuseInstance, query, activeCategories, activeCertificates, activeCompanies} : SearchProductsProps) => {
+export const SearchProducts = ({ fuseInstance, query, activeCategories, activeSubCategories, activeCertificates, activeCompanies} : SearchProductsProps) => {
 
   let queryMaker = { $and : []}
 
@@ -18,7 +19,16 @@ export const SearchProducts = ({ fuseInstance, query, activeCategories, activeCe
     })
   }
 
-  if(activeCategories.length > 0 ){
+  if(activeSubCategories.length > 0){
+    const categoriesOrLogic = activeSubCategories.map(category =>  {
+      return { 'categories.name': category}
+    })
+
+    queryMaker.$and.push({
+      $or: categoriesOrLogic
+    })
+  }
+  else if(activeCategories.length > 0 ){
     const categoriesOrLogic = activeCategories.map(category =>  {
       return { 'categories.name': category}
     })
