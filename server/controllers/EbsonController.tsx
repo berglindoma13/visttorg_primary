@@ -68,22 +68,22 @@ export const DeleteAllSheetsCert = async(req,res) => {
 
 const createdProductsFile = async(product : Array<object>) => {
     // write product info of created products to file (and send an email to employee)
-    fs.writeFile("createdProductsFile.txt", JSON.stringify(product))
+    fs.writeFile("createdProductsFileEbson.txt", JSON.stringify(product))
 }
 
 const updatedProductsFile = async(product : Array<object>) => {
     // write product info of updated products to file (and send an email to employee)
-    fs.writeFile("updatedProductsFile.txt", JSON.stringify(product))
+    fs.writeFile("updatedProductsFileEbson.txt", JSON.stringify(product))
 }
 
 const productsNoLongerComingInFile = async(nolonger) => {
     // write product info of products no longer coming into the database (and send email to company)
-    fs.writeFile("nolonger.txt", JSON.stringify(nolonger))
+    fs.writeFile("nolongerEbson.txt", JSON.stringify(nolonger))
 }
 
 const productsNoLongerValid = async(notValid) => {
     // write product info of products no longer coming into the database (and send email to company)
-    fs.writeFile("notValidAnymore.txt", JSON.stringify(notValid))
+    fs.writeFile("notValidAnymoreEbson.txt", JSON.stringify(notValid))
 }
 
 const DeleteAllSheetsProductCertificates = async(id) => {
@@ -95,14 +95,13 @@ const DeleteAllSheetsProductCertificates = async(id) => {
         productid : id 
       }
     })
-    // res.end("All sheets product certificates deleted");
 }
 
 // gets all products from online sheets file
 const getProducts = () => {
     const options = {
-        apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg',
-        sheetId: '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ',
+        apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg', //google api key in testProject console
+        sheetId: '1SFHaI8ZqPUrQU3LLgCsrLBUtk4vzyl6_FQ02nm6XehI',
         returnAllResults: false,
     };
 
@@ -133,7 +132,6 @@ const getProducts = () => {
                         ]
                     }
                 allprod.push(temp_prod)
-            // check if product is in the database or not
         }
         // process for database
         ProcessForDatabase(allprod);
@@ -308,59 +306,59 @@ const UpsertProductInDatabase = async(product : result, approved : boolean) => {
         return;
     }
 
-     validatedCertificates.map( (cert) => {
-        if (cert.name === "EPD") {
-            const ble = ValidDate({epdUrl: product.epdUrl})
-        }
-        if (cert.name === "FSC") {
-            // bua til nytt valid date fall fyrir fsc
-            // const ble = ValidDate({epdUrl: product.epdUrl})
-        }
-        if (cert.name === "VOC") {
-            // bua til nytt valid date fall fyrir voc
-            // const ble = ValidDate({epdUrl: product.epdUrl})
-        }
+    validatedCertificates.map( (cert) => {
+      if (cert.name === "EPD") {
+        const ble = ValidDate({epdUrl: product.epdUrl})
+      }
+      if (cert.name === "FSC") {
+        // bua til nytt valid date fall fyrir fsc
+        // const ble = ValidDate({epdUrl: product.epdUrl})
+      }
+      if (cert.name === "VOC") {
+        // bua til nytt valid date fall fyrir voc
+        // const ble = ValidDate({epdUrl: product.epdUrl})
+      }
     })
 
     await prisma.product.upsert({
-        where: {
-          productid : product.id
+      where: {
+        productid : product.id
+      },
+      update: {
+        approved: approved,
+        title: product.prodName,
+        productid : product.id,
+        sellingcompany: {
+          connect: { id : 3}
         },
-        update: {
-          approved: approved,
-          title: product.prodName,
-          productid : product.id,
-          sellingcompany: {
-            connect: { id : 3}
-          },
-          categories : {
-            connect: { name : product.fl}
-          },
-          description : product.longDescription,
-          shortdescription : product.shortDescription,
-          productimageurl : product.prodImage,
-          url : product.url,
-          brand : product.brand,
-          updatedAt: new Date()
+        categories : {
+          connect: { name : product.fl}
         },
-        create: {
-          title: product.prodName,
-          productid : product.id,
-          sellingcompany: {
-            connect: { id : 3}
-          },
-          categories : {
-            connect: { name : product.fl}
-          },
-          description : product.longDescription,
-          shortdescription : product.shortDescription,
-          productimageurl : product.prodImage,
-          url : product.url,
-          brand : product.brand,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      })
+        description : product.longDescription,
+        shortdescription : product.shortDescription,
+        productimageurl : product.prodImage,
+        url : product.url,
+        brand : product.brand,
+        updatedAt: new Date()
+      },
+      create: {
+        title: product.prodName,
+        productid : product.id,
+        sellingcompany: {
+          connect: { id : 3}
+        },
+        categories : {
+          connect: { name : product.fl}
+        },
+        description : product.longDescription,
+        shortdescription : product.shortDescription,
+        productimageurl : product.prodImage,
+        url : product.url,
+        brand : product.brand,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
     
     await CreateProductCertificates(product, validatedCertificates)
 }
@@ -383,7 +381,6 @@ const isProductListFound = async(products : Array<result>) => {
             }
         }
         if (found == false) {
-            console.log("ekki inni")
             nolonger.push(currprods[i])
         }
     }
@@ -396,18 +393,7 @@ const ProcessForDatabase = async(products : Array<result>) => {
 
     var created : Array<object> = [];
     var updated : Array<object> = [];
-    // products.map(async(product) => {
-    //   const prod = await prisma.product.findUnique({
-    //     where : {productid: products[i].id},
-    //     include : {certificates: {
-    //         include: {
-    //           certificate : true
-    //         }
-    //       }}
-    //   })
-    //   var approved : boolean = true;
 
-    // })
     for(var i = 0; i < products.length; i++) {
         const prod = await prisma.product.findUnique({
             where : {productid: products[i].id},

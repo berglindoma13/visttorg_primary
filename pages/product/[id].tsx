@@ -177,7 +177,8 @@ const Product = ({ productString } : ProductPageProps) => {
               return (
                 <SingleCertificateItem key={index}>
                   {getCertImage(certificate.certificate.name)}
-                  <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} clickable={false} />
+                  {/* <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} clickable={false} /> */}
+                  {/* <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} clickable={false} /> */}
                 </SingleCertificateItem>
               )
             })}
@@ -194,7 +195,7 @@ export default Product
 const CertImageWrapper = styled.div`
   position: relative;
   height: 80px;
-  width: 100%;
+  width: 100px;
   display:flex;
   flex-direction: row;
   justify-content: center;

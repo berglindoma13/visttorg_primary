@@ -44,7 +44,7 @@ export const getStaticProps: GetStaticProps = async () => {
       products: true
     }
   })
-  console.log(companies)
+  // console.log(companies)
 
   // const bykoproductList = await prismaInstance.product.findMany({
   //   where: {

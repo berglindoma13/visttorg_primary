@@ -43,7 +43,7 @@ model productcertificate {
   fileurl          String?
   productid        String
   connectedproduct product    @relation(fields: [productid], references: [productid])
-  // validDate      DateTime?
+  validDate        DateTime?
 }
 
 model certificate {
