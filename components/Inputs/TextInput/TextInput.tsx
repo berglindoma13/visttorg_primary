@@ -18,9 +18,9 @@ export const TextInput = ({ placeholder, onSubmit, className, onChange, value }:
   }
   
   return(
-    <InputWrapper className={className} onChange={onChange}>
+    <InputWrapper className={className}>
       <StyledMagnifyingGlass />
-      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} />
+      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} onChange={onChange}/>
     </InputWrapper>
   )
 }

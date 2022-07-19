@@ -115,6 +115,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   //Initialize filteredProductList as all products
   useEffect(() => {
     resetFilteredProductList()
+
+    //Initalize the sessionStorage items for the filtering if any, when coming back after pressing on a product card
+    getSessionStorageItems()
   }, [])
   
   //This checks the pagination status and updates current status
@@ -136,6 +139,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   useEffect(() => {
      //Reset pagination 
      onChangePagination(1)
+
+     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
+     setSessionStorageItems()
 
     //if no filters are active, then show all products
     if(!query && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
@@ -203,6 +209,34 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       }
     })
     return val
+  }
+
+  const setSessionStorageItems = () => {
+    sessionStorage.setItem('level1Filters', JSON.stringify(filters))
+    sessionStorage.setItem('level2Filters', '')
+    sessionStorage.setItem('queryParam', query)
+  }
+
+  const getSessionStorageItems = () => {
+    const level1Filters = sessionStorage.getItem('level1Filters')
+    const level2Filters = sessionStorage.getItem('level2Filters')
+    const queryFilter = sessionStorage.getItem('queryParam')
+
+    //Scroll to searchPage if any sessionItems are present and open the filterBar
+    if(!!level1Filters || !!level2Filters || queryFilter){
+      document.getElementById("search").scrollIntoView();
+      setFilterDrawerIsActive(true)
+    }
+
+    if(!!level1Filters){
+      setFilters(JSON.parse(level1Filters))
+    }
+    if(!!level2Filters){
+      // setFilters(JSON.parse(level2Filters))
+    }
+    if(!!queryFilter){
+      setQuery(queryFilter)
+    }
   }
 
   const getCertificateCounts = (cert) => { var val = 0
@@ -293,7 +327,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         {VisttorgCategories.map(cat => {
           if(cat.weight == 1) {
             return(
-              <StyledMainButton 
+              <StyledMainButton
+                key={cat.name}
                 text={cat.name}
                 onClick={() => {
                   toggleFilters('categories', cat)
@@ -317,8 +352,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterItems>
               {companies.map(company => {
                 return(
-                  <>
-                  {/* {console.log(companyNumberList.name == company.name)} */}
                   <FilterItem 
                     key={company.id}
                     text={company.name}
@@ -328,7 +361,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                     }} 
                     active={filters.companies.includes(company.name)} 
                   />
-                  </>
                 )
               })}
             </FilterItems>
