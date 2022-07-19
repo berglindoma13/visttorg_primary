@@ -56,7 +56,7 @@ const StyledTextInput = styled.input`
   border-radius: 999px;
   border:none;
   outline:none;
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 14px;
   line-height: 104%;
@@ -64,7 +64,7 @@ const StyledTextInput = styled.input`
   color: ${({ theme }) => theme.colors.grey_five};
 
   &::placeholder{
-    font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+    font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
     font-weight: 600;
     font-size: 14px;
     line-height: 104%;

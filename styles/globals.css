@@ -16,32 +16,24 @@ a {
 }
 
 body #nprogress .bar {
-	background: white;
+	background: #3C6F72;
+	height: 5px;
 }  
 
+#nprogress .peg {
+  display: none !important;
+}
+
 body #nprogress .spinner-icon {
-	border-top-color: white;
-  border-left-color: white;
+	border-top-color: #3C6F72;
+  border-left-color: #21333B;
+
 }
 
 @font-face {
-	font-family : 'Roboto';
-	src: url('/fonts/Roboto/Roboto-Regular.ttf');
+	font-family : 'GT';
+	src: url('/fonts/GT_Walsheim/GT-Walsheim-Medium.ttf');
 	font-weight:normal;
-	font-style:normal;
-	font-display:swap;
-}
-@font-face {
-	font-family : 'Roboto';
-	src: url('/fonts/Roboto/Roboto-Bold.ttf');
-	font-weight:bold;
-	font-style:normal;
-	font-display:swap;
-}
-@font-face {
-	font-family : 'Roboto';
-	src: url('/fonts/Roboto/Roboto-Light.ttf');
-	font-weight:300;
 	font-style:normal;
 	font-display:swap;
 }

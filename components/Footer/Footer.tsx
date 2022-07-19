@@ -1,35 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { mediaMax } from '../../constants/breakpoints'
+import { TextInput } from '../Inputs'
 import FacebookIcon from '../Svg/Facebook'
-import { Heading5 } from '../Typography'
-// import { fire } from 'firebase/app'
-
-
+import { prismaInstance } from '../../lib/prisma'
+import { Heading3, Heading5 } from '../Typography'
 
 export const Footer = () => {
 
-  // const [errorMessage, setErrorMessage] = useState(false)
-  // const [postListDone, setPostlistDone] = useState(false)
+  const [postlistEmail, setPostlistEmail] = useState('')
+  const [postlistDone, setPostlistDone] = useState(false)
 
-  // const SubmitToPostlist = (email) => {
-  //   // setIsLoading(true);
-  //   if(email){
-  //     setErrorMessage(false);
-  //     fire.firestore().collection('postlist').add({
-  //       email: email
-  //     }).then(() => {
-  //       setTimeout(() => {
-  //         // setIsLoading(false);
-  //         setPostlistDone(true);
-  //         // setEmail("");
-  //       }, 1000)
-  //     })
-  //   }else{
-  //     // setIsLoading(false);
-  //     setErrorMessage(true);
-  //   }
-  // }
+  useEffect(() => {
+    const postlistset = localStorage.getItem('postlist')
+    if(!!postlistset){
+      setPostlistDone(true)
+    }
+  }, [])
+
+  const addToPostlist = () => {
+    localStorage.setItem('postlist', 'true')
+
+    // prismaInstance.postlist.create({
+    //   data: {
+    //     email: postlistEmail
+    //   }
+    // })
+    
+  }
 
   return(
     <FooterContainer>
@@ -45,11 +43,14 @@ export const Footer = () => {
           <BottomContentRight>
             <a href='https://www.facebook.com/Vistbok' target='_blank'><FacebookIcon /></a>
           </BottomContentRight>
-          {/* <BottomContentMid>
-            Viltu fylgjast með?
-            <input placeholder="bla"></input>
-              {errorMessage && <div>ekki til</div>}
-          </BottomContentMid> */}
+          <BottomContentMid>
+            <PostlistTitle>Viltu vera á póstlista?</PostlistTitle>
+            {postlistDone ? (
+              <Heading3>Þú ert nú þegar skráð/ur á póstlista</Heading3>
+            ) : (
+              <TextInput placeholder="netfang" onSubmit={() => addToPostlist()} onChange={(e) => setPostlistEmail(e.target.value)}></TextInput>
+            )}
+          </BottomContentMid>
         </BottomContent>
       </FooterContent>
     </FooterContainer>
@@ -93,7 +94,7 @@ const FooterTitle = styled.span`
 `
 
 const FooterSubText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 36px;
   line-height: 104%;
@@ -122,8 +123,9 @@ const TopContent = styled.div`
 `
 
 const BottomContent = styled.div`
-  height:25px;
   display:flex;
+  flex-direction: row;
+  align-items: flex-end;
 `
 
 const BottomContentLeft = styled(Heading5)`
@@ -136,14 +138,22 @@ const BottomContentRight = styled.div`
   flex-direction:row;
   justify-content: flex-start;
 
+  >a{
+    height:24px;
+  }
+
   @media ${mediaMax.tablet}{
     flex:0;
   }
 `
 
-const BottomContentMid = styled(Heading5)`
+const BottomContentMid = styled.div`
   flex:1;
   display:flex;
-  flex-direction:row;
+  flex-direction:column;
   justify-content: flex-end;
+`
+
+const PostlistTitle = styled(Heading5)`
+  margin-bottom:5px;
 `

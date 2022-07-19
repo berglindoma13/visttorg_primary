@@ -29,7 +29,7 @@ const CustomTag = styled.div`
   padding: 7px 15px 8px;
   width: fit-content;
 
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 12px;
   line-height: 104%;
