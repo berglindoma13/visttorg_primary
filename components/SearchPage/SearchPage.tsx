@@ -15,20 +15,33 @@ import { useRouter } from 'next/router'
 import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
 import Close from '../Svg/Close'
 import certificateMapper from '../../mappers/certificates'
+
 interface SearchPageProps{
   products: Array<ProductProps>
   certificates : Array<Certificate>
   companies: Array<Company>
+  companyCounts: Array<Counter>
+  certificateCounts: Array<Counter>
+}
+
+interface CategoryProps{
+  name: string
+  subCategories: Array<string>
 }
 
 interface FilterProps{
   brand: Array<string>
   companies: Array<string>
   certificates: Array<string>
-  categories: Array<string>
+  categories: Array<CategoryProps>
 }
 
-export const SearchPage = ({ products = [], certificates, companies }: SearchPageProps) => {
+interface Counter {
+  name: string
+  count: number
+}
+
+export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {
   const [query, setQuery] = useState("");
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
   
@@ -44,6 +57,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
     certificates: [],
     categories: []
   })
+  const [subfilters, setSubFilters] = useState<Array<string>>([])
 
   const options = {
     // isCaseSensitive: false,
@@ -67,7 +81,27 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
       'categories.name',
       'certificates.certificate.name'],
   }
-  
+
+  const VisttorgCategories = [
+    {name: "Lýsing og rafmagn", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
+    {name: "Eldhús", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
+    {name: "Baðherbergi", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
+    {name: "Gólfefni", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
+    {name: "Garðurinn", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
+    {name: "Gluggar", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
+    {name: "Burðavirki", subCategories: ["Húsgögn", "Heimilistæki"], weight: 2 },
+    {name: "Loftaefni", subCategories: ["Veggir", "Málningarvörur"], weight: 2 },
+    {name: "Hurðir", subCategories: ["hur1", "hur2", "hur3"], weight: 2 },
+    {name: "Lagnir", subCategories: ["lag", "lag2", "lag3"], weight: 2 },
+    {name: "Textíll", subCategories: ["tex1", "tex2", "tex3"], weight: 2 },
+    {name: "Lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
+    {name: "Öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
+    {name: "Vélbúnaður", subCategories: ["Heimilistæki", "Húsgögn"], weight: 2 },
+    // {name: "Húsgögn", items: ["hús1", "hús2", "hús3"]},
+    // {name: "Heimilistæki", items: ["hei1", "hei2", "hei3"]},
+    // {name: "Veggir", items: ["veg1", "veg2", "veg3"]},
+    // {name: "Málningarvörur", items: ["mál1", "mál2", "mál3"]}
+  ]
 
   const fuseInstance = new Fuse(products, options)
 
@@ -110,15 +144,17 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
       const results = SearchProducts({
         fuseInstance, 
         query, 
-        activeCategories: filters.categories,
+        activeCategories: filters.categories.map(category => category.name),
+        // activeCategories: ["Burðavirki"],
+        activeSubCategories: subfilters,
         activeCertificates: filters.certificates, 
         activeCompanies: filters.companies
       })
       setFilteredProductList(results)
     }
-  }, [filters, query])
+  }, [filters, query, subfilters])
 
-  const toggleFilters = (filter: string, value: string) => {
+  const toggleFilters = (filter: string, value: any) => {
 
     //close drawer on filterToggle in tablet and mobile
     if(isTablet){
@@ -126,17 +162,56 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
     }
 
     //if value is already in list -> remove
-    if(filters[filter].includes(value)){
+    if(filter=="categories" && filters.categories.filter(cat=>cat.name==value.name).length>0){
+      const filteredArray = filters[filter].filter(item => item.name !== value.name)
+      setFilters({...filters, [filter]: filteredArray})
+    }
+    else if(filters[filter].includes(value)){
       const filteredArray = filters[filter].filter(item => item !== value)
       setFilters({...filters, [filter]: filteredArray})
-    }else{
+    }
+    else{
       setFilters({...filters, [filter]: [...filters[filter], value ]})
+    }
+  }
+
+  const toggleSubFilters = (value: string) => {
+
+    //close drawer on filterToggle in tablet and mobile
+    if(isTablet){
+      setFilterDrawerIsActive(false)
+    }
+
+    //if value is already in list -> remove
+    if(subfilters.includes(value)){
+      const filteredArray = subfilters.filter(item => item !== value)
+      setSubFilters(filteredArray)
+    }else{
+      setSubFilters([...subfilters, value])
     }
   }
 
   const onChangePagination = (number: number) => {
     setPaginationNumber(number)
     router.push(`/?page=${number}`, undefined, { shallow: true })
+  }
+
+  const getCompanyCounts = (comp) => { var val = 0
+    companyCounts.map(compcount => { 
+      if(compcount.name === comp) {
+        val = compcount.count
+      }
+    })
+    return val
+  }
+
+  const getCertificateCounts = (cert) => { var val = 0
+    certificateCounts.map(certcount => {
+      if(certcount.name === cert) {
+        val = certcount.count
+      }
+    })
+    return val
   }
 
   //Framer motion controls for showing and hiding filter drawer
@@ -215,48 +290,19 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
       <CategoryFilters>
         <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
         {/* <MainButton text='Baðherbergi' onClick={() => {toggleFilters('categories', 'Baðherbergi')}} active={false} /> */}
-        <StyledMainButton 
-          text='Lýsing og rafmagn' 
-          onClick={() => {
-            toggleFilters('categories', 'Lýsing og rafmagn')
-          }} 
-          active={filters.categories.includes('Lýsing og rafmagn')} 
-        />
-        <StyledMainButton 
-          text='Eldhús' 
-          onClick={() => {
-            toggleFilters('categories', 'Eldhús')
-          }} 
-          active={filters.categories.includes('Eldhús')} 
-        />
-        <StyledMainButton 
-          text='Baðherbergi' 
-          onClick={() => {
-            toggleFilters('categories', 'Baðherbergi')
-          }} 
-          active={filters.categories.includes('Baðherbergi')} 
-        />
-        <StyledMainButton 
-          text='Gólfefni' 
-          onClick={() => {
-            toggleFilters('categories', 'Gólfefni')
-          }} 
-          active={filters.categories.includes('Gólfefni')} 
-        />
-        <StyledMainButton 
-          text='Garðurinn' 
-          onClick={() => {
-            toggleFilters('categories', 'Garðurinn')
-          }} 
-          active={filters.categories.includes('Garðurinn')} 
-        />
-        <StyledMainButton
-          text='Gluggar' 
-          onClick={() => {
-            toggleFilters('categories', 'Gluggar')
-          }} 
-          active={filters.categories.includes('Gluggar')} 
-        />
+        {VisttorgCategories.map(cat => {
+          if(cat.weight == 1) {
+            return(
+              <StyledMainButton 
+                text={cat.name}
+                onClick={() => {
+                  toggleFilters('categories', cat)
+                }} 
+                active={filters.categories.filter(category=>category.name==cat.name).length>0} 
+              />
+            )
+          }
+        })}
       </CategoryFilters>
       <ProductsAndFilter
         animate={controls}
@@ -271,14 +317,18 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
             <FilterItems>
               {companies.map(company => {
                 return(
+                  <>
+                  {/* {console.log(companyNumberList.name == company.name)} */}
                   <FilterItem 
                     key={company.id}
-                    text={company.name} 
+                    text={company.name}
+                    num={getCompanyCounts(company.name)} 
                     onClick={() => {
                       toggleFilters('companies', company.name)
                     }} 
                     active={filters.companies.includes(company.name)} 
                   />
+                  </>
                 )
               })}
             </FilterItems>
@@ -291,6 +341,7 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
                   <FilterItem 
                     key={certificate.id}
                     text={certificateMapper[certificate.name]} 
+                    num={getCertificateCounts(certificate.name)} 
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
                     }} 
@@ -301,108 +352,50 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
             </FilterItems>
           </FilterGroup>
           <FilterGroup>
-            <FilterGroupTitle>Flokkar</FilterGroupTitle>
+            <FilterGroupTitle>VisttorgCategories</FilterGroupTitle>
             <FilterItems>
-              <FilterItem 
-                key='Burðavirki'
-                text='Burðavirki' 
-                onClick={() => {
-                  toggleFilters('categories', 'Burðavirki')
-                }} 
-                active={filters.categories.includes('Burðavirki')}
-              />
-              <FilterItem 
-                key='Loftaefni'
-                text='Loftaefni' 
-                onClick={() => {
-                  toggleFilters('categories', 'Loftaefni')
-                }} 
-                active={filters.categories.includes('Loftaefni')}
-              />
-              <FilterItem 
-                key='Hurðir'
-                text='Hurðir' 
-                onClick={() => {
-                  toggleFilters('categories', 'Hurðir')
-                }} 
-                active={filters.categories.includes('Hurðir')}
-              />
-              <FilterItem 
-                key='Lagnir'
-                text='Lagnir' 
-                onClick={() => {
-                  toggleFilters('categories', 'Lagnir')
-                }} 
-                active={filters.categories.includes('Lagnir')}
-              />
-              <FilterItem 
-                key='Textíll'
-                text='Textíll' 
-                onClick={() => {
-                  toggleFilters('categories', 'Textíll')
-                }} 
-                active={filters.categories.includes('Textíll')}
-              />
-              <FilterItem 
-                key='Lyftur'
-                text='Lyftur' 
-                onClick={() => {
-                  toggleFilters('categories', 'Lyftur')
-                }} 
-                active={filters.categories.includes('Lyftur')}
-              />
-              <FilterItem 
-                key='Öryggi og merkingar'
-                text='Öryggi og merkingar' 
-                onClick={() => {
-                  toggleFilters('categories', 'Öryggi og merkingar')
-                }} 
-                active={filters.categories.includes('Öryggi og merkingar')}
-              />
-              <FilterItem 
-                key='Vélbúnaður'
-                text='Vélbúnaður' 
-                onClick={() => {
-                  toggleFilters('categories', 'Vélbúnaður')
-                }} 
-                active={filters.categories.includes('Vélbúnaður')}
-              />
-              <FilterItem 
-                key='Húsgögn'
-                text='Húsgögn' 
-                onClick={() => {
-                  toggleFilters('categories', 'Húsgögn')
-                }} 
-                active={filters.categories.includes('Húsgögn')}
-              />
-              <FilterItem 
-                key='Heimilistæki'
-                text='Heimilistæki' 
-                onClick={() => {
-                  toggleFilters('categories', 'Heimilistæki')
-                }} 
-                active={filters.categories.includes('Heimilistæki')}
-              />
-              <FilterItem 
-                key='Veggir'
-                text='Veggir' 
-                onClick={() => {
-                  toggleFilters('categories', 'Veggir')
-                }} 
-                active={filters.categories.includes('Veggir')} 
-              />
-              <FilterItem 
-                key='Málningarvörur'
-                text='Málningarvörur' 
-                onClick={() => {
-                  toggleFilters('categories', 'Málningarvörur')
-                }} 
-                active={filters.categories.includes('Málningarvörur')} 
-              />
+              {VisttorgCategories.map(item => {
+                if(item.weight == 2){
+                  return(
+                    <FilterItem 
+                      key={item.name}
+                      text={item.name} 
+                      onClick={() => {
+                        toggleFilters('categories', item)
+                      }} 
+                      active={filters.categories.filter(cat=>cat.name==item.name).length>0}
+                    />
+                  )
+                }
+              })}
             </FilterItems>
+          </FilterGroup>
+          <FilterGroup>
+            { filters.categories.length !== 0 && <>
+            <FilterGroupTitle>UndirVisttorgCategories</FilterGroupTitle>
+            <FilterItems>
+              {filters.categories.map(category => {
+                return(
+                category.subCategories.map(sub => {
+                  return(
+                    <FilterItem 
+                      key={sub}
+                      text={sub} 
+                      onClick={() => {
+                        toggleSubFilters(sub)
+                      }} 
+                      active={subfilters.includes(sub)}
+                    />
+                  )
+                }))
+                })
+              }
+            </FilterItems>
+            </>}
           </FilterGroup>
         </FilterWrapper>
         <ProductList>
+          {filteredProductList.length === 0 && <NoResults>Engar vörur fundust</NoResults>}
           {filteredProductList.map((product, index) => {
             if(index >= (paginationNumber - 1) * paginationPageSize && index < paginationNumber * paginationPageSize){
               const thisProduct = product.item
@@ -422,13 +415,14 @@ export const SearchPage = ({ products = [], certificates, companies }: SearchPag
           })}
         </ProductList>
       </ProductsAndFilter>
+      {filteredProductList.length !== 0 &&
       <Pagination 
         currentPage={paginationNumber}
         setCurrentPage={onChangePagination}
         queryParamName='productPage'
         total={filteredProductList.length}
         pageSize={paginationPageSize}
-      />
+      />}
     </SearchPageContainer>
   )
 }
@@ -579,4 +573,11 @@ const CategoryFilters = styled.div`
     height: 117px;
     
   }
+`
+const NoResults = styled.div`
+  width: 100%;
+  font-size: max(1.52vw, 22px);
+  text-align: center;
+  padding-top: 20px;
+  color: black;
 `

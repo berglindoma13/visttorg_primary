@@ -25,7 +25,7 @@ model product {
   description      String?
   shortdescription String?
   categories       category[]           @relation("ConnectedCategory")
-  url              String
+  url              String? // bætti við spurningarmerki, ef að fyrirtæki eru ekki með vefverslun
   brand            String
   productimageurl  String?
   //productimageref attachedFile?
@@ -43,6 +43,7 @@ model productcertificate {
   fileurl          String?
   productid        String
   connectedproduct product    @relation(fields: [productid], references: [productid])
+  // validDate      DateTime?
 }
 
 model certificate {

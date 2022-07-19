@@ -5,5 +5,7 @@ export default {
   SV_ALLOWED: 'Leyfilegt í svansvottað hús',
   SV: 'Svanurinn',
   BREEAM: 'BREEAM',
-  BLENGILL: 'Blái engillinn'
+  BLENGILL: 'Blái engillinn',
+  EV: 'Evrópublómið',
+  CE: 'CE'
 }

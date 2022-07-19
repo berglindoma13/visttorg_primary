@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import certificates from '../../mappers/certificates';
 const reader = require('g-sheets-api');
 const fs = require('file-system');
 import { Certificate } from '../types/models'
@@ -8,7 +7,7 @@ import { ValidDate } from '../helpers/ValidDate'
 
 const prisma = new PrismaClient()
 
-// company id 2, get data from google sheets and insert into database
+// company id 3, get data from google sheets and insert into database from Ebson
 
 interface result {
     id: string,
@@ -44,23 +43,23 @@ interface allResults {
 export const InsertAllSheetsProducts = async(req,res) => {
     // get all data from sheets file
     getProducts();
-    res.end('All products inserted')
+    res.end('All Ebson products inserted')
 }
 
 export const DeleteAllSheetsProducts = async(req,res) => {
     await prisma.product.deleteMany({
       where: {
-        companyid: 2
+        companyid: 3
       }
     })
-    res.end("All deleted");
+    res.end("All Ebson products deleted");
 }
 
 export const DeleteAllSheetsCert = async(req,res) => {
     await prisma.productcertificate.deleteMany({
       where: {
         connectedproduct: {
-            companyid: 2
+            companyid: 3
           }
       }
     })
@@ -91,7 +90,7 @@ const DeleteAllSheetsProductCertificates = async(id) => {
     await prisma.productcertificate.deleteMany({
       where: {
         connectedproduct: {
-            companyid: 2
+            companyid: 3
         },
         productid : id 
       }
@@ -110,7 +109,6 @@ const getProducts = () => {
     reader(options, (results: allResults) => {
         const allprod : Array<result> = [];
         for (var i=1; i< results.length; i++) {
-            // console.log("FIRST", results[i].ev)
             var temp_prod : result = {id: results[i].nr,
                         prodName: results[i].name,
                         longDescription: results[i].long,
@@ -142,11 +140,9 @@ const getProducts = () => {
     });
 }
 
-
 const CreateProductCertificates = async(product : result, productValidatedCertificates: Array<Certificate>) => {
     let certificateObjectList = [];
     await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
-        // console.log('certificite name', certificate.name)
       if(certificate.name === 'EPD'){
         //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
         return await prisma.productcertificate.create({
@@ -313,19 +309,17 @@ const UpsertProductInDatabase = async(product : result, approved : boolean) => {
     }
 
      validatedCertificates.map( (cert) => {
-      // console.log("cert", cert)
-      if (cert.name === "EPD") {
-        // console.log("jeoj")
-        const ble = ValidDate({epdUrl: product.epdUrl})
-      }
-      if (cert.name === "FSC") {
-        // bua til nytt valid date fall fyrir fsc
-        // const ble = ValidDate({epdUrl: product.epdUrl})
-      }
-      if (cert.name === "VOC") {
-        // bua til nytt valid date fall fyrir voc
-        // const ble = ValidDate({epdUrl: product.epdUrl})
-      }
+        if (cert.name === "EPD") {
+            const ble = ValidDate({epdUrl: product.epdUrl})
+        }
+        if (cert.name === "FSC") {
+            // bua til nytt valid date fall fyrir fsc
+            // const ble = ValidDate({epdUrl: product.epdUrl})
+        }
+        if (cert.name === "VOC") {
+            // bua til nytt valid date fall fyrir voc
+            // const ble = ValidDate({epdUrl: product.epdUrl})
+        }
     })
 
     await prisma.product.upsert({
@@ -337,7 +331,7 @@ const UpsertProductInDatabase = async(product : result, approved : boolean) => {
           title: product.prodName,
           productid : product.id,
           sellingcompany: {
-            connect: { id : 2}
+            connect: { id : 3}
           },
           categories : {
             connect: { name : product.fl}
@@ -353,7 +347,7 @@ const UpsertProductInDatabase = async(product : result, approved : boolean) => {
           title: product.prodName,
           productid : product.id,
           sellingcompany: {
-            connect: { id : 2}
+            connect: { id : 3}
           },
           categories : {
             connect: { name : product.fl}
@@ -375,7 +369,7 @@ const UpsertProductInDatabase = async(product : result, approved : boolean) => {
 const isProductListFound = async(products : Array<result>) => {
     // get all current products from this company
     const currprods = await prisma.product.findMany({
-        where : {companyid : 2}
+        where : {companyid : 3}
     })
 
     var nolonger = [];
@@ -394,10 +388,6 @@ const isProductListFound = async(products : Array<result>) => {
         }
     }
     productsNoLongerComingInFile(nolonger)
-}
-
-const checkValidDate = async(file) => {
-  
 }
 
 const ProcessForDatabase = async(products : Array<result>) => {
@@ -435,21 +425,18 @@ const ProcessForDatabase = async(products : Array<result>) => {
             for (var x = 0; x < prod.certificates.length; x++) {
                 if (prod.certificates[x].certificateid == 1) {
                     if(prod.certificates[x].fileurl !== products[i].epdUrl) {
-                        console.log("EPD er ekki eins")
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (prod.certificates[x].certificateid == 2) {
                     if(prod.certificates[x].fileurl !== products[i].fscUrl) {
-                        console.log("FSC er ekki eins")
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (prod.certificates[x].certificateid == 3) {
                     if(prod.certificates[x].fileurl !== products[i].vocUrl) {
-                        console.log("VOC er ekki eins")
                         certChange = true;
                         approved = false;
                     }

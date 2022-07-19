@@ -1,22 +1,55 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { mediaMax } from '../../constants/breakpoints'
 import FacebookIcon from '../Svg/Facebook'
 import { Heading5 } from '../Typography'
+// import { fire } from 'firebase/app'
+
+
 
 export const Footer = () => {
+
+  // const [errorMessage, setErrorMessage] = useState(false)
+  // const [postListDone, setPostlistDone] = useState(false)
+
+  // const SubmitToPostlist = (email) => {
+  //   // setIsLoading(true);
+  //   if(email){
+  //     setErrorMessage(false);
+  //     fire.firestore().collection('postlist').add({
+  //       email: email
+  //     }).then(() => {
+  //       setTimeout(() => {
+  //         // setIsLoading(false);
+  //         setPostlistDone(true);
+  //         // setEmail("");
+  //       }, 1000)
+  //     })
+  //   }else{
+  //     // setIsLoading(false);
+  //     setErrorMessage(true);
+  //   }
+  // }
+
   return(
     <FooterContainer>
       <FooterContent>
         <TopContent>
           <FooterTitle>Allar umhverfisvottaðar byggingavörur á einum stað</FooterTitle>
           <FooterSubText>Viltu vera memm ? <a href="mailto:vistbok@visttorg.is" >Hafðu samband</a></FooterSubText>
+          
         </TopContent>
         <BottomContent>
-          <BottomContentLeft>2021©</BottomContentLeft>
+          
+          <BottomContentLeft>2022©</BottomContentLeft>
           <BottomContentRight>
             <a href='https://www.facebook.com/Vistbok' target='_blank'><FacebookIcon /></a>
           </BottomContentRight>
+          {/* <BottomContentMid>
+            Viltu fylgjast með?
+            <input placeholder="bla"></input>
+              {errorMessage && <div>ekki til</div>}
+          </BottomContentMid> */}
         </BottomContent>
       </FooterContent>
     </FooterContainer>
@@ -106,4 +139,11 @@ const BottomContentRight = styled.div`
   @media ${mediaMax.tablet}{
     flex:0;
   }
+`
+
+const BottomContentMid = styled(Heading5)`
+  flex:1;
+  display:flex;
+  flex-direction:row;
+  justify-content: flex-end;
 `

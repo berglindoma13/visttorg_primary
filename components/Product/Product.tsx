@@ -53,7 +53,7 @@ export const Product = ({
         <ProductDetails>
           <ProductCompany>{sellingcompany}</ProductCompany>
           <ProductTitle>{title}</ProductTitle>
-          <ProductAbstract>{shortdescription}</ProductAbstract>
+          <ProductAbstract>{shortdescription.replace(/<[^>]+>/g, '')}</ProductAbstract>
           <MainButton text='Skoða' onClick={() => console.log('hello')}/>
         </ProductDetails>
       </StyledProduct>

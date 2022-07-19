@@ -29,11 +29,39 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   });
 
-  console.log(productList)
-
   const categories = await prismaInstance.category.findMany()
-  const certificates = await prismaInstance.certificate.findMany()
-  const companies = await prismaInstance.company.findMany()
+
+  const certificatesA = await prismaInstance.certificate.findMany()
+  const certificates = await prismaInstance.certificate.findMany({
+    include: {
+      productcertificate: true
+    }
+  })
+  
+  const companiesA = await prismaInstance.company.findMany()
+  const companies = await prismaInstance.company.findMany({
+    include: {
+      products: true
+    }
+  })
+  console.log(companies)
+
+  // const bykoproductList = await prismaInstance.product.findMany({
+  //   where: {
+  //     companyid: 1,
+  //   }
+  // });
+
+  // const mariaproductList = await prismaInstance.product.findMany({
+  //   where: {
+  //     companyid: 2,
+  //   }
+  // });
+
+  // const companyCounts = [
+  //   {name: "Byko", count: bykoproductList.length}, 
+  //   {name: "MariaTestCompany", count: mariaproductList.length}
+  // ]
 
   // const categoryCounts = []
   // categories.map(cat => {
@@ -63,9 +91,19 @@ export const getStaticProps: GetStaticProps = async () => {
   //   companyCounts.push({ name: comp.name, count: filteredList.length})
   // })
 
+  const certificateCounts = []
+  certificates.map(cert => {
+    certificateCounts.push({ name: cert.name, count: cert.productcertificate.length})
+  })
+
+  const companyCounts = []
+  companies.map(comp => {
+    companyCounts.push({ name: comp.name, count: comp.products.length})
+  })
+
   const productListString = superjson.stringify(productList)
 
-  return { props: { productListString , categories, certificates, companies }}
+  return { props: { productListString, categories, certificatesA, companiesA, certificateCounts, companyCounts }}
 }
 
 interface Counter {
@@ -76,14 +114,14 @@ interface Counter {
 type HomeProps = {
   productListString: string
   categories: Category[]
-  certificates : Certificate[]
-  companies: Company[]
+  certificatesA : Certificate[]
+  companiesA: Company[]
   categoryCounts: Array<Counter>
   certificateCounts: Array<Counter>
   companyCounts: Array<Counter>
 }
 
-const Home = ({ productListString, categories, certificates = [], companies = [] } : HomeProps) => {
+const Home = ({ productListString, categories, certificatesA = [], companiesA = [], certificateCounts, companyCounts } : HomeProps) => {
   const productList: Array<ProductProps> = superjson.parse(productListString)
   
   return(
@@ -113,8 +151,10 @@ const Home = ({ productListString, categories, certificates = [], companies = []
         </CategoryBoxes>
         <SearchPage 
           products={productList} 
-          certificates={certificates} 
-          companies={companies} 
+          certificates={certificatesA} 
+          companies={companiesA}
+          companyCounts={companyCounts}
+          certificateCounts={certificateCounts}
         />
       </PageContainer>
       <Footer />
