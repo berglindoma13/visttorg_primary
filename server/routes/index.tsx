@@ -3,7 +3,7 @@ const router = express.Router();
 import { InsertAllBykoProducts, TestProduct, GetAllCategories, DeleteAllProducts, DeleteAllProducCertificates } from '../controllers/BykoController';
 import { fileUpload } from '../controllers/ProductUploadController'
 
-import { InsertAllSheetsProducts, /*ProcessNewInDatabase*/ DeleteAllSheetsProducts, /*DeleteAllSheetsProductCertificates*/ DeleteAllSheetsCert } from '../controllers/testController';
+import { InsertAllSheetsProducts, /*ProcessNewInDatabase*/ DeleteAllSheetsProducts, /*DeleteAllSheetsProductCertificates*/ DeleteAllSheetsCert, SendEmail } from '../controllers/testController';
 
 function routes(app : any) {
   //COMPANY ID IN DATABASE IS 1
@@ -22,6 +22,7 @@ function routes(app : any) {
   app.post('/api/product/add', fileUpload)
   // app.post('/api/product/add', fileUpload)
 
+  app.get('/api/sendmail', SendEmail)
   return router;
 };  
 
