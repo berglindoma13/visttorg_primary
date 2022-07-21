@@ -1,58 +1,19 @@
 import { PrismaClient } from '@prisma/client'
-import certificates from '../../mappers/certificates';
 const reader = require('g-sheets-api');
 const fs = require('file-system');
-const download = require("download");
-const pdf = require('pdf-parse');
-const nodemailer = require("nodemailer");
 import { Certificate } from '../types/models'
 import { CertificateValidator } from '../helpers/CertificateValidator'
-import { applyReferentialEqualityAnnotations } from 'superjson/dist/plainer';
-// import { ValidDate } from '../helpers/ValidDate'
+import { TestControllerProduct, allProducts, validDateObj } from '../types/testResult'
+import { SendEmail } from '../helpers/SendEmail'
+import { ValidDate } from '../helpers/ValidDate'
+// import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
 
 const prisma = new PrismaClient()
 
 // company id 2, get data from google sheets and insert into database
 
-interface result {
-  id: string,
-  prodName: string,
-  longDescription: string,
-  shortDescription: string,
-  fl: string,
-  prodImage: string,
-  url: string,
-  brand: string,
-  fscUrl: string,
-  epdUrl: string,
-  vocUrl: string,
-  ceUrl: string,
-  certificates: [
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-    { name: string, val: string },
-  ]
-}
-
-interface allResults {
-  obj: Array<result>,
-  length: number
-}
-
-interface validDateObj {
-  message: string,
-  date ?: Date 
-}
-
 var updatedProducts = [];
 var createdProducts = [];
-// var productsNoLongerComingInFromFile = [];
 var productsNotValid = [];
 
 export const InsertAllSheetsProducts = async(req,res) => {
@@ -80,63 +41,42 @@ export const DeleteAllSheetsCert = async(req,res) => {
   await prisma.productcertificate.deleteMany({
     where: {
       connectedproduct: {
-          companyid: 2
-        }
+        companyid: 2
+      }
     }
   })
   res.end("All deleted");
 }
 
-export const SendEmail = async(req, res) => {
-  // send email from test mail now - change so it sends from visttorg and to the correct email
-  const hostname = "smtp.gmail.com";
-  const username = "mariavinna123@gmail.com"; 
-  const password = "cxapowxvwkejbrzl"; // const password = "marraom123%";
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: hostname,
-    auth: {
-      user: username,
-      pass: password,
-    },
-  });
-  const info = await transporter.sendMail({
-    from: "mariavinna123@gmail.com",
-    to: "maria.omarsd99@gmail.com",
-    subject: "Hello from node",
-    text: "Hello world?",
-    html: "<strong>Hello world?</strong>",
-    headers: { 'x-myheader': 'test header' }
-  });
-  console.log("Message sent: %s", info.response);
-  res.end("email sent")
-}
-
 const createdProductsWriteFile = async() => {
   // write product info of created products to file (and send an email to employee)
   fs.writeFile("createdProductsFile.txt", JSON.stringify(createdProducts))
+  // SendEmail("Created products")
 }
 
 const updatedProductsWriteFile = async() => {
   // write product info of updated products to file (and send an email to employee)
   fs.writeFile("updatedProductsFile.txt", JSON.stringify(updatedProducts))
+  // SendEmail("Updated products")
 }
 
 const productsNoLongerComingInWriteFile = async(nolonger) => {
   // write product info of products no longer coming into the database (and send email to company)
   fs.writeFile("nolonger.txt", JSON.stringify(nolonger))
+  // SendEmail("Products no longer coming in from company")
 }
 
 const productsNoLongerValidWriteFile = async() => {
   // write product info of products no longer coming into the database (and send email to company)
   fs.writeFile("notValidAnymore.txt", JSON.stringify(productsNotValid))
+  // SendEmail("Products not valid anymore")
 }
 
 const DeleteAllSheetsProductCertificates = async(id) => {
   await prisma.productcertificate.deleteMany({
     where: {
       connectedproduct: {
-          companyid: 2
+        companyid: 2
       },
       productid : id 
     }
@@ -159,10 +99,10 @@ const getProducts = () => {
     returnAllResults: false,
   };
 
-  reader(options, (results: allResults) => {
-    const allprod : Array<result> = [];
+  reader(options, (results: allProducts) => {
+    const allprod : Array<TestControllerProduct> = [];
     for (var i=1; i< results.length; i++) {
-      var temp_prod : result = {
+      var temp_prod : TestControllerProduct = {
             id: results[i].nr,
             prodName: results[i].name,
             longDescription: results[i].long,
@@ -193,14 +133,16 @@ const getProducts = () => {
   });
 }
 
-const CreateProductCertificates = async(product : result, valid : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
+// SPURJA BEGGU -> þetta er með prisma create dót, má ég setja þetta bara í sér skjal og búa til nýjan prisma client þar
+// --> það kemur too many connections error ef eg set í annað skjal til að endurnýta
+const CreateProductCertificates = async(product : TestControllerProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
   let certificateObjectList = [];
   await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
     if(certificate.name === 'EPD'){
       //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
       var date = null;
-      if(valid[0].message === "Valid") {
-        date = valid[0].date
+      if(validDateCertificates[0].message === "Valid") {
+        date = validDateCertificates[0].date
       }
       console.log("valid date", date)
       return await prisma.productcertificate.create({
@@ -222,8 +164,8 @@ const CreateProductCertificates = async(product : result, valid : Array<validDat
 
     if(certificate.name === 'FSC'){
       var date = null;
-      if(valid[1].message === "Valid") {
-        date = valid[1].date
+      if(validDateCertificates[1].message === "Valid") {
+        date = validDateCertificates[1].date
       }
       return await prisma.productcertificate.create({
         data: {
@@ -244,8 +186,8 @@ const CreateProductCertificates = async(product : result, valid : Array<validDat
 
     if(certificate.name === 'VOC'){
       var date = null;
-      if(valid[2].message === "Valid") {
-        date = valid[2].date
+      if(validDateCertificates[2].message === "Valid") {
+        date = validDateCertificates[2].date
       }
       return await prisma.productcertificate.create({
         data: {
@@ -362,90 +304,7 @@ const CreateProductCertificates = async(product : result, valid : Array<validDat
   return certificateObjectList
 }
 
-const check = ((parsedate : Date) => {
-  // check if data extracted from pdf files is valid or not
-  if (parsedate > new Date()) {
-    return {message: "Valid", date: parsedate}
-  }
-  else if(parsedate.toString() == "Invalid Date"){
-    return {message: "Invalid Date"}
-  }
-  else {
-    return {message: "Expired Date"}
-  }
-})
-
-const test = async() => {
-  Promise.all(
-    download("https://byko.is/Files/Files/PDF%20skjol/BREEAM/FSC_certificate_valid_to_31.05.2024.pdf", "dist", function(err){
-      if(err) throw err
-    })
-  ).catch((err) => {
-    console.error('FAILED', err)
-  })
-}
-
-const ValidDate = async(validatedCertificates : Array<Certificate>, product : result) => {
-  var arr = new Array<validDateObj>(3)
-  await Promise.all(validatedCertificates.map(async(cert) => {
-    if (cert.name === "EPD") {
-      await Promise.all(
-        download(product.epdUrl, "dist", function(err){
-          if(err) throw err
-        })
-      ).catch((err) => {
-        // console.error('Failed', err)
-      })
-      const url = product.epdUrl.split("/").pop()
-      let dataBuffer = fs.readFileSync('dist/' + url); //dist/Sikasil-C%20EPD.pdf
-      await pdf(dataBuffer).then(async function(data) {
-        const filedate = data.text.split("\n").filter(text=> text.includes("Valid to"))[0].replace("Valid to", ""); 
-        const parsedate = new Date(filedate)
-        const test = check(parsedate)
-        arr[0] = test
-      })
-    }
-    if (cert.name === "FSC") {
-      await Promise.all(
-        download(product.fscUrl, "dist", function(err){
-          if(err) throw err
-        })
-      ).catch((err) => {
-        // console.error('Failed', err)
-      })
-      const url = product.fscUrl.split("/").pop()
-      let dataBuffer = fs.readFileSync('dist/' + url); // dist/FSC_certificate_valid_to_31.05.2024.pdf
-      await pdf(dataBuffer).then(async function(data) {
-        const filedate = data.text.split("\n").filter(text=> text.includes("valid"))[1].split(" ").at(-1).split("-");
-        const swap = ([item0, item1, rest]) => [item1, item0, rest]; 
-        const newdate = swap(filedate).join("-")
-        const parsedate = new Date(newdate)
-        const test = check(parsedate)
-        arr[1] = test
-      })
-    }
-    if (cert.name === "VOC") {
-      await Promise.all(
-        download(product.vocUrl, "dist", function(err){
-          if(err) throw err
-        })
-      ).catch((err) => {
-        // console.error('Failed', err)
-      })
-      const url = product.vocUrl.split("/").pop()
-      let dataBuffer = fs.readFileSync('dist/' + url); // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
-      await pdf(dataBuffer).then(async function(data) {
-        const filedate = data.text.split("\n").filter(text=> text.includes("valid until"))[0].replace("valid until", '')
-        const parsedate = new Date(filedate)
-        const test = check(parsedate)
-        arr[2] = test
-      })
-    }
-  }))
-  return arr
-}
-
-const UpsertProductInDatabase = async(product : result, approved : boolean, create : boolean, certChange : boolean) => {
+const UpsertProductInDatabase = async(product : TestControllerProduct, approved : boolean, create : boolean, certChange : boolean) => {
   //delete all productcertificates so they wont be duplicated and so they are up to date
   DeleteAllSheetsProductCertificates(product.id)
 
@@ -463,18 +322,16 @@ const UpsertProductInDatabase = async(product : result, approved : boolean, crea
     if (validatedCertificates.length !== 0) {
       createdProducts.push(product)
       // check valid date when product is created
-      var ble = await ValidDate(validatedCertificates, product)
+      var validDate = await ValidDate(validatedCertificates, product)
     }
   }
   if(certChange === true) {
     if(validatedCertificates.length !== 0 ) {
       updatedProducts.push(product)
       // check valid date when the certificates have changed
-      var ble = await ValidDate(validatedCertificates, product)
+      var validDate = await ValidDate(validatedCertificates, product)
     }
   }
-
-  // var ble = await ValidDate(validatedCertificates, product)
 
   await prisma.product.upsert({
     where: {
@@ -516,11 +373,11 @@ const UpsertProductInDatabase = async(product : result, approved : boolean, crea
       updatedAt: new Date()
     }
   })
-  await CreateProductCertificates(product, ble, validatedCertificates)
+  await CreateProductCertificates(product, validDate, validatedCertificates)
 }
 
 // check if product list database has any products that are not coming from sheets anymore
-const isProductListFound = async(products : Array<result>) => {
+const isProductListFound = async(products : Array<TestControllerProduct>) => {
   // get all current products from this company
   const currprods = await prisma.product.findMany({
       where : {companyid : 2}
@@ -542,7 +399,7 @@ const isProductListFound = async(products : Array<result>) => {
   })
 }
 
-const ProcessForDatabase = async(products : Array<result>) => {
+const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
   // check if product is in database but not coming in from company anymore
   isProductListFound(products)
 
@@ -555,7 +412,9 @@ const ProcessForDatabase = async(products : Array<result>) => {
             }
           }}
     })
+
     var approved = null;
+
     if(prod !== null) {
       approved = prod.approved;
       var certChange : boolean = false;
@@ -587,7 +446,6 @@ const ProcessForDatabase = async(products : Array<result>) => {
     else {
       var create = true;
     }
-    // UpsertProductInDatabase(products[i], approved, create, certChange)
-    test()
+    UpsertProductInDatabase(products[i], approved, create, certChange)
   }
 }
