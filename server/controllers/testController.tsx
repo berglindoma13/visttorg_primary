@@ -6,6 +6,7 @@ import { CertificateValidator } from '../helpers/CertificateValidator'
 import { TestControllerProduct, allProducts, validDateObj } from '../types/testResult'
 import { SendEmail } from '../helpers/SendEmail'
 import { ValidDate } from '../helpers/ValidDate'
+import { WriteFile } from '../helpers/WriteFile'
 // import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
 
 const prisma = new PrismaClient()
@@ -18,11 +19,7 @@ var productsNotValid = [];
 
 export const InsertAllSheetsProducts = async(req,res) => {
   // get all data from sheets file
-  getProducts();
-  // write all appropriate files
-  createdProductsWriteFile();
-  updatedProductsWriteFile();
-  productsNoLongerValidWriteFile();
+  getProducts()
   res.end('All products inserted')
 }
 
@@ -48,28 +45,22 @@ export const DeleteAllSheetsCert = async(req,res) => {
   res.end("All deleted");
 }
 
-const createdProductsWriteFile = async() => {
-  // write product info of created products to file (and send an email to employee)
-  fs.writeFile("createdProductsFile.txt", JSON.stringify(createdProducts))
-  // SendEmail("Created products")
-}
-
-const updatedProductsWriteFile = async() => {
-  // write product info of updated products to file (and send an email to employee)
-  fs.writeFile("updatedProductsFile.txt", JSON.stringify(updatedProducts))
-  // SendEmail("Updated products")
+const WriteAllFiles = async() => {
+  if (createdProducts.length > 0) {
+    WriteFile("created", createdProducts);
+  }
+  if (updatedProducts.length > 0) {
+    WriteFile("updated", updatedProducts);
+  }
+  if (productsNotValid.length > 0) {
+    WriteFile("notValid", productsNotValid);
+  }
 }
 
 const productsNoLongerComingInWriteFile = async(nolonger) => {
   // write product info of products no longer coming into the database (and send email to company)
-  fs.writeFile("nolonger.txt", JSON.stringify(nolonger))
+  fs.writeFile("writefiles/nolonger.txt", JSON.stringify(nolonger))
   // SendEmail("Products no longer coming in from company")
-}
-
-const productsNoLongerValidWriteFile = async() => {
-  // write product info of products no longer coming into the database (and send email to company)
-  fs.writeFile("notValidAnymore.txt", JSON.stringify(productsNotValid))
-  // SendEmail("Products not valid anymore")
 }
 
 const DeleteAllSheetsProductCertificates = async(id) => {
@@ -128,7 +119,6 @@ const getProducts = () => {
           }
           allprod.push(temp_prod)
     }
-    // process for database
     ProcessForDatabase(allprod);
   });
 }
@@ -161,7 +151,6 @@ const CreateProductCertificates = async(product : TestControllerProduct, validDa
         certificateObjectList.push(obj)
       })
     }
-
     if(certificate.name === 'FSC'){
       var date = null;
       if(validDateCertificates[1].message === "Valid") {
@@ -183,7 +172,6 @@ const CreateProductCertificates = async(product : TestControllerProduct, validDa
         certificateObjectList.push(obj)
       })
     }
-
     if(certificate.name === 'VOC'){
       var date = null;
       if(validDateCertificates[2].message === "Valid") {
@@ -205,7 +193,6 @@ const CreateProductCertificates = async(product : TestControllerProduct, validDa
         certificateObjectList.push(obj)
       })
     }
-
     if(certificate.name === 'SV'){
       return await prisma.productcertificate.create({
         data: {
@@ -221,7 +208,6 @@ const CreateProductCertificates = async(product : TestControllerProduct, validDa
         certificateObjectList.push(obj)
       })
     }
-
     if(certificate.name === 'SV_ALLOWED'){
       return await prisma.productcertificate.create({
         data: {
@@ -237,7 +223,6 @@ const CreateProductCertificates = async(product : TestControllerProduct, validDa
         certificateObjectList.push(obj)
       })
     }
-
     if(certificate.name === 'BREEAM'){
       return await prisma.productcertificate.create({
         data: {
@@ -305,9 +290,6 @@ const CreateProductCertificates = async(product : TestControllerProduct, validDa
 }
 
 const UpsertProductInDatabase = async(product : TestControllerProduct, approved : boolean, create : boolean, certChange : boolean) => {
-  //delete all productcertificates so they wont be duplicated and so they are up to date
-  DeleteAllSheetsProductCertificates(product.id)
-
   // get all product certificates from sheets
   const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { if(certificate.val=="TRUE") {return {name: certificate.name.toUpperCase() }} })
   Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
@@ -326,6 +308,8 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
     }
   }
   if(certChange === true) {
+    //delete all productcertificates so they wont be duplicated and so they are up to date
+    DeleteAllSheetsProductCertificates(product.id)
     if(validatedCertificates.length !== 0 ) {
       updatedProducts.push(product)
       // check valid date when the certificates have changed
@@ -355,7 +339,6 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
       updatedAt: new Date()
     },
     create: {
-      // approved: approved,
       title: product.prodName,
       productid : product.id,
       sellingcompany: {
@@ -373,7 +356,9 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
       updatedAt: new Date()
     }
   })
-  await CreateProductCertificates(product, validDate, validatedCertificates)
+  if(certChange === true || create === true) {
+    await CreateProductCertificates(product, validDate, validatedCertificates)
+  }
 }
 
 // check if product list database has any products that are not coming from sheets anymore
@@ -403,49 +388,49 @@ const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
   // check if product is in database but not coming in from company anymore
   isProductListFound(products)
 
-  for(var i = 0; i < products.length; i++) {
+  products.map(async(product) => {
     const prod = await prisma.product.findUnique({
-        where : {productid: products[i].id},
-        include : {certificates: {
-            include: {
-              certificate : true
-            }
-          }}
+      where : {productid: product.id},
+      include : {certificates: {
+        include: {
+          certificate : true
+        }
+      }}
     })
-
     var approved = null;
-
-    if(prod !== null) {
+    if (prod !== null){
       approved = prod.approved;
       var certChange : boolean = false;
-      for (var x = 0; x < prod.certificates.length; x++) {
-         // epd file url is not the same
-        if (prod.certificates[x].certificateid == 1) {
-          if(prod.certificates[x].fileurl !== products[i].epdUrl) {
+      prod.certificates.map((cert) => {
+        if (cert.certificateid == 1) {
+          // epd file url is not the same
+          if(cert.fileurl !== product.epdUrl) {
               certChange = true;
               approved = false;
           }
         }
-        if (prod.certificates[x].certificateid == 2) {
+        if (cert.certificateid == 2) {
           // fsc file url is not the same
-          if(prod.certificates[x].fileurl !== products[i].fscUrl) {
+          if(cert.fileurl !== product.fscUrl) {
               certChange = true;
               approved = false;
           }
         }
-        if (prod.certificates[x].certificateid == 3) {
+        if (cert.certificateid == 3) {
           // voc file url is not the same
-          if(prod.certificates[x].fileurl !== products[i].vocUrl) {
+          if(cert.fileurl !== product.vocUrl) {
               certChange = true;
               approved = false;
           }
         }
-      }
+      })
     }
-    // no product found --> create it
     else {
       var create = true;
+      var certChange = true;
     }
-    UpsertProductInDatabase(products[i], approved, create, certChange)
-  }
+    UpsertProductInDatabase(product, approved, create, certChange)
+  })
+  // write all appropriate files
+  WriteAllFiles()
 }
