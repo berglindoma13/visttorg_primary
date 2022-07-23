@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { mediaMax } from '../../constants/breakpoints'
 import { TextInput } from '../Inputs'
 import FacebookIcon from '../Svg/Facebook'
-import { prismaInstance } from '../../lib/prisma'
 import { Heading3, Heading5 } from '../Typography'
 
 export const Footer = () => {
@@ -21,12 +20,13 @@ export const Footer = () => {
   const addToPostlist = () => {
     localStorage.setItem('postlist', 'true')
 
-    // prismaInstance.postlist.create({
-    //   data: {
-    //     email: postlistEmail
-    //   }
-    // })
-    
+    fetch('/api/postlist/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        postlistEmail,
+      }),
+    })
   }
 
   return(
@@ -35,10 +35,8 @@ export const Footer = () => {
         <TopContent>
           <FooterTitle>Allar umhverfisvottaðar byggingavörur á einum stað</FooterTitle>
           <FooterSubText>Viltu vera memm ? <a href="mailto:vistbok@visttorg.is" >Hafðu samband</a></FooterSubText>
-          
         </TopContent>
         <BottomContent>
-          
           <BottomContentLeft>2022©</BottomContentLeft>
           <BottomContentRight>
             <a href='https://www.facebook.com/Vistbok' target='_blank'><FacebookIcon /></a>
@@ -155,5 +153,5 @@ const BottomContentMid = styled.div`
 `
 
 const PostlistTitle = styled(Heading5)`
-  margin-bottom:5px;
+  margin-bottom: 10px;
 `
