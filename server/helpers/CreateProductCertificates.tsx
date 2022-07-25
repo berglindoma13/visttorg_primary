@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import { TestControllerProduct, validDateObj } from '../types/testResult'
 import { Certificate } from '../types/models'
-
-const prisma = new PrismaClient()
+import { prismaInstance } from '../../lib/prisma'
 
 // TODO breyta testControllerProduct í meira general product til að geta notað þetta fall fyrir allt
 export const CreateProductCertificates = async(product : TestControllerProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
@@ -15,7 +13,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
           date = validDateCertificates[0].date
         }
         console.log("valid date", date)
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 1 }
@@ -37,7 +35,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
         if(validDateCertificates[1].message === "Valid") {
           date = validDateCertificates[1].date
         }
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 2 }
@@ -59,7 +57,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
         if(validDateCertificates[2].message === "Valid") {
           date = validDateCertificates[2].date
         }
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 3 }
@@ -77,7 +75,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
       }
   
       if(certificate.name === 'SV'){
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 4 }
@@ -93,7 +91,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
       }
   
       if(certificate.name === 'SV_ALLOWED'){
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 5 }
@@ -109,7 +107,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
       }
   
       if(certificate.name === 'BREEAM'){
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 6 }
@@ -124,7 +122,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
         })
       }
       if(certificate.name === 'BLENGILL'){
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 7 }
@@ -139,7 +137,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
         })
       }
       if(certificate.name === 'EV'){
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 8 }
@@ -154,7 +152,7 @@ export const CreateProductCertificates = async(product : TestControllerProduct, 
         })
       }
       if(certificate.name === 'CE'){
-        return await prisma.productcertificate.create({
+        return await prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 9 }

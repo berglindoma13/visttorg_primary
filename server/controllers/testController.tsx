@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client'
 const reader = require('g-sheets-api');
 const fs = require('file-system');
 import { Certificate } from '../types/models'
@@ -7,9 +6,15 @@ import { TestControllerProduct, allProducts, validDateObj } from '../types/testR
 import { SendEmail } from '../helpers/SendEmail'
 import { ValidDate } from '../helpers/ValidDate'
 import { WriteFile } from '../helpers/WriteFile'
-// import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
-
-const prisma = new PrismaClient()
+import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
+// import { prismaInstance } from '../../lib/prisma';
+import { DeleteAllProductsByCompany,
+        DeleteAllCertByCompany,
+        DeleteProduct, 
+        DeleteProductCertificates,
+        UpsertProduct,
+        GetUniqueProduct,
+        GetAllProductsByCompanyid } from '../helpers/PrismaHelper'
 
 // company id 2, get data from google sheets and insert into database
 
@@ -25,24 +30,14 @@ export const InsertAllSheetsProducts = async(req,res) => {
 
 export const DeleteAllSheetsProducts = async(req,res) => {
   // delete all products with company id 2
-  await prisma.product.deleteMany({
-    where: {
-      companyid: 2
-    }
-  })
-  res.end("All deleted");
+  DeleteAllProductsByCompany(2)
+  res.end("All products deleted")
 }
 
 export const DeleteAllSheetsCert = async(req,res) => {
   // delete all product certificates connected to company id 2
-  await prisma.productcertificate.deleteMany({
-    where: {
-      connectedproduct: {
-        companyid: 2
-      }
-    }
-  })
-  res.end("All deleted");
+  DeleteAllCertByCompany(2)
+  res.end("all product certificates deleted")
 }
 
 const WriteAllFiles = async() => {
@@ -61,25 +56,6 @@ const productsNoLongerComingInWriteFile = async(nolonger) => {
   // write product info of products no longer coming into the database (and send email to company)
   fs.writeFile("writefiles/nolonger.txt", JSON.stringify(nolonger))
   // SendEmail("Products no longer coming in from company")
-}
-
-const DeleteAllSheetsProductCertificates = async(id) => {
-  await prisma.productcertificate.deleteMany({
-    where: {
-      connectedproduct: {
-        companyid: 2
-      },
-      productid : id 
-    }
-  })
-}
-
-const DeleteProduct = async(product) => {
-  await prisma.product.delete({
-    where: {
-      productid: product.productid
-    }
-  })
 }
 
 // gets all products from online sheets file
@@ -123,172 +99,6 @@ const getProducts = () => {
   });
 }
 
-// SPURJA BEGGU -> þetta er með prisma create dót, má ég setja þetta bara í sér skjal og búa til nýjan prisma client þar
-// --> það kemur too many connections error ef eg set í annað skjal til að endurnýta
-const CreateProductCertificates = async(product : TestControllerProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
-  let certificateObjectList = [];
-  await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
-    if(certificate.name === 'EPD'){
-      //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
-      var date = null;
-      if(validDateCertificates[0].message === "Valid") {
-        date = validDateCertificates[0].date
-      }
-      console.log("valid date", date)
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 1 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          },
-          fileurl : product.epdUrl,
-          validDate : date
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'FSC'){
-      var date = null;
-      if(validDateCertificates[1].message === "Valid") {
-        date = validDateCertificates[1].date
-      }
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 2 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          },
-          fileurl : product.fscUrl,
-          validDate : date
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'VOC'){
-      var date = null;
-      if(validDateCertificates[2].message === "Valid") {
-        date = validDateCertificates[2].date
-      }
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 3 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          },
-          fileurl : product.vocUrl,
-          validDate : date
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'SV'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 4 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'SV_ALLOWED'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 5 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'BREEAM'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 6 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'BLENGILL'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 7 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'EV'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 8 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-    if(certificate.name === 'CE'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 9 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        const obj = { id : prodcert.id }
-        certificateObjectList.push(obj)
-      })
-    }
-  })).then(() => {
-    
-  })
-  return certificateObjectList
-}
-
 const UpsertProductInDatabase = async(product : TestControllerProduct, approved : boolean, create : boolean, certChange : boolean) => {
   // get all product certificates from sheets
   const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { if(certificate.val=="TRUE") {return {name: certificate.name.toUpperCase() }} })
@@ -301,6 +111,7 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
     return;
   }
   if(create === true) {
+    console.log('created product', product)
     if (validatedCertificates.length !== 0) {
       createdProducts.push(product)
       // check valid date when product is created
@@ -309,53 +120,15 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
   }
   if(certChange === true) {
     //delete all productcertificates so they wont be duplicated and so they are up to date
-    DeleteAllSheetsProductCertificates(product.id)
+    DeleteProductCertificates(product.id)
     if(validatedCertificates.length !== 0 ) {
       updatedProducts.push(product)
       // check valid date when the certificates have changed
       var validDate = await ValidDate(validatedCertificates, product)
     }
   }
-
-  await prisma.product.upsert({
-    where: {
-      productid : product.id
-    },
-    update: {
-      approved: approved,
-      title: product.prodName,
-      productid : product.id,
-      sellingcompany: {
-        connect: { id : 2}
-      },
-      categories : {
-        connect: { name : product.fl}
-      },
-      description : product.longDescription,
-      shortdescription : product.shortDescription,
-      productimageurl : product.prodImage,
-      url : product.url,
-      brand : product.brand,
-      updatedAt: new Date()
-    },
-    create: {
-      title: product.prodName,
-      productid : product.id,
-      sellingcompany: {
-        connect: { id : 2}
-      },
-      categories : {
-        connect: { name : product.fl}
-      },
-      description : product.longDescription,
-      shortdescription : product.shortDescription,
-      productimageurl : product.prodImage,
-      url : product.url,
-      brand : product.brand,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  })
+  // update or create product in database
+  await UpsertProduct(product, approved, 2)
   if(certChange === true || create === true) {
     await CreateProductCertificates(product, validDate, validatedCertificates)
   }
@@ -364,9 +137,7 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
 // check if product list database has any products that are not coming from sheets anymore
 const isProductListFound = async(products : Array<TestControllerProduct>) => {
   // get all current products from this company
-  const currprods = await prisma.product.findMany({
-      where : {companyid : 2}
-  })
+  const currprods = await GetAllProductsByCompanyid(2)
   const nolonger = currprods.map((curr_prod) => {
     const match = products.map((prod) => {
       if(curr_prod.productid == prod.id) {
@@ -380,7 +151,7 @@ const isProductListFound = async(products : Array<TestControllerProduct>) => {
   productsNoLongerComingInWriteFile(nolonger)
   // deleta prodcut from prisma database
   nolonger.map(product => {
-    DeleteProduct(product)
+    DeleteProduct(product.productid)
   })
 }
 
@@ -389,14 +160,7 @@ const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
   isProductListFound(products)
 
   products.map(async(product) => {
-    const prod = await prisma.product.findUnique({
-      where : {productid: product.id},
-      include : {certificates: {
-        include: {
-          certificate : true
-        }
-      }}
-    })
+    const prod = await GetUniqueProduct(product.id)
     var approved = null;
     if (prod !== null){
       approved = prod.approved;

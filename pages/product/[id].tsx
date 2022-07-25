@@ -37,6 +37,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
+  console.log("prod", uniqueProduct)
+
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
   return {
@@ -75,8 +77,8 @@ const Product = ({ productString } : ProductPageProps) => {
         return <CertImageWrapper><Image src='/leyfilegt-svansvottad.png' layout="fill" objectFit="contain" /></CertImageWrapper>
       case 'EV':
         return <CertImageWrapper><Image src='/Euroblume_logo.svg.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-      case 'CE':
-        return <CertImageWrapper><Image src='/ce_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
+      // case 'CE':
+      //   return <CertImageWrapper><Image src='/ce_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
       case 'BLENGILL':
         return <CertImageWrapper><Image src='/blue_angel_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
     }
@@ -159,11 +161,10 @@ const Product = ({ productString } : ProductPageProps) => {
                 }
               </div>
               <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description.replace(/<[^>]+>/g, '')}</Heading4>
-              {console.log("product url", product.url)}
               {product.url && <>
                 <UIBig style={{ marginBottom: 15 }}>Sjá vöru á vef</UIBig>
                 <MainButton
-                  text={product.sellingcompany.name + ".is"}
+                  text={product.sellingcompany.websiteurl}
                   isLink
                   href={product.url}
                 />
