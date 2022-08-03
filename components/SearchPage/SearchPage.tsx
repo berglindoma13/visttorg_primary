@@ -352,7 +352,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
           </FilterGroup>
           <FilterGroup>
-            <FilterGroupTitle>VisttorgCategories</FilterGroupTitle>
+            <FilterGroupTitle>Flokkar</FilterGroupTitle>
             <FilterItems>
               {VisttorgCategories.map(item => {
                 if(item.weight == 2){
@@ -372,7 +372,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           </FilterGroup>
           <FilterGroup>
             { filters.categories.length !== 0 && <>
-            <FilterGroupTitle>UndirVisttorgCategories</FilterGroupTitle>
+            <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories.map(category => {
                 return(

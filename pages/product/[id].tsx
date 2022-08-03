@@ -164,7 +164,7 @@ const Product = ({ productString } : ProductPageProps) => {
               {product.url && <>
                 <UIBig style={{ marginBottom: 15 }}>Sjá vöru á vef</UIBig>
                 <MainButton
-                  text={product.sellingcompany.websiteurl}
+                  text={product.sellingcompany.websiteurl.replace('https://','').replace('www.', '').replace('/','')}
                   isLink
                   href={product.url}
                 />

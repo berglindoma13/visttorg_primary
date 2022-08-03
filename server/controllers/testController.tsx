@@ -82,7 +82,8 @@ const getProducts = () => {
             epdUrl: results[i].epdlink,
             vocUrl: results[i].voclink,
             ceUrl: results[i].ce,
-            certificates: [{ name: "fsc", val: results[i].fsc },
+            certificates: [
+                { name: "fsc", val: results[i].fsc },
                 { name: "epd", val: results[i].epd },
                 { name: "voc", val: results[i].voc },
                 { name: "sv_allowed", val: results[i].sv },
@@ -104,33 +105,38 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
   const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { if(certificate.val=="TRUE") {return {name: certificate.name.toUpperCase() }} })
   Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
   const validatedCertificates = CertificateValidator({ certificates: convertedCertificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
-  
+  console.log("vorunumber", product.id == "")
   if(validatedCertificates.length === 0){
     // no valid certificates for this product
     productsNotValid.push(product)
     return;
   }
   if(create === true) {
-    console.log('created product', product)
     if (validatedCertificates.length !== 0) {
-      createdProducts.push(product)
-      // check valid date when product is created
-      var validDate = await ValidDate(validatedCertificates, product)
+      if (product.id !== "") {
+        createdProducts.push(product)
+        // check valid date when product is created
+        var validDate = await ValidDate(validatedCertificates, product)
+      }
     }
   }
   if(certChange === true) {
     //delete all productcertificates so they wont be duplicated and so they are up to date
     DeleteProductCertificates(product.id)
     if(validatedCertificates.length !== 0 ) {
-      updatedProducts.push(product)
-      // check valid date when the certificates have changed
-      var validDate = await ValidDate(validatedCertificates, product)
+      if (product.id !== "") {
+        updatedProducts.push(product)
+        // check valid date when the certificates have changed
+        var validDate = await ValidDate(validatedCertificates, product)
+      }
     }
   }
-  // update or create product in database
-  await UpsertProduct(product, approved, 2)
-  if(certChange === true || create === true) {
-    await CreateProductCertificates(product, validDate, validatedCertificates)
+  // update or create product in database if the product has a productnumber (vörunúmer)
+  if(product.id !== "") {
+    await UpsertProduct(product, approved, 2)
+    if(certChange === true || create === true) {
+      await CreateProductCertificates(product, validDate, validatedCertificates)
+    }
   }
 }
 

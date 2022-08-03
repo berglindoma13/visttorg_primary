@@ -5,8 +5,6 @@ import FacebookIcon from '../Svg/Facebook'
 import { Heading5 } from '../Typography'
 // import { fire } from 'firebase/app'
 
-
-
 export const Footer = () => {
 
   // const [errorMessage, setErrorMessage] = useState(false)
