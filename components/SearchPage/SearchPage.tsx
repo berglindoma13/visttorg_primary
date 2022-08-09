@@ -13,7 +13,7 @@ import { Product } from '../Product'
 import { Pagination } from '../Pagination'
 import { useRouter } from 'next/router'
 import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
-import Close from '../Svg/Close'
+import { Close, MagnifyingGlass } from '../Svg'
 import certificateMapper from '../../mappers/certificates'
 
 interface SearchPageProps{
@@ -322,6 +322,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         }}
         onSubmit={() => {}}
         value={query}
+        inputIcon={<MagnifyingGlass />}
       />
 
       <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>
@@ -337,7 +338,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 onClick={() => {
                   toggleFilters('categories', cat)
                 }} 
-                active={filters.categories.filter(category=>category.name==cat.name).length>0} 
+                active={filters.categories && filters.categories.filter(category=>category.name==cat.name).length>0} 
               />
             )
           }

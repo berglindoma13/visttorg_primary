@@ -3,12 +3,14 @@ import styled from 'styled-components'
 import { mediaMax } from '../../constants/breakpoints'
 import { TextInput } from '../Inputs'
 import FacebookIcon from '../Svg/Facebook'
-import { Heading3, Heading5 } from '../Typography'
+import { Heading4, Heading5 } from '../Typography'
 
 export const Footer = () => {
 
   const [postlistEmail, setPostlistEmail] = useState('')
   const [postlistDone, setPostlistDone] = useState(false)
+
+  const [inputError, setInputError] = useState('')
 
   useEffect(() => {
     const postlistset = localStorage.getItem('postlist')
@@ -17,16 +19,33 @@ export const Footer = () => {
     }
   }, [])
 
-  const addToPostlist = () => {
-    localStorage.setItem('postlist', 'true')
+  const addToPostlist = async() => {
 
-    fetch('/api/postlist/', {
+    fetch('/api/postlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        postlistEmail,
-      }),
+        postlistEmail
+      })
+    }).then((response) => {
+      console.log('response', response)
+      
+      if (response.ok) {
+        return;
+      }
+
+      throw new Error(response.statusText);
     })
+    .then(() => {
+      console.log('successful adding to postlist')
+      localStorage.setItem('postlist', 'true')
+    })
+    .catch((error) => {
+      console.log('error adding to postlist', error.message)
+      //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
+      // setInputError(error.message)
+      setInputError('Villa við skráningu, vinsamlegast reyndu aftur')
+    });
   }
 
   return(
@@ -44,9 +63,13 @@ export const Footer = () => {
           <BottomContentMid>
             <PostlistTitle>Viltu vera á póstlista?</PostlistTitle>
             {postlistDone ? (
-              <Heading3>Þú ert nú þegar skráð/ur á póstlista</Heading3>
+              <Heading5>Takk fyrir skráninguna, þú ert skráð/ur á póstlistann</Heading5>
             ) : (
-              <TextInput placeholder="netfang" onSubmit={() => addToPostlist()} onChange={(e) => setPostlistEmail(e.target.value)}></TextInput>
+              <Wrapper>
+                <TextInput placeholder="netfang" onSubmit={() => addToPostlist()} onChange={(e) => setPostlistEmail(e.target.value)}></TextInput>
+                <SubmitButton onClick={() => addToPostlist()}>Skrá</SubmitButton>
+                {inputError && <StyledError>{inputError}</StyledError>}
+              </Wrapper>
             )}
           </BottomContentMid>
         </BottomContent>
@@ -54,6 +77,32 @@ export const Footer = () => {
     </FooterContainer>
   )
 }
+
+const StyledError = styled.span`
+  color:red;
+  font-size: 12px;
+  max-width: 70%;
+  display: block;
+  margin-top: 5px;
+  margin-left: 10px;
+`
+
+const Wrapper = styled.div`
+  position:relative;
+`
+
+const SubmitButton = styled.button`
+  position:absolute;
+  z-index: 2;
+  top:5px;
+  right:5px;
+  border:none;
+  background-color: ${({ theme }) => theme.colors.green};
+  height:30px;
+  border-radius: 999px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+  width:60px;
+`
 
 const FooterContainer = styled.div`
   height: fit-content;
@@ -152,6 +201,6 @@ const BottomContentMid = styled.div`
   justify-content: flex-end;
 `
 
-const PostlistTitle = styled(Heading5)`
+const PostlistTitle = styled(Heading4)`
   margin-bottom: 10px;
 `

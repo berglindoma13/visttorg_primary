@@ -12,7 +12,7 @@ app
   .prepare()
   .then(() => {
     const server = express();
-    const CompanyRoutes = require("./routes/index.tsx");
+    const Routes = require("./routes/index.tsx");
 
     server.use(express.json())
 
@@ -21,7 +21,7 @@ app
       createParentPath: true
     }));
 
-    server.use("/", CompanyRoutes(server));
+    server.use("/", Routes(server));
 
     server.get("*", (req : Request, res : Response) => {
       return handle(req, res);

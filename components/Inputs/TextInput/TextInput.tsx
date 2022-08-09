@@ -7,9 +7,10 @@ interface TextInputProps {
   className?: string
   onChange: (e) => void
   value?: string
+  inputIcon?: React.ReactNode
 }
 
-export const TextInput = ({ placeholder, onSubmit, className, onChange, value }: TextInputProps) => {
+export const TextInput = ({ placeholder, onSubmit, className, onChange, value, inputIcon }: TextInputProps) => {
   
   const _onSubmit = (e) => {
     if (e.which === 13) {
@@ -19,13 +20,13 @@ export const TextInput = ({ placeholder, onSubmit, className, onChange, value }:
   
   return(
     <InputWrapper className={className}>
-      <StyledMagnifyingGlass />
-      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} onChange={onChange}/>
+      {inputIcon && <StyledIcon>{inputIcon}</StyledIcon>}
+      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} onChange={onChange} withIcon={!!inputIcon}/>
     </InputWrapper>
   )
 }
 
-const StyledMagnifyingGlass = styled(MagnifyingGlass)`
+const StyledIcon = styled.div`
   position:absolute;
   left:18px;
   top:11px;
@@ -38,18 +39,20 @@ const InputWrapper = styled.div`
   position:relative;
 
   &:hover{
-    ${StyledMagnifyingGlass}{
+    ${StyledIcon}{
       fill: ${({ theme }) => theme.colors.green};
     }
-  }
-  
+  } 
 `
 
+interface inputStyleProps{
+  withIcon: boolean
+}
 
-const StyledTextInput = styled.input`
+const StyledTextInput = styled.input<inputStyleProps>`
   height: 40px;
   width:100%;
-  padding-left:50px;
+  padding-left: ${({ withIcon }) => withIcon ? '50px' : '20px'};
   position:relative;
   background: #FAFAFA;
   box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);

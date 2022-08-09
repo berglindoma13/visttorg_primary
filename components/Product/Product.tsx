@@ -32,7 +32,7 @@ export const Product = ({
   return(
     <Link href={`/product/${productId}`}>
       <StyledProduct className={className}>
-        {/* <StyledFavoritesButton 
+        <StyledFavoritesButton 
           onClick={() => { 
             if(myProducts.includes(productId)){
               dispatch(removeFromFavorites(productId))
@@ -40,7 +40,7 @@ export const Product = ({
               dispatch(addToFavorites(productId))
             }
           }}
-          status={myProducts.includes(productId) ? 'enabled' : 'disabled'} /> */}
+          status={myProducts.includes(productId) ? 'enabled' : 'disabled'} />
         {productimageurl && 
         <ProductImage>
           <Image

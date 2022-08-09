@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import { InsertAllBykoProducts, TestProduct, GetAllCategories, DeleteAllProducts, DeleteAllProducCertificates } from '../controllers/BykoController';
 import { fileUpload } from '../controllers/ProductUploadController'
+import { Postlist } from '../controllers/Postlist'
 
 import { InsertAllSheetsProducts, /*ProcessNewInDatabase*/ DeleteAllSheetsProducts, /*DeleteAllSheetsProductCertificates*/ DeleteAllSheetsCert, SendEmail } from '../controllers/testController';
 
@@ -23,9 +24,10 @@ function routes(app : any) {
   // app.post('/api/product/add', fileUpload)
 
   app.get('/api/sendmail', SendEmail)
+
+  //add to postlist
+  app.post('/api/postlist', Postlist)
   return router;
 };  
-
-
 
 module.exports = routes;

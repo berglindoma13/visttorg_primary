@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Heart } from '../Svg/Heart'
+import { Heart } from '../Svg'
 
 interface FavoritesButtonProps {
   onClick: () => void

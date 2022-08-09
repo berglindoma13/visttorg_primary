@@ -31,7 +31,7 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
         <>
           {/* DESKTOP */}     
           <TextInputWrapper>
-            <TextInput placeholder='Leita eftir nafni vöru' onSubmit={Submit} onChange={(e) => setSearch(e.target.value)}/>
+            <TextInput placeholder='Leita eftir nafni vöru' onSubmit={Submit} onChange={(e) => setSearch(e.target.value)} inputIcon={<MagnifyingGlass />}/>
           </TextInputWrapper>
           {/* MOBILE */}
           <Link href='/#search' passHref>
