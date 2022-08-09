@@ -19,7 +19,8 @@ export interface ProductProps {
 
 export interface Company{
   id : number,
-  name : string
+  name : string,
+  websiteurl: string,
 }
 
 export interface Category{

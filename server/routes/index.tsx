@@ -4,7 +4,7 @@ import { InsertAllBykoProducts, TestProduct, GetAllCategories, DeleteAllProducts
 import { fileUpload } from '../controllers/ProductUploadController'
 import { Postlist } from '../controllers/Postlist'
 
-import { InsertAllSheetsProducts, /*ProcessNewInDatabase*/ DeleteAllSheetsProducts, /*DeleteAllSheetsProductCertificates*/ DeleteAllSheetsCert, SendEmail } from '../controllers/testController';
+import { InsertAllSheetsProducts, /*ProcessNewInDatabase*/ DeleteAllSheetsProducts, /*DeleteAllSheetsProductCertificates*/ DeleteAllSheetsCert, /*SendEmail*/ } from '../controllers/testController';
 
 function routes(app : any) {
   //COMPANY ID IN DATABASE IS 1
@@ -23,10 +23,9 @@ function routes(app : any) {
   app.post('/api/product/add', fileUpload)
   // app.post('/api/product/add', fileUpload)
 
-  app.get('/api/sendmail', SendEmail)
-
   //add to postlist
   app.post('/api/postlist', Postlist)
+  // app.get('/api/sendmail', SendEmail)
   return router;
 };  
 

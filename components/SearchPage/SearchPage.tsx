@@ -4,7 +4,7 @@ import { mediaMax } from '../../constants/breakpoints'
 import { Certificate } from '../../types/certificates'
 import { Company, ProductProps } from '../../types/products'
 import { TextInput } from '../Inputs'
-import { Heading1Large, Heading6, UIMedium } from '../Typography'
+import { Heading1Large, Heading3, Heading4, Heading6, UIMedium } from '../Typography'
 import Fuse from 'fuse.js'
 import { FilterButton, FilterItem, MainButton } from '../Buttons'
 import { SearchProducts } from '../../utils/Search'
@@ -15,6 +15,8 @@ import { useRouter } from 'next/router'
 import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
 import { Close, MagnifyingGlass } from '../Svg'
 import certificateMapper from '../../mappers/certificates'
+import PaintBucket from '../../public/PaintBucketIcon.svg'
+import Image from 'next/image'
 
 interface SearchPageProps{
   products: Array<ProductProps>
@@ -324,8 +326,12 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         value={query}
         inputIcon={<MagnifyingGlass />}
       />
-
-      <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>
+      {filteredProductList.length === 0 ?
+        <> 
+          <NoResultsSubtext> Þú leitaðir að </NoResultsSubtext> 
+          <SearchResultSubtext> "{query.toUpperCase()}" </SearchResultSubtext>
+        </>
+        : <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>}
       <CategoryFilters>
         <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
         {/* <MainButton text='Baðherbergi' onClick={() => {toggleFilters('categories', 'Baðherbergi')}} active={false} /> */}
@@ -389,7 +395,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
           </FilterGroup>
           <FilterGroup>
-            <FilterGroupTitle>VisttorgCategories</FilterGroupTitle>
+            <FilterGroupTitle>Flokkar</FilterGroupTitle>
             <FilterItems>
               {VisttorgCategories.map(item => {
                 if(item.weight == 2){
@@ -409,7 +415,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           </FilterGroup>
           <FilterGroup>
             { filters.categories.length !== 0 && <>
-            <FilterGroupTitle>UndirVisttorgCategories</FilterGroupTitle>
+            <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories.map(category => {
                 return(
@@ -432,7 +438,20 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           </FilterGroup>
         </FilterWrapper>
         <ProductList>
-          {filteredProductList.length === 0 && <NoResults>Engar vörur fundust</NoResults>}
+          {filteredProductList.length === 0 &&
+            <div>
+              <ImageWrapper>
+                <Image 
+                  src={PaintBucket} 
+                  alt='Icon image' 
+                  layout='fill'
+                  objectFit='contain'
+                />
+              </ImageWrapper>
+              <NoResultsText>Úps! Ekkert fannst.</NoResultsText>
+              <NoResultsSubtext>Endilega prófaðu að leita eftir öðrum leitarskilyrðum.</NoResultsSubtext>
+            </div>
+          }
           {filteredProductList.map((product, index) => {
             if(index >= (paginationNumber - 1) * paginationPageSize && index < paginationNumber * paginationPageSize){
               const thisProduct = product.item
@@ -611,10 +630,31 @@ const CategoryFilters = styled.div`
     
   }
 `
-const NoResults = styled.div`
-  width: 100%;
-  font-size: max(1.52vw, 22px);
+const SearchResultSubtext = styled(Heading4)`
+  font-family: Space Mono;
   text-align: center;
   padding-top: 20px;
-  color: black;
+`
+
+const NoResultsText = styled(Heading3)`
+  font-family: Space Mono;
+  text-align: center;
+  padding-top: 20px;
+`
+
+const NoResultsSubtext = styled(Heading6)`
+  text-align: center;
+  padding-top: 20px;
+  color: #BDBDBD;
+`
+
+const ImageWrapper = styled.div`
+  max-height:100%;
+  height: 25%;
+  position:relative;
+  // width: 70%;
+  @media ${mediaMax.tablet}{
+    // width: 25%;
+    height:auto;
+  }
 `

@@ -312,7 +312,7 @@ const Home = ({ productListString, categories, certificates, companies, category
             )
           })}
           {filteredList.length === 0 && (
-            <NoResults>Engar vörur fundust</NoResults>
+            <NoResults>Úps! Ekkert fannst.</NoResults>
           )}
         </StyledRight>
       </StyledContainer>

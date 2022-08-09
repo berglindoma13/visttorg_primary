@@ -11,9 +11,10 @@ generator client {
 }
 
 model company {
-  id       Int       @id @default(autoincrement())
-  name     String
-  products product[]
+  id            Int       @id @default(autoincrement())
+  name          String
+  websiteurl    String
+  products      product[]
 }
 
 model product {
