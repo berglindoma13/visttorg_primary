@@ -344,7 +344,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 onClick={() => {
                   toggleFilters('categories', cat)
                 }} 
-                active={filters.categories && filters.categories.filter(category=>category.name==cat.name).length>0} 
+                active={filters.categories && filters.categories && filters.categories.filter(category=>category.name==cat.name).length>0} 
               />
             )
           }
@@ -370,7 +370,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                     onClick={() => {
                       toggleFilters('companies', company.name)
                     }} 
-                    active={filters.companies.includes(company.name)} 
+                    active={filters.companies && filters.companies.includes(company.name)} 
                   />
                 )
               })}
@@ -388,7 +388,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
                     }} 
-                    active={filters.certificates.includes(certificate.name)}
+                    active={filters.certificates && filters.certificates.includes(certificate.name)}
                   />
                 )
               })}
@@ -406,7 +406,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                       onClick={() => {
                         toggleFilters('categories', item)
                       }} 
-                      active={filters.categories.filter(cat=>cat.name==item.name).length>0}
+                      active={filters.categories && filters.categories.filter(cat=>cat.name==item.name).length>0}
                     />
                   )
                 }
