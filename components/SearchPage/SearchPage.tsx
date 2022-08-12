@@ -17,6 +17,7 @@ import Close from '../Svg/Close'
 import certificateMapper from '../../mappers/certificates'
 import PaintBucket from '../../public/PaintBucketIcon.svg'
 import Image from 'next/image'
+// import CloseIcon from '../Svg/Close'
 
 interface SearchPageProps{
   products: Array<ProductProps>
@@ -198,7 +199,19 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     router.push(`/?page=${number}`, undefined, { shallow: true })
   }
 
-  const getCompanyCounts = (comp) => { var val = 0
+  const clearFilters = () => {
+    setFilters({
+      brand: [],
+      companies: [],
+      certificates: [],
+      categories: []
+    })
+    setSubFilters([])
+    setQuery("")
+  }
+
+  const getCompanyCounts = (comp : string) => { 
+    var val = 0
     companyCounts.map(compcount => { 
       if(compcount.name === comp) {
         val = compcount.count
@@ -207,7 +220,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     return val
   }
 
-  const getCertificateCounts = (cert) => { var val = 0
+  const getCertificateCounts = (cert : string) => { 
+    var val = 0
     certificateCounts.map(certcount => {
       if(certcount.name === cert) {
         val = certcount.count
@@ -399,6 +413,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
             </>}
           </FilterGroup>
+          <StyledClearFilterButton onClick={clearFilters} >
+            <Close fill="#000"/> <StyledClearFilterButtonText> Hreinsa síur </StyledClearFilterButtonText>
+          </StyledClearFilterButton>
         </FilterWrapper>
         <ProductList>
           {filteredProductList.length === 0 &&
@@ -593,6 +610,28 @@ const CategoryFilters = styled.div`
     
   }
 `
+
+const StyledClearFilterButton = styled.button`
+  padding: 8px 18px 10px;
+  height: 33px;
+  background: none;
+  border-radius: 1284.43px;
+  border:none;
+  width: fit-content;
+  min-width: fit-content;
+  cursor:pointer;
+  float: right;
+`
+const StyledClearFilterButtonText = styled.span`
+  font-family: Space Mono;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 104%;
+  letter-spacing: 0.005em;
+  padding-left: 10px;
+`
+
 const SearchResultSubtext = styled(Heading4)`
   font-family: Space Mono;
   text-align: center;
