@@ -20,11 +20,11 @@ export const Postlist = async (req: NextApiRequest, res: NextApiResponse): Promi
     return res.status(400).send('Netfang ekki gilt')
   }
 
-  prismaInstance.postlist.create({
-    data: {
-      email: postlistEmail
-    }
-  })
+  // prismaInstance.postlist.create({
+  //   data: {
+  //     email: postlistEmail
+  //   }
+  // })
 
   return res.status(200).send('success')
 }
