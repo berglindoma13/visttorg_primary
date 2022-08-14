@@ -35,12 +35,14 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
               <MagnifyingGlass />
             </MobileSearchButton>
           </Link>
-
         </>
-      ) : (
+      ) : ( <>
         <Link href='/umokkur'>
           <NavItem>Um okkur</NavItem>
         </Link>
+        <Link href='/myfavorites'>
+          <NavItem>Favorites</NavItem>
+        </Link> </>
       )}
     </HeaderWrapper>
   )

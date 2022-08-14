@@ -100,10 +100,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     {name: "Lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
     {name: "Öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
     {name: "Vélbúnaður", subCategories: ["Heimilistæki", "Húsgögn"], weight: 2 },
-    // {name: "Húsgögn", items: ["hús1", "hús2", "hús3"]},
-    // {name: "Heimilistæki", items: ["hei1", "hei2", "hei3"]},
-    // {name: "Veggir", items: ["veg1", "veg2", "veg3"]},
-    // {name: "Málningarvörur", items: ["mál1", "mál2", "mál3"]}
   ]
 
   const fuseInstance = new Fuse(products, options)
@@ -654,9 +650,7 @@ const ImageWrapper = styled.div`
   max-height:100%;
   height: 25%;
   position:relative;
-  // width: 70%;
   @media ${mediaMax.tablet}{
-    // width: 25%;
     height:auto;
   }
 `
