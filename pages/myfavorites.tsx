@@ -57,7 +57,6 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
         <StyledHeader showSearch={false} />
         <StyledHeader1>Þínar uppáhalds vörur</StyledHeader1>
         {/* <button onClick={() => dispatch(addToFavorites('123'))}></button> */}
-        {console.log('PRODUCTS', myProducts)}
         <ProductList>
           {myProducts && (
             productList.map(prod => {
