@@ -38,12 +38,16 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
         </>
       ) : ( 
         <SidebarWrapper>
-          <Link href='/umokkur'>
-            <NavItem>Um okkur</NavItem>
-          </Link>
-          <Link href='/myfavorites'>
-            <NavItem>Favorites</NavItem>
-          </Link> 
+          <TopbarWrapper>
+            <Link href='/umokkur'>
+              <NavItem>Um okkur</NavItem>
+            </Link>
+          </TopbarWrapper>
+          <TopbarWrapper>
+            <Link href='/myfavorites'>
+              <NavItem>Favorites</NavItem>
+            </Link> 
+          </TopbarWrapper>
         </SidebarWrapper>
       )}
     </HeaderWrapper>
@@ -97,7 +101,12 @@ const NavItem = styled.span`
   }
 `
 
-const SidebarWrapper = styled.div`
+const SidebarWrapper = styled.span`
   display:flex;
-  flex-direction: column;
+  flex-direction: row;
+  // padding-left: 10px;
+`
+
+const TopbarWrapper = styled.span`
+  padding-left: 20px;
 `

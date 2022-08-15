@@ -11,8 +11,8 @@ interface FavoritesButtonProps {
 export const FavoritesButton = ({ onClick, status, className }: FavoritesButtonProps) => {
   return (
     <StyledFavoritesButton onClick={onClick} className={className}>
-      {status === 'disabled'  && <Heart variant='outline'/>}
-      {status === 'enabled'  && <Heart variant='fill'/>}
+      {status === 'disabled'  && <Heart variant='outline' id='heartbutton'/>}
+      {status === 'enabled'  && <Heart variant='fill' id='heartbutton'/>}
     </StyledFavoritesButton>
   )
 }

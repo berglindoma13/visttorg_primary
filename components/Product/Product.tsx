@@ -33,7 +33,10 @@ export const Product = ({
     <Link href={`/product/${productId}`}>
       <StyledProduct className={className}>
         <StyledFavoritesButton 
-          onClick={() => { 
+          onClick={(e) => {
+            if(e.target.id === 'heartbutton') {
+              e.preventDefault()
+            }
             if(myProducts.includes(productId)){
               dispatch(removeFromFavorites(productId))
             }else{
