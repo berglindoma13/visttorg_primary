@@ -1,6 +1,6 @@
 import { TestControllerProduct, validDateObj } from '../types/testResult'
 import { Certificate } from '../types/models'
-import { prismaInstance } from '../../lib/prisma'
+import { prismaInstance } from '../lib/prisma'
 
 // TODO breyta testControllerProduct í meira general product til að geta notað þetta fall fyrir allt
 export const CreateProductCertificates = async(product : TestControllerProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {

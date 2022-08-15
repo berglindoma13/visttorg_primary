@@ -1,5 +1,0 @@
-{
-  "watch": ["server", "server/routes"],
-  "ext": "ts tsx",
-  "exec": "ts-node --project tsconfig.server.json server/index.ts"
-}

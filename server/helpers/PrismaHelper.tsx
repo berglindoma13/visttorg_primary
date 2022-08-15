@@ -1,4 +1,4 @@
-import { prismaInstance } from "../../lib/prisma";
+import { prismaInstance } from "../lib/prisma";
 import { TestControllerProduct } from "../types/testResult";
 
 export const DeleteAllProductsByCompany = async(companyid : number) => {

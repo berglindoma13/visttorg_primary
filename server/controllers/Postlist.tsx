@@ -1,8 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { validateEmail } from '../../utils/emailValidation'
-import { prismaInstance } from '../../lib/prisma'
+import { validateEmail } from '../utils/emailValidation'
+import { prismaInstance } from '../lib/prisma'
 
-export const Postlist = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+export const Postlist = async (req: any, res: any): Promise<void> => {
 
   const {
     postlistEmail = '',

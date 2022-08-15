@@ -1,5 +1,5 @@
-const reader = require('g-sheets-api');
-const fs = require('file-system');
+import reader from 'g-sheets-api';
+import fs from'file-system';
 import { Certificate } from '../types/models'
 import { CertificateValidator } from '../helpers/CertificateValidator'
 import { TestControllerProduct, allProducts, validDateObj } from '../types/testResult'

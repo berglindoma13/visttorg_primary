@@ -1,1 +1,0 @@
-export interface SVG extends React.SVGAttributes<HTMLOrSVGElement> { }
