@@ -104,7 +104,6 @@ const NavItem = styled.span`
 const SidebarWrapper = styled.span`
   display:flex;
   flex-direction: row;
-  // padding-left: 10px;
 `
 
 const TopbarWrapper = styled.span`

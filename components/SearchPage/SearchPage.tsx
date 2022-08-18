@@ -49,7 +49,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
   
   const router = useRouter()
-  const paginationPageSize = 9
+  // const paginationPageSize = 9
   const isTablet = useIsTablet()
 
   const [filteredProductList, setFilteredProductList] = useState<Fuse.FuseResult<ProductProps>[]>([])
@@ -61,6 +61,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     categories: []
   })
   const [subfilters, setSubFilters] = useState<Array<string>>([])
+
+  const [paginationPageSize, SetPaginationPageSize] = useState(9)
 
   const options = {
     // isCaseSensitive: false,
@@ -302,7 +304,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           <NoResultsSubtext> Þú leitaðir að </NoResultsSubtext> 
           <SearchResultSubtext> "{query.toUpperCase()}" </SearchResultSubtext>
         </>
-        : <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>}
+        : <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>
+      }
       <CategoryFilters>
         <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
         {/* <MainButton text='Baðherbergi' onClick={() => {toggleFilters('categories', 'Baðherbergi')}} active={false} /> */}
@@ -320,6 +323,25 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           }
         })}
       </CategoryFilters>
+      {/* <ShowsizeWrapper>
+        <button onClick={() => SetPaginationPageSize(12)}>12</button>
+        <button onClick={() => SetPaginationPageSize(24)}>30</button>
+        <button onClick={() => SetPaginationPageSize(54)}>60</button>
+      </ShowsizeWrapper> */}
+      <ShowsizeWrapper>
+        <StyledMainButton 
+          text={12}
+          onClick={() => SetPaginationPageSize(12)}
+          active={paginationPageSize===12} />
+        <StyledMainButton 
+          text={30}
+          onClick={() => SetPaginationPageSize(30)}
+          active={paginationPageSize===30} />
+        <StyledMainButton 
+          text={60}
+          onClick={() => SetPaginationPageSize(60)}
+          active={paginationPageSize===60} />
+      </ShowsizeWrapper>
       <ProductsAndFilter
         animate={controls}
         transition={{ type: "Tween" }}
@@ -653,4 +675,8 @@ const ImageWrapper = styled.div`
   @media ${mediaMax.tablet}{
     height:auto;
   }
+`
+
+const ShowsizeWrapper = styled.div`
+  padding-bottom: 55px;
 `
