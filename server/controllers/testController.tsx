@@ -7,7 +7,6 @@ import { SendEmail } from '../helpers/SendEmail'
 import { ValidDate } from '../helpers/ValidDate'
 import { WriteFile } from '../helpers/WriteFile'
 import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
-// import { prismaInstance } from '../../lib/prisma';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         DeleteProduct, 

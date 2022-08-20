@@ -45,7 +45,7 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
   useEffect(() => {
     const myFavs = window.localStorage.getItem('myFavorites')
 
-    console.log('myFavs', myFavs)
+    // console.log('myFavs', myFavs)
 
     //Convert string to array
 
@@ -56,7 +56,6 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
       <PageContainer>
         <StyledHeader showSearch={false} />
         <StyledHeader1>Þínar uppáhalds vörur</StyledHeader1>
-        {/* <button onClick={() => dispatch(addToFavorites('123'))}></button> */}
         <ProductList>
           {myProducts && (
             productList.map(prod => {

@@ -3,7 +3,9 @@ const router = express.Router();
 import { InsertAllBykoProducts, TestProduct, GetAllCategories, DeleteAllProducts, DeleteAllProducCertificates } from '../controllers/BykoController';
 import { fileUpload } from '../controllers/ProductUploadController'
 
-import { InsertAllSheetsProducts, /*ProcessNewInDatabase*/ DeleteAllSheetsProducts, /*DeleteAllSheetsProductCertificates*/ DeleteAllSheetsCert, /*SendEmail*/ } from '../controllers/testController';
+import { InsertAllSheetsProducts, DeleteAllSheetsProducts, DeleteAllSheetsCert } from '../controllers/testController';
+
+import { InsertAllTengiProducts } from '../controllers/TengiController';
 
 function routes(app : any) {
   //COMPANY ID IN DATABASE IS 1
@@ -23,6 +25,9 @@ function routes(app : any) {
   // app.post('/api/product/add', fileUpload)
 
   // app.get('/api/sendmail', SendEmail)
+  
+  app.get('/api/tengi', InsertAllTengiProducts); 
+
   return router;
 };  
 

@@ -20,7 +20,7 @@ export const TextInput = ({ placeholder, onSubmit, className, onChange, value }:
   return(
     <InputWrapper className={className} onChange={onChange}>
       <StyledMagnifyingGlass />
-      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} />
+      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} /*value={value}*/ defaultValue={value}/>
     </InputWrapper>
   )
 }

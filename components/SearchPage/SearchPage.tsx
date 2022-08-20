@@ -17,6 +17,7 @@ import Close from '../Svg/Close'
 import certificateMapper from '../../mappers/certificates'
 import PaintBucket from '../../public/PaintBucketIcon.svg'
 import Image from 'next/image'
+// import InfiniteScroll from "react-infinite-scroll-component";
 // import CloseIcon from '../Svg/Close'
 
 interface SearchPageProps{
@@ -308,11 +309,11 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       }
       <CategoryFilters>
         <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
-        {/* <MainButton text='Baðherbergi' onClick={() => {toggleFilters('categories', 'Baðherbergi')}} active={false} /> */}
         {VisttorgCategories.map(cat => {
           if(cat.weight == 1) {
             return(
-              <StyledMainButton 
+              <StyledMainButton
+                key={cat.name} 
                 text={cat.name}
                 onClick={() => {
                   toggleFilters('categories', cat)
@@ -323,25 +324,22 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           }
         })}
       </CategoryFilters>
-      {/* <ShowsizeWrapper>
-        <button onClick={() => SetPaginationPageSize(12)}>12</button>
-        <button onClick={() => SetPaginationPageSize(24)}>30</button>
-        <button onClick={() => SetPaginationPageSize(54)}>60</button>
-      </ShowsizeWrapper> */}
-      <ShowsizeWrapper>
-        <StyledMainButton 
-          text={12}
-          onClick={() => SetPaginationPageSize(12)}
-          active={paginationPageSize===12} />
-        <StyledMainButton 
-          text={30}
-          onClick={() => SetPaginationPageSize(30)}
-          active={paginationPageSize===30} />
-        <StyledMainButton 
-          text={60}
-          onClick={() => SetPaginationPageSize(60)}
-          active={paginationPageSize===60} />
-      </ShowsizeWrapper>
+      {filteredProductList.length !== 0 &&
+        <ShowsizeWrapper>
+          <StyledMainButton 
+            text={12}
+            onClick={() => SetPaginationPageSize(12)}
+            active={paginationPageSize===12} />
+          <StyledMainButton 
+            text={30}
+            onClick={() => SetPaginationPageSize(30)}
+            active={paginationPageSize===30} />
+          <StyledMainButton 
+            text={60}
+            onClick={() => SetPaginationPageSize(60)}
+            active={paginationPageSize===60} />
+        </ShowsizeWrapper>
+      }
       <ProductsAndFilter
         animate={controls}
         transition={{ type: "Tween" }}
