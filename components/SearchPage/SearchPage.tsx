@@ -235,7 +235,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
 
     if(level1Filters !== 'null'){
-      setFilters(JSON.parse(level1Filters))
+      //setFilters(JSON.parse(level1Filters))
     }
     if(level2Filters !== 'null'){
       // setFilters(JSON.parse(level2Filters))
@@ -414,7 +414,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
           </FilterGroup>
           <FilterGroup>
-            { filters.categories && filters.categories.length !== 0 && <>
+            { filters && filters.categories && filters.categories.length !== 0 && <>
             <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories && filters.categories.map(category => {
