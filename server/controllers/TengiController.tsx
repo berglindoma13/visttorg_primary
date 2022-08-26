@@ -17,7 +17,7 @@ import { DeleteAllProductsByCompany,
 
 // TENGI COMPANY ID = 4
 
-const TengiAPI = "https://www.tengi.is/product-category/badherbergi/fylgihlutir/?swoof=1&product_tag=unidrain&really_curr_tax=231-product_cat"
+const TengiAPI = "https://api.integrator.is/Products/GetMany/?CompanyId=608c19f3591c2b328096b230&ApiKey=b3a6e86d4d4d6612b55d436f7fa60c65d0f8f217c34ead6333407162d308982b&Status=2&Brands=61efc9d1591c275358c86f84" 
 
 var updatedProducts = [];
 var createdProducts = [];
@@ -47,8 +47,8 @@ const requestTengiApi = async() => {
   return axios.get(TengiAPI).then(response => {
     if (response.status === 200) {
       const data = response;
-      console.log('DATA', data.data)
-      return data;
+      // console.log('DATA', data.data)
+      return data.data;
     }else{
       console.log(`Error occured : ${response.status} - ${response.statusText}`);
     } 
@@ -57,6 +57,46 @@ const requestTengiApi = async() => {
 
 // WRITE FILES MISSING HERE
 
+const next = async(data) => {
+  console.log('DATA', data)
+  // data.map(af => {
+  //   console.log('her', af.fl)
+  // })
+}
+
 const ProcessForDatabase = async(data) => {
-    console.log(data)
+  console.log("DATA NUNA",data.Data)
+  const allprod : Array<TestControllerProduct> = [];
+  data.Data.map(prod => {
+    // console.log('PROD', prod.Attachments)
+    var temp_prod : TestControllerProduct = {
+      id: prod.Id,
+      prodName: prod.StandardFields.Name,
+      longDescription: prod.StandardFields.Description,
+      shortDescription: prod.StandardFields.ShortDescription,
+      fl: prod.StandardFields.Categories,
+      prodImage: prod.Images[0].Url,
+      url: 'vantar',
+      brand: prod.StandardFields.Brands,
+      fscUrl: "vantar",
+      epdUrl: "vantar",
+      vocUrl: "vantar",
+      ceUrl: "vantar",
+      certificates: [
+          { name: "fsc", val:  "FALSE" },
+          { name: "epd", val:  "FALSE" },
+          { name: "voc", val:  "FALSE" },
+          { name: "sv_allowed", val:  "FALSE" },
+          { name: "sv", val:  "FALSE" },
+          { name: "breeam", val:  "FALSE" },
+          { name: "blengill", val:  "FALSE" },
+          { name: "ev", val: "FALSE" },
+          { name: "ce", val: "TRUE" }
+      ]
+
+    }
+    allprod.push(temp_prod)
+  })
+  // console.log('ALL prods', allprod)
+  next(allprod)
 }

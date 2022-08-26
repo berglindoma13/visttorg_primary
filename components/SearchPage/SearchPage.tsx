@@ -89,20 +89,20 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }
 
   const VisttorgCategories = [
-    {name: "Lýsing og rafmagn", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
-    {name: "Eldhús", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
-    {name: "Baðherbergi", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
-    {name: "Gólfefni", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
-    {name: "Garðurinn", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
-    {name: "Gluggar", subCategories: ["Húsgögn", "Heimilistæki"], weight: 1 },
-    {name: "Burðavirki", subCategories: ["Húsgögn", "Heimilistæki"], weight: 2 },
-    {name: "Loftaefni", subCategories: ["Veggir", "Málningarvörur"], weight: 2 },
+    {name: "Lýsing og rafmagn", subCategories: ["Ljós", "Perur"], weight: 1 },
+    {name: "Eldhús", subCategories: ["Hnífar", "Heimilistæki"], weight: 1 },
+    {name: "Baðherbergi", subCategories: ["Klósett", "Sturta"], weight: 1 },
+    {name: "Gólfefni", subCategories: ["Parket", "Flísar"], weight: 1 },
+    {name: "Garðurinn", subCategories: ["Timbur", "Blóm"], weight: 1 },
+    {name: "Gluggar", subCategories: ["Gler"], weight: 1 },
+    {name: "Burðavirki", subCategories: ["Veggir"], weight: 2 },
+    {name: "Loftaefni", subCategories: ["Loft", "Málningarvörur"], weight: 2 },
     {name: "Hurðir", subCategories: ["hur1", "hur2", "hur3"], weight: 2 },
     {name: "Lagnir", subCategories: ["lag", "lag2", "lag3"], weight: 2 },
     {name: "Textíll", subCategories: ["tex1", "tex2", "tex3"], weight: 2 },
     {name: "Lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
     {name: "Öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
-    {name: "Vélbúnaður", subCategories: ["Heimilistæki", "Húsgögn"], weight: 2 },
+    {name: "Vélbúnaður", subCategories: ["Vél", "Húsgögn"], weight: 2 },
   ]
 
   const fuseInstance = new Fuse(products, options)
@@ -113,6 +113,10 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     })
     setFilteredProductList(resultProducts)
   }
+
+  // useEffect(() => {
+  //   console.log('NUNA', window.location)
+  // }, [])
 
   //Initialize filteredProductList as all products
   useEffect(() => {
@@ -147,7 +151,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         fuseInstance, 
         query, 
         activeCategories: filters.categories.map(category => category.name),
-        // activeCategories: ["Burðavirki"],
         activeSubCategories: subfilters,
         activeCertificates: filters.certificates, 
         activeCompanies: filters.companies
@@ -228,6 +231,10 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     })
     return val
   }
+
+  // const test = (str) => {
+    
+  // }
 
   //Framer motion controls for showing and hiding filter drawer
   const controls = useAnimation()
@@ -353,8 +360,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterItems>
               {companies.map(company => {
                 return(
-                  <>
-                  {/* {console.log(companyNumberList.name == company.name)} */}
                   <FilterItem 
                     key={company.id}
                     text={company.name}
@@ -364,7 +369,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                     }} 
                     active={filters.companies.includes(company.name)} 
                   />
-                  </>
                 )
               })}
             </FilterItems>
@@ -411,6 +415,11 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories.map(category => {
+                // {console.log('bla', category)}
+                if(typeof category === 'string') {
+                  console.log('blablabla', category)
+                  // test();
+                }
                 return(
                 category.subCategories.map(sub => {
                   return(
