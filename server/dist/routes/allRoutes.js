@@ -7,6 +7,9 @@ const BykoController_1 = require("../controllers/BykoController");
 const EbsonController_1 = require("../controllers/EbsonController");
 const Postlist_1 = require("../controllers/Postlist");
 exports.allRoutes = (0, express_1.Router)();
+exports.allRoutes.get('/', (req, res) => {
+    res.send('Server is up and running here!');
+});
 //BYKO ROUTES
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
 exports.allRoutes.get('/api/testByko', BykoController_1.TestProduct);

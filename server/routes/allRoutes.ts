@@ -7,6 +7,10 @@ import { Postlist } from '../controllers/Postlist'
 
 export const allRoutes = Router();
 
+allRoutes.get('/', (req: Request, res: Response) => {
+  res.send('Server is up and running here!')
+})
+
 //BYKO ROUTES
 allRoutes.get('/api/byko', InsertAllBykoProducts);
 allRoutes.get('/api/testByko', TestProduct)
