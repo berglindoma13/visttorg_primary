@@ -34,7 +34,6 @@ export const Product = ({
       <StyledProduct className={className}>
         <StyledFavoritesButton 
           onClick={(e) => {
-            console.log('e', e.target.id) 
             if(e.target.id === 'heart'){
               e.preventDefault()
             }

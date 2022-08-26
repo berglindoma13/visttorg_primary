@@ -30,7 +30,7 @@ export const Footer = () => {
         postlistEmail
       })
     }).then((response) => {
-      console.log('response', response)
+      
       
       if (response.ok) {
         return;
@@ -39,11 +39,11 @@ export const Footer = () => {
       throw new Error(response.statusText);
     })
     .then(() => {
-      console.log('successful adding to postlist')
+      // console.log('successful adding to postlist')
       localStorage.setItem('postlist', 'true')
     })
     .catch((error) => {
-      console.log('error adding to postlist', error.message)
+      // console.log('error adding to postlist', error.message)
       //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
       // setInputError(error.message)
       setInputError('Villa við skráningu, vinsamlegast reyndu aftur')

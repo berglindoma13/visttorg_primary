@@ -39,8 +39,6 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
   useEffect(() => {
     const myFavs = window.localStorage.getItem('myFavorites')
 
-    console.log('myFavs', myFavs)
-
     //Convert string to array
 
   }, [])
