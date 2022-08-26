@@ -7,6 +7,7 @@ import { Postlist } from '../controllers/Postlist'
 
 export const allRoutes = Router();
 
+//ALMENNT
 allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here!')
 })
