@@ -55,17 +55,33 @@ const requestTengiApi = async() => {
   });
 }
 
+const getcat = async(data) => {
+  var categories = []
+  data.map(prod => {
+    // console.log('prod', prod.fl)
+    prod.fl.map(cat => {
+      // console.log('cat', cat.Name)
+      if(!categories.includes(cat.Name)) {
+        categories.push(cat.Name)
+      }
+    })
+  })
+  console.log(categories)
+}
+
 // WRITE FILES MISSING HERE
 
 const next = async(data) => {
-  console.log('DATA', data)
-  // data.map(af => {
-  //   console.log('her', af.fl)
+  // console.log('DATA', data)
+  // data.map( => {
+  //   // console.log('her', af.fl)
+  //   getcat(data)
   // })
+  getcat(data)
 }
 
 const ProcessForDatabase = async(data) => {
-  console.log("DATA NUNA",data.Data)
+  // console.log("DATA NUNA",data.Data)
   const allprod : Array<TestControllerProduct> = [];
   data.Data.map(prod => {
     // console.log('PROD', prod.Attachments)

@@ -114,10 +114,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     setFilteredProductList(resultProducts)
   }
 
-  // useEffect(() => {
-  //   console.log('NUNA', window.location)
-  // }, [])
-
   //Initialize filteredProductList as all products
   useEffect(() => {
     resetFilteredProductList()
@@ -135,7 +131,11 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
 
     if(!!cat){
-      toggleFilters('categories', cat.toString())
+      VisttorgCategories.map(item => {
+        if(item.name === cat.toString()) {
+          toggleFilters('categories', item)
+        }
+      })
     }
   }, [router])
 
