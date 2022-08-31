@@ -89,20 +89,20 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }
 
   const VisttorgCategories = [
-    {name: "Lýsing og rafmagn", subCategories: ["Ljós", "Perur"], weight: 1 },
-    {name: "Eldhús", subCategories: ["Hnífar", "Heimilistæki"], weight: 1 },
-    {name: "Baðherbergi", subCategories: ["Klósett", "Sturta"], weight: 1 },
-    {name: "Gólfefni", subCategories: ["Parket", "Flísar"], weight: 1 },
-    {name: "Garðurinn", subCategories: ["Timbur", "Blóm"], weight: 1 },
-    {name: "Gluggar", subCategories: ["Gler"], weight: 1 },
-    {name: "Burðavirki", subCategories: ["Veggir"], weight: 2 },
-    {name: "Loftaefni", subCategories: ["Loft", "Málningarvörur"], weight: 2 },
-    {name: "Hurðir", subCategories: ["hur1", "hur2", "hur3"], weight: 2 },
-    {name: "Lagnir", subCategories: ["lag", "lag2", "lag3"], weight: 2 },
-    {name: "Textíll", subCategories: ["tex1", "tex2", "tex3"], weight: 2 },
-    {name: "Lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
-    {name: "Öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
-    {name: "Vélbúnaður", subCategories: ["Vél", "Húsgögn"], weight: 2 },
+    {name: "lýsing og rafmagn", subCategories: ["ljós", "perur"], weight: 1 },
+    {name: "eldhús", subCategories: ["hnífar", "heimilistæki"], weight: 1 },
+    {name: "baðherbergi", subCategories: ["klósett", "sturta"], weight: 1 },
+    {name: "gólfefni", subCategories: ["parket", "flísar"], weight: 1 },
+    {name: "garðurinn", subCategories: ["timbur", "blóm"], weight: 1 },
+    {name: "gluggar", subCategories: ["gler"], weight: 1 },
+    {name: "burðavirki", subCategories: ["veggir"], weight: 2 },
+    {name: "loftaefni", subCategories: ["loft", "málningarvörur"], weight: 2 },
+    {name: "hurðir", subCategories: ["hur1", "hur2", "hur3"], weight: 2 },
+    {name: "lagnir", subCategories: ["lag", "lag2", "lag3"], weight: 2 },
+    {name: "textíll", subCategories: ["tex1", "tex2", "tex3"], weight: 2 },
+    {name: "lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
+    {name: "öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
+    {name: "vélbúnaður", subCategories: ["vél", "húsgögn"], weight: 2 },
   ]
 
   const fuseInstance = new Fuse(products, options)
@@ -362,7 +362,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 return(
                   <FilterItem 
                     key={company.id}
-                    text={company.name}
+                    text={company.name.toLowerCase()}
                     num={getCompanyCounts(company.name)} 
                     onClick={() => {
                       toggleFilters('companies', company.name)
@@ -380,7 +380,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 return(
                   <FilterItem 
                     key={certificate.id}
-                    text={certificateMapper[certificate.name]} 
+                    text={certificateMapper[certificate.name].toLowerCase()} 
                     num={getCertificateCounts(certificate.name)} 
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
@@ -415,13 +415,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories.map(category => {
-                // {console.log('bla', category)}
-                if(typeof category === 'string') {
-                  console.log('blablabla', category)
-                  // test();
-                }
-                return(
-                category.subCategories.map(sub => {
+                return( category.subCategories.map(sub => {
                   return(
                     <FilterItem 
                       key={sub}

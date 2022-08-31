@@ -104,15 +104,18 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
   const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { if(certificate.val=="TRUE") {return {name: certificate.name.toUpperCase() }} })
   Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
   const validatedCertificates = CertificateValidator({ certificates: convertedCertificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
-  console.log("vorunumber", product.id == "")
+  // console.log("vorunumber", product.id == "")
   if(validatedCertificates.length === 0){
     // no valid certificates for this product
     productsNotValid.push(product)
     return;
   }
   if(create === true) {
+    console.log('created')
     if (validatedCertificates.length !== 0) {
+      console.log('valid certs', validatedCertificates)
       if (product.id !== "") {
+        console.log('prod id')
         createdProducts.push(product)
         // check valid date when product is created
         var validDate = await ValidDate(validatedCertificates, product)
@@ -196,7 +199,7 @@ const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
     }
     else {
       var create = true;
-      var certChange = true;
+      var certChange = false;
     }
     UpsertProductInDatabase(product, approved, create, certChange)
   })

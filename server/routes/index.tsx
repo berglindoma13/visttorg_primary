@@ -7,6 +7,8 @@ import { InsertAllSheetsProducts, DeleteAllSheetsProducts, DeleteAllSheetsCert }
 
 import { InsertAllTengiProducts } from '../controllers/TengiController';
 
+import { InsertAllEbsonProducts, DeleteAllEbsonProducts, DeleteAllEbsonCert } from '../controllers/EbsonController';
+
 function routes(app : any) {
   //COMPANY ID IN DATABASE IS 1
   app.get('/api/byko', InsertAllBykoProducts);
@@ -27,6 +29,11 @@ function routes(app : any) {
   // app.get('/api/sendmail', SendEmail)
   
   app.get('/api/tengi', InsertAllTengiProducts); 
+
+  app.get('/api/ebson', InsertAllEbsonProducts); 
+  app.get('/api/deleteebsonprods', DeleteAllEbsonProducts);
+  app.get('/api/deleteebsoncerts', DeleteAllEbsonCert);
+  
 
   return router;
 };  

@@ -22,18 +22,18 @@ var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
 
-export const InsertAllSheetsProducts = async(req,res) => {
+export const InsertAllEbsonProducts = async(req,res) => {
     // get all data from sheets file
     getProducts();
     res.end('All Ebson products inserted')
 }
 
-export const DeleteAllSheetsProducts = async(req,res) => {
+export const DeleteAllEbsonProducts = async(req,res) => {
   DeleteAllProductsByCompany(3)
   res.end("All Ebson products deleted");
 }
 
-export const DeleteAllSheetsCert = async(req,res) => {
+export const DeleteAllEbsonCert = async(req,res) => {
   DeleteAllCertByCompany(3)
   res.end("All Ebson product certificates deleted");
 }
@@ -59,42 +59,42 @@ const productsNoLongerComingInWriteFile = async(nolonger) => {
 // gets all products from online sheets file
 const getProducts = () => {
   const options = {
-    apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg', //google api key in testProject console
-    sheetId: '1SFHaI8ZqPUrQU3LLgCsrLBUtk4vzyl6_FQ02nm6XehI',
+    apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg',
+    sheetId: '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg',
     returnAllResults: false,
   };
 
   reader(options, (results: allProducts) => {
     const allprod : Array<TestControllerProduct> = [];
-    for (var i=1; i< results.length; i++) {
+    for (var i=1; i< 2; i++) {
       var temp_prod : TestControllerProduct = {
-          id: results[i].nr,
-          prodName: results[i].name,
-          longDescription: results[i].long,
-          shortDescription: results[i].short,
-          fl: results[i].fl,
-          prodImage: results[i].pic,
-          url: results[i].link,
-          brand: results[i].mark,
-          fscUrl: results[i].fsclink,
-          epdUrl: results[i].epdlink,
-          vocUrl: results[i].voclink,
-          ceUrl: results[i].ce,
-          certificates: [
-              {name: "fsc", val: results[i].fsc },
-              { name: "epd", val: results[i].epd },
-              { name: "voc", val: results[i].voc },
-              { name: "sv_allowed", val: results[i].sv },
-              { name: "sv", val: results[i].svans },
-              { name: "breeam", val: results[i].breeam },
-              { name: "blengill", val: results[i].blue },
-              { name: "ev", val: results[i].ev },
-              { name: "ce", val: "TRUE" }
-          ]
-      }
-      allprod.push(temp_prod)
+            id: results[i].nr,
+            prodName: results[i].name,
+            longDescription: results[i].long,
+            shortDescription: results[i].short,
+            fl: results[i].fl,
+            prodImage: results[i].pic,
+            url: results[i].link,
+            brand: results[i].mark,
+            fscUrl: results[i].fsclink,
+            epdUrl: results[i].epdlink,
+            vocUrl: results[i].voclink,
+            ceUrl: results[i].ce,
+            certificates: [
+                { name: "fsc", val: results[i].fsc },
+                { name: "epd", val: results[i].epd },
+                { name: "voc", val: results[i].voc },
+                { name: "sv_allowed", val: results[i].sv },
+                { name: "sv", val: results[i].svans },
+                { name: "breeam", val: results[i].breeam },
+                { name: "blengill", val: results[i].blue },
+                { name: "ev", val: results[i].ev },
+                { name: "ce", val: "TRUE" }
+            ]
+          }
+          allprod.push(temp_prod)
     }
-    // process for database
+    // console.log('ALL prods for database', allprod)
     ProcessForDatabase(allprod);
   });
 }
@@ -104,32 +104,40 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
   const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { if(certificate.val=="TRUE") {return {name: certificate.name.toUpperCase() }} })
   Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
   const validatedCertificates = CertificateValidator({ certificates: convertedCertificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
-  
+  // console.log("vorunumber", product.id == "")
   if(validatedCertificates.length === 0){
     // no valid certificates for this product
     productsNotValid.push(product)
     return;
   }
   if(create === true) {
+    console.log('satt created')
     if (validatedCertificates.length !== 0) {
-      createdProducts.push(product)
-      // check valid date when product is created
-      var validDate = await ValidDate(validatedCertificates, product)
+      if (product.id !== "") {
+        createdProducts.push(product)
+        // check valid date when product is created
+        var validDate = await ValidDate(validatedCertificates, product)
+        console.log('valid date obj', validDate)
+      }
     }
   }
   if(certChange === true) {
     //delete all productcertificates so they wont be duplicated and so they are up to date
     DeleteProductCertificates(product.id)
     if(validatedCertificates.length !== 0 ) {
-      updatedProducts.push(product)
-      // check valid date when the certificates have changed
-      var validDate = await ValidDate(validatedCertificates, product)
+      if (product.id !== "") {
+        updatedProducts.push(product)
+        // check valid date when the certificates have changed
+        var validDate = await ValidDate(validatedCertificates, product)
+      }
     }
   }
-  // update or create product in database
-  await UpsertProduct(product, approved, 3)
-  if(certChange === true || create === true) {
-    await CreateProductCertificates(product, validDate, validatedCertificates)
+  // update or create product in database if the product has a productnumber (vörunúmer)
+  if(product.id !== "") {
+    await UpsertProduct(product, approved, 3)
+    if(certChange === true || create === true) {
+      await CreateProductCertificates(product, validDate, validatedCertificates)
+    }
   }
 }
 
@@ -158,9 +166,12 @@ const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
   // check if product is in database but not coming in from company anymore
   isProductListFound(products)
 
+  // console.log('products', products)
+
   products.map(async(product) => {
     const prod = await GetUniqueProduct(product.id)
     var approved = null;
+    console.log('prod found', prod)
     if (prod !== null){
       approved = prod.approved;
       var certChange : boolean = false;
@@ -168,29 +179,29 @@ const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
         if (cert.certificateid == 1) {
           // epd file url is not the same
           if(cert.fileurl !== product.epdUrl) {
-            certChange = true;
-            approved = false;
+              certChange = true;
+              approved = false;
           }
         }
         if (cert.certificateid == 2) {
           // fsc file url is not the same
           if(cert.fileurl !== product.fscUrl) {
-            certChange = true;
-            approved = false;
+              certChange = true;
+              approved = false;
           }
         }
         if (cert.certificateid == 3) {
           // voc file url is not the same
           if(cert.fileurl !== product.vocUrl) {
-            certChange = true;
-            approved = false;
+              certChange = true;
+              approved = false;
           }
         }
       })
     }
     else {
       var create = true;
-      var certChange = true;
+      var certChange = false;
     }
     UpsertProductInDatabase(product, approved, create, certChange)
   })
