@@ -41,6 +41,7 @@ export const Footer = () => {
     .then(() => {
       console.log('successful adding to postlist')
       localStorage.setItem('postlist', 'true')
+      setPostlistDone(true)
     })
     .catch((error) => {
       console.log('error adding to postlist', error.message)
