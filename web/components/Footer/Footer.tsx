@@ -23,7 +23,7 @@ export const Footer = () => {
 
   const addToPostlist = async() => {
 
-    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'linktoheroku'}/postlist`, {
+    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://vistbokserver.herokuapp.com'}/postlist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -39,11 +39,11 @@ export const Footer = () => {
       throw new Error(response.statusText);
     })
     .then(() => {
-      // console.log('successful adding to postlist')
+      console.log('successful adding to postlist')
       localStorage.setItem('postlist', 'true')
     })
     .catch((error) => {
-      // console.log('error adding to postlist', error.message)
+      console.log('error adding to postlist', error.message)
       //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
       // setInputError(error.message)
       setInputError('Villa við skráningu, vinsamlegast reyndu aftur')
