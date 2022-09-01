@@ -23,7 +23,7 @@ export const Footer = () => {
 
   const addToPostlist = async() => {
 
-    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://vistbokserver.herokuapp.com'}/postlist`, {
+    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/postlist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
