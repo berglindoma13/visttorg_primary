@@ -99,10 +99,10 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     {name: "Lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
     {name: "Öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
     {name: "Vélbúnaður", subCategories: ["Heimilistæki", "Húsgögn"], weight: 2 },
-    // {name: "Húsgögn", items: ["hús1", "hús2", "hús3"]},
-    // {name: "Heimilistæki", items: ["hei1", "hei2", "hei3"]},
-    // {name: "Veggir", items: ["veg1", "veg2", "veg3"]},
-    // {name: "Málningarvörur", items: ["mál1", "mál2", "mál3"]}
+    {name: "Málningarvörur", items: ["mál1", "mál2", "mál3"]},
+    {name: "Húsgögn", items: ["hús1", "hús2", "hús3"]},
+    {name: "Heimilistæki", items: ["hei1", "hei2", "hei3"]},
+    {name: "Veggir", items: ["veg1", "veg2", "veg3"]},
   ]
 
   const fuseInstance = new Fuse(products, options)
@@ -146,13 +146,13 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
      setSessionStorageItems()
 
     //if no filters are active, then show all products
-    if(!query && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
+    if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
       resetFilteredProductList()
     }else{
       const results = SearchProducts({
         fuseInstance, 
         query, 
-        activeCategories: filters.categories.map(category => category.name),
+        activeCategories: filters.categories ? filters.categories.map(category => category.name) : [],
         // activeCategories: ["Burðavirki"],
         activeSubCategories: subfilters,
         activeCertificates: filters.certificates, 
@@ -170,7 +170,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
 
     //if value is already in list -> remove
-    if(filter=="categories" && filters.categories.filter(cat=>cat.name==value.name).length>0){
+    if(filter=="categories" && filters.categories && filters.categories.filter(cat=>cat.name==value.name).length>0){
       const filteredArray = filters[filter].filter(item => item.name !== value.name)
       setFilters({...filters, [filter]: filteredArray})
     }
@@ -214,7 +214,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }
 
   const setSessionStorageItems = () => {
-    if(filters.brand.length > 0 || filters.categories.length > 0 || filters.certificates.length > 0|| filters.companies.length > 0){
+    if(filters.brand.length > 0 || (filters.categories && filters.categories.length > 0) || filters.certificates.length > 0|| filters.companies.length > 0){
       sessionStorage.setItem('level1Filters', JSON.stringify(filters))
     }else{
       sessionStorage.setItem('level1Filters', null)
@@ -345,7 +345,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 onClick={() => {
                   toggleFilters('categories', cat)
                 }} 
-                active={filters.categories && filters.categories.filter(category=>category.name==cat.name).length>0} 
+                active={filters.categories.filter(category=>category.name==cat.name).length>0} 
               />
             )
           }
@@ -371,7 +371,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                     onClick={() => {
                       toggleFilters('companies', company.name)
                     }} 
-                    active={filters.companies && filters.companies.includes(company.name)} 
+                    active={filters.companies.includes(company.name)} 
                   />
                 )
               })}
@@ -389,7 +389,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
                     }} 
-                    active={filters.certificates && filters.certificates.includes(certificate.name)}
+                    active={filters.certificates.includes(certificate.name)}
                   />
                 )
               })}
@@ -407,7 +407,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                       onClick={() => {
                         toggleFilters('categories', item)
                       }} 
-                      active={filters.categories && filters.categories.filter(cat=>cat.name==item.name).length>0}
+                      active={filters.categories.filter(cat=>cat.name==item.name).length>0}
                     />
                   )
                 }
@@ -415,7 +415,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
           </FilterGroup>
           <FilterGroup>
-            { filters.categories.length !== 0 && <>
+            {filters.categories.length !== 0 && <>
             <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories.map(category => {
