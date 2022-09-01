@@ -39,12 +39,11 @@ export const Footer = () => {
       throw new Error(response.statusText);
     })
     .then(() => {
-      console.log('successful adding to postlist')
       localStorage.setItem('postlist', 'true')
       setPostlistDone(true)
     })
     .catch((error) => {
-      console.log('error adding to postlist', error.message)
+      console.error('error adding to postlist', error.message)
       //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
       // setInputError(error.message)
       setInputError('Villa við skráningu, vinsamlegast reyndu aftur')
