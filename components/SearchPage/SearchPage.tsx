@@ -214,13 +214,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }
 
   const setSessionStorageItems = () => {
-    if(filters.brand.length > 0 || (filters.categories && filters.categories.length > 0) || filters.certificates.length > 0|| filters.companies.length > 0){
-      sessionStorage.setItem('level1Filters', JSON.stringify(filters))
-    }else{
-      sessionStorage.setItem('level1Filters', null)
-    }
-    sessionStorage.setItem('level2Filters', null)
-    sessionStorage.setItem('queryParam', !!query ? query : null)
+    sessionStorage.setItem('level1Filters', JSON.stringify(filters))
+    sessionStorage.setItem('level2Filters', JSON.stringify(subfilters))
+    sessionStorage.setItem('queryParam', !!query ? query : '')
   }
 
   const getSessionStorageItems = () => {
@@ -229,19 +225,18 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     const queryFilter = sessionStorage.getItem('queryParam')
 
     //Scroll to searchPage if any sessionItems are present and open the filterBar
-    if(level1Filters !== 'null' || level2Filters !== 'null' || queryFilter !== 'null'){
+    if(level1Filters !== JSON.stringify(filters) || level2Filters !== JSON.stringify(subfilters)|| queryFilter !== ''){
       document.getElementById("search").scrollIntoView();
       setFilterDrawerIsActive(true)
     }
 
-    if(level1Filters !== 'null'){
-      //TODO LAGA
-      // setFilters(JSON.parse(level1Filters))
+    if(level1Filters !== JSON.stringify(filters)){
+      setFilters(JSON.parse(level1Filters))
     }
-    if(level2Filters !== 'null'){
-      // setFilters(JSON.parse(level2Filters))
+    if(level2Filters !== JSON.stringify(subfilters)){
+      setFilters(JSON.parse(level2Filters))
     }
-    if(queryFilter !== 'null'){
+    if(queryFilter !== ''){
       setQuery(queryFilter)
     }
   }

@@ -1,5 +1,5 @@
 module.exports = {
   images: {
-    domains: ['byko.is'],
+    domains: ['byko.is', 'pimdata.boen.com'],
   },
 }
