@@ -224,19 +224,21 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     const level2Filters = sessionStorage.getItem('level2Filters')
     const queryFilter = sessionStorage.getItem('queryParam')
 
+    console.log('level1filters', level1Filters)
+
     //Scroll to searchPage if any sessionItems are present and open the filterBar
-    if(level1Filters !== JSON.stringify(filters) || level2Filters !== JSON.stringify(subfilters)|| queryFilter !== ''){
+    if((level1Filters !== null && level1Filters !== JSON.stringify(filters))|| (level2Filters !== null && level2Filters !== JSON.stringify(subfilters))|| (queryFilter !== null && queryFilter !== '')){
       document.getElementById("search").scrollIntoView();
       setFilterDrawerIsActive(true)
     }
 
-    if(level1Filters !== JSON.stringify(filters)){
+    if(level1Filters !== null && level1Filters !== JSON.stringify(filters)){
       setFilters(JSON.parse(level1Filters))
     }
-    if(level2Filters !== JSON.stringify(subfilters)){
+    if(level2Filters !== null && level2Filters !== JSON.stringify(subfilters)){
       setFilters(JSON.parse(level2Filters))
     }
-    if(queryFilter !== ''){
+    if(queryFilter !== null && queryFilter !== ''){
       setQuery(queryFilter)
     }
   }
