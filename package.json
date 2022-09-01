@@ -10,9 +10,6 @@
     "build-storybook": "build-storybook"
   },
   "keywords": [],
-  "engines": {
-    "node": "16.x"
-  },
   "author": "",
   "license": "MIT",
   "dependencies": {
