@@ -84,7 +84,7 @@ const GetProducts = async(data) => {
       shortDescription: prod.StandardFields.ShortDescription,
       fl: prod.StandardFields.Categories[1].Name, // Breyta nuna er allt að fá child nr 1 sem flokk
       prodImage: prod.Images[0].Url,
-      url: 'vantar', // EKKI HÆGT AÐ SKOÐA VÖRU Á VEF ÞVÍ ÞAÐ ER EKKI LINKUR
+      url: 'https://www.tengi.is/', // EKKI HÆGT AÐ SKOÐA VÖRU Á VEF ÞVÍ ÞAÐ ER EKKI LINKUR
       brand: prod.StandardFields.Brands[0].Name,
       fscUrl: "vantar",
       epdUrl: "vantar",
