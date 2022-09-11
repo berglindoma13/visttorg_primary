@@ -21,7 +21,6 @@ const Wrapper: React.FC<AppProps> = (props) => {
       NProgress.start()
     }
     const handlePageChangeDone = () => { 
-      
       NProgress.done()
     }
 

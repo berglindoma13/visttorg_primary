@@ -64,7 +64,7 @@ const HeaderRightContent = styled.div`
 `
 
 const FakeTextInputText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 14px;
   line-height: 104%;
@@ -85,7 +85,7 @@ const FakeTextInputButton = styled.a`
   background: #FAFAFA;
   box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
   border-radius: 999px;
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 14px;
   line-height: 104%;

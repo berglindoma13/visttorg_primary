@@ -63,6 +63,11 @@ model manualProducts {
   id       Int       @id @default(autoincrement())
 }
 
+model postlist {
+  id  Int @id @default(autoincrement())
+  email String
+}
+
 // model attachedFile {
 //   id       Int       @id @default(autoincrement())
 //   connectedproduct product @relation(fields: [id], references: [id])

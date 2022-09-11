@@ -22,12 +22,16 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
 
   return(
     <HeaderWrapper className={className}>
-      <Link href="/"><VistbokLogo style={{cursor:'pointer'}} width="150px"/></Link>
+      <Link href="/" passHref>
+        <a>
+          <VistbokLogo style={{cursor:'pointer'}} width="150px"/>
+        </a>
+      </Link>
       {showSearch ? (
         <>
           {/* DESKTOP */}     
           <TextInputWrapper>
-            <TextInput placeholder='Leita eftir nafni vöru' onSubmit={Submit} onChange={(e) => setSearch(e.target.value)}/>
+            <TextInput placeholder='Leita eftir nafni vöru' onSubmit={Submit} onChange={(e) => setSearch(e.target.value)} inputIcon={<MagnifyingGlass />}/>
           </TextInputWrapper>
           {/* MOBILE */}
           <Link href='/#search' passHref>

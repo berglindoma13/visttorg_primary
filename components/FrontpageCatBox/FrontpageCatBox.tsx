@@ -84,7 +84,7 @@ const BoxWrapper = styled.div<BoxWrapperProps>`
 `
 
 const BoxTitle = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 24px;
   line-height: 110%;

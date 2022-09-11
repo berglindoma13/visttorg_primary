@@ -120,7 +120,7 @@ const ProductCompany = styled.span`
   margin-top:20px;
 `
 const ProductTitle = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 36px;
   line-height: 104%;

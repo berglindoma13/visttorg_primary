@@ -23,7 +23,7 @@ export const FilterItem = ({ text, num, onClick, active, className }: FilterItem
 }
 
 const ModifiedMainButtonText = styled(MainButtonText)`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 12px;
   line-height: 104%;

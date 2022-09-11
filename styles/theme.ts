@@ -36,7 +36,7 @@ const theme = {
   fonts: {
     // TODO: We need to add some fallback fonts.
     fontFamilyPrimary: 'Space Mono',
-    fontFamilySecondary: 'Roboto',
+    fontFamilySecondary: 'GT',
   },
 }
 

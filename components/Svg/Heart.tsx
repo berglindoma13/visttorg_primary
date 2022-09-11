@@ -4,7 +4,8 @@ export type HeartVariants = 'outline' | 'fill'
 export interface HeartProps extends SVG {
   variant?: HeartVariants
 }
-export const Heart: React.FC<HeartProps> = ({
+
+const Heart: React.FC<HeartProps> = ({
   variant = 'outline',
   ...rest
 }) => {
@@ -31,3 +32,5 @@ export const Heart: React.FC<HeartProps> = ({
     </svg>
   )
 }
+
+export default Heart

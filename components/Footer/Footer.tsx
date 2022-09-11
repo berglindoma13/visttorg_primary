@@ -1,33 +1,54 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { mediaMax } from '../../constants/breakpoints'
+import { TextInput } from '../Inputs'
 import FacebookIcon from '../Svg/Facebook'
-import { Heading5 } from '../Typography'
-// import { fire } from 'firebase/app'
+import { Heading4, Heading5 } from '../Typography'
 
 export const Footer = () => {
 
-  // const [errorMessage, setErrorMessage] = useState(false)
-  // const [postListDone, setPostlistDone] = useState(false)
+  const [postlistEmail, setPostlistEmail] = useState('')
+  const [postlistDone, setPostlistDone] = useState(false)
 
-  // const SubmitToPostlist = (email) => {
-  //   // setIsLoading(true);
-  //   if(email){
-  //     setErrorMessage(false);
-  //     fire.firestore().collection('postlist').add({
-  //       email: email
-  //     }).then(() => {
-  //       setTimeout(() => {
-  //         // setIsLoading(false);
-  //         setPostlistDone(true);
-  //         // setEmail("");
-  //       }, 1000)
-  //     })
-  //   }else{
-  //     // setIsLoading(false);
-  //     setErrorMessage(true);
-  //   }
-  // }
+  const [inputError, setInputError] = useState('')
+
+  useEffect(() => {
+    const postlistset = localStorage.getItem('postlist')
+    if(!!postlistset){
+      setPostlistDone(true)
+
+    }
+
+  }, [])
+
+  const addToPostlist = async() => {
+
+    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/postlist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        postlistEmail
+      })
+    }).then((response) => {
+      
+      
+      if (response.ok) {
+        return;
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then(() => {
+      localStorage.setItem('postlist', 'true')
+      setPostlistDone(true)
+    })
+    .catch((error) => {
+      console.error('error adding to postlist', error.message)
+      //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
+      // setInputError(error.message)
+      setInputError('Villa við skráningu, vinsamlegast reyndu aftur')
+    });
+  }
 
   return(
     <FooterContainer>
@@ -35,24 +56,55 @@ export const Footer = () => {
         <TopContent>
           <FooterTitle>Allar umhverfisvottaðar byggingavörur á einum stað</FooterTitle>
           <FooterSubText>Viltu vera memm ? <a href="mailto:vistbok@visttorg.is" >Hafðu samband</a></FooterSubText>
-          
         </TopContent>
         <BottomContent>
-          
           <BottomContentLeft>2022©</BottomContentLeft>
           <BottomContentRight>
             <a href='https://www.facebook.com/Vistbok' target='_blank'><FacebookIcon /></a>
           </BottomContentRight>
-          {/* <BottomContentMid>
-            Viltu fylgjast með?
-            <input placeholder="bla"></input>
-              {errorMessage && <div>ekki til</div>}
-          </BottomContentMid> */}
+          <BottomContentMid>
+            <PostlistTitle>Viltu vera á póstlista?</PostlistTitle>
+            {postlistDone ? (
+              <Heading5>Takk fyrir skráninguna, þú ert skráð/ur á póstlistann</Heading5>
+            ) : (
+              <Wrapper>
+                <TextInput placeholder="netfang" onSubmit={() => addToPostlist()} onChange={(e) => setPostlistEmail(e.target.value)}></TextInput>
+                <SubmitButton onClick={() => addToPostlist()}>Skrá</SubmitButton>
+                {inputError && <StyledError>{inputError}</StyledError>}
+              </Wrapper>
+            )}
+          </BottomContentMid>
         </BottomContent>
       </FooterContent>
     </FooterContainer>
   )
 }
+
+const StyledError = styled.span`
+  color:red;
+  font-size: 12px;
+  max-width: 70%;
+  display: block;
+  margin-top: 5px;
+  margin-left: 10px;
+`
+
+const Wrapper = styled.div`
+  position:relative;
+`
+
+const SubmitButton = styled.button`
+  position:absolute;
+  z-index: 2;
+  top:5px;
+  right:5px;
+  border:none;
+  background-color: ${({ theme }) => theme.colors.green};
+  height:30px;
+  border-radius: 999px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+  width:60px;
+`
 
 const FooterContainer = styled.div`
   height: fit-content;
@@ -91,7 +143,7 @@ const FooterTitle = styled.span`
 `
 
 const FooterSubText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 36px;
   line-height: 104%;
@@ -120,8 +172,9 @@ const TopContent = styled.div`
 `
 
 const BottomContent = styled.div`
-  height:25px;
   display:flex;
+  flex-direction: row;
+  align-items: flex-end;
 `
 
 const BottomContentLeft = styled(Heading5)`
@@ -134,14 +187,22 @@ const BottomContentRight = styled.div`
   flex-direction:row;
   justify-content: flex-start;
 
+  >a{
+    height:24px;
+  }
+
   @media ${mediaMax.tablet}{
     flex:0;
   }
 `
 
-const BottomContentMid = styled(Heading5)`
+const BottomContentMid = styled.div`
   flex:1;
   display:flex;
-  flex-direction:row;
+  flex-direction:column;
   justify-content: flex-end;
+`
+
+const PostlistTitle = styled(Heading4)`
+  margin-bottom: 10px;
 `

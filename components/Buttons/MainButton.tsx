@@ -30,7 +30,7 @@ export const MainButton = ({ text, onClick, active, className, isLink, href }: M
 }
 
 export const MainButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilSecondary};
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-style: normal;
   font-weight: 600;
   font-size: 14px;

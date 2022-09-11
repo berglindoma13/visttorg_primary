@@ -6,14 +6,12 @@ import { FrontpageCatBox } from '../components/FrontpageCatBox'
 import { Header } from '../components/Header'
 import { mediaMax } from '../constants/breakpoints'
 import { Certificate } from '../types/certificates'
-import { theme } from '../styles/theme'
 import { Category, Company, ProductProps } from '../types/products'
 import { prismaInstance } from '../lib/prisma'
-import BykoCertificateMapper from '../server/mappers/certificates/byko'
 import { SearchPage } from '../components/SearchPage'
 import { Footer } from '../components/Footer'
 import superjson from 'superjson'
-import { Heading1, H4, Heading3, H1, Heading4 } from '../components/Typography'
+import { H1 } from '../components/Typography'
 
 export const getStaticProps: GetStaticProps = async () => {
 

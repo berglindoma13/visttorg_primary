@@ -7,7 +7,8 @@ export type StarVariants = 'outline' | 'fill'
 export interface StarProps extends SVG {
   variant?: StarVariants
 }
-export const Star: React.FC<StarProps> = ({
+
+const Star: React.FC<StarProps> = ({
   variant = 'outline',
   ...rest
 }) => {
@@ -36,3 +37,6 @@ export const Star: React.FC<StarProps> = ({
     </svg>
   )
 }
+
+
+export default Star

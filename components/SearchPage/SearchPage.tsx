@@ -13,7 +13,7 @@ import { Product } from '../Product'
 import { Pagination } from '../Pagination'
 import { useRouter } from 'next/router'
 import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
-import Close from '../Svg/Close'
+import { Close, MagnifyingGlass } from '../Svg'
 import certificateMapper from '../../mappers/certificates'
 import PaintBucket from '../../public/PaintBucketIcon.svg'
 import Image from 'next/image'
@@ -118,6 +118,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   //Initialize filteredProductList as all products
   useEffect(() => {
     resetFilteredProductList()
+
+    //Initalize the sessionStorage items for the filtering if any, when coming back after pressing on a product card
+    getSessionStorageItems()
   }, [])
   
   //This checks the pagination status and updates current status
@@ -144,8 +147,11 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
      //Reset pagination 
      onChangePagination(1)
 
+     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
+     setSessionStorageItems()
+
     //if no filters are active, then show all products
-    if(!query && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
+    if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
       resetFilteredProductList()
     }else{
       const results = SearchProducts({
@@ -168,7 +174,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
 
     //if value is already in list -> remove
-    if(filter=="categories" && filters.categories.filter(cat=>cat.name==value.name).length>0){
+    if(filter=="categories" && filters.categories && filters.categories.filter(cat=>cat.name==value.name).length>0){
       const filteredArray = filters[filter].filter(item => item.name !== value.name)
       setFilters({...filters, [filter]: filteredArray})
     }
@@ -225,6 +231,37 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   const getCertificateCounts = (cert : string) => { 
     var val = 0
+  const setSessionStorageItems = () => {
+    sessionStorage.setItem('level1Filters', JSON.stringify(filters))
+    sessionStorage.setItem('level2Filters', JSON.stringify(subfilters))
+    sessionStorage.setItem('queryParam', !!query ? query : '')
+  }
+
+  const getSessionStorageItems = () => {
+    const level1Filters = sessionStorage.getItem('level1Filters')
+    const level2Filters = sessionStorage.getItem('level2Filters')
+    const queryFilter = sessionStorage.getItem('queryParam')
+
+    console.log('level1filters', level1Filters)
+
+    //Scroll to searchPage if any sessionItems are present and open the filterBar
+    if((level1Filters !== null && level1Filters !== JSON.stringify(filters))|| (level2Filters !== null && level2Filters !== JSON.stringify(subfilters))|| (queryFilter !== null && queryFilter !== '')){
+      document.getElementById("search").scrollIntoView();
+      setFilterDrawerIsActive(true)
+    }
+
+    if(level1Filters !== null && level1Filters !== JSON.stringify(filters)){
+      setFilters(JSON.parse(level1Filters))
+    }
+    if(level2Filters !== null && level2Filters !== JSON.stringify(subfilters)){
+      setFilters(JSON.parse(level2Filters))
+    }
+    if(queryFilter !== null && queryFilter !== ''){
+      setQuery(queryFilter)
+    }
+  }
+
+  const getCertificateCounts = (cert) => { var val = 0
     certificateCounts.map(certcount => {
       if(certcount.name === cert) {
         val = certcount.count
@@ -307,6 +344,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         }}
         onSubmit={() => {}}
         value={query}
+        inputIcon={<MagnifyingGlass />}
       />
       {filteredProductList.length === 0 ?
         <> 
@@ -412,7 +450,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
           </FilterGroup>
           <FilterGroup>
-            { filters.categories.length !== 0 && <>
+            {filters.categories.length !== 0 && <>
             <FilterGroupTitle>Undirflokkar</FilterGroupTitle>
             <FilterItems>
               {filters.categories.map(category => {
