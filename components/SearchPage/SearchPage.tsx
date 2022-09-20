@@ -229,8 +229,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     return val
   }
 
-  const getCertificateCounts = (cert : string) => { 
-    var val = 0
   const setSessionStorageItems = () => {
     sessionStorage.setItem('level1Filters', JSON.stringify(filters))
     sessionStorage.setItem('level2Filters', JSON.stringify(subfilters))
@@ -261,7 +259,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
   }
 
-  const getCertificateCounts = (cert) => { var val = 0
+  const getCertificateCounts = (cert) => { 
+    var val = 0
     certificateCounts.map(certcount => {
       if(certcount.name === cert) {
         val = certcount.count
@@ -269,10 +268,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     })
     return val
   }
-
-  // const test = (str) => {
-    
-  // }
 
   //Framer motion controls for showing and hiding filter drawer
   const controls = useAnimation()
@@ -334,8 +329,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   return (
     <SearchPageContainer>
-      <div id="search">
-      </div>
+      {/* <div id="search">
+      </div> */}
       <StyledTitle>Taktu grænni skref</StyledTitle>
       <StyledInput 
         placeholder='Leitaðu eftir vöru' 
@@ -360,7 +355,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             return(
               <StyledMainButton
                 key={cat.name} 
-                text={cat.name}
+                text={cat.name.toLowerCase()}
                 onClick={() => {
                   toggleFilters('categories', cat)
                 }} 
@@ -438,7 +433,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                   return(
                     <FilterItem 
                       key={item.name}
-                      text={item.name} 
+                      text={item.name.toLowerCase()} 
                       onClick={() => {
                         toggleFilters('categories', item)
                       }} 

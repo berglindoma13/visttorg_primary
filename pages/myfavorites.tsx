@@ -9,7 +9,7 @@ import superjson from 'superjson'
 import { Header } from '../components/Header'
 import { Product } from '../components/Product'
 import { mediaMax } from '../constants/breakpoints'
-import { Heading1 } from '../components/Typography';
+import { Heading1, Heading5 } from '../components/Typography';
 
 
 export const getStaticProps: GetStaticProps = async () => {
@@ -42,21 +42,30 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
   const dispatch = useAppDispatch()
 
   const [loading,setLoading] = useState(true)
+
+  const [favorites,setFavorites] = useState([])
+
   useEffect(() => {
     const myFavs = window.localStorage.getItem('myFavorites')
-
-    // console.log('myFavs', myFavs)
-
-    //Convert string to array
-
+    getCurrentFavorites()
   }, [])
+
+  const getCurrentFavorites = () => {
+    const currentFavorites = productList.map(prod => {
+      if(myProducts.includes(prod.productid.toString())) {
+        return prod
+      }
+    }).filter(item => {return item !== undefined })
+    setFavorites(currentFavorites)
+  }
 
   return(
     <Page>
       <PageContainer>
         <StyledHeader showSearch={false} />
-        <StyledHeader1>Þínar uppáhalds vörur</StyledHeader1>
-        <ProductList>
+        <MainHeading>Þínar uppáhalds vörur</MainHeading>
+        {favorites.length === 0 && <StyledHeading5>Þú átt engar uppáhalds vörur</StyledHeading5> }
+        {/* <ProductList>
           {myProducts && (
             productList.map(prod => {
               if(myProducts.includes(prod.productid.toString())) {
@@ -73,6 +82,20 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
               }
             })
           )}
+        </ProductList> */}
+        <ProductList>
+          {favorites.map(prod => {
+            return (
+              <StyledProduct
+                key={prod.productid}
+                productId={prod.productid}
+                title={prod.title}
+                shortdescription={prod.shortdescription}
+                sellingcompany={prod.sellingcompany.name}
+                productimageurl={prod.productimageurl}
+              />
+            )
+          })}
         </ProductList>
       </PageContainer>
     </Page>
@@ -94,7 +117,15 @@ const StyledHeader = styled(Header)`
   margin-bottom:50px;
 `
 
-const StyledHeader1 = styled(Heading1)`
+const MainHeading = styled(Heading1)`
+  max-width:930px;
+  width:100%;
+  text-align:center;
+  margin: 0 auto;
+  padding-bottom:80px;
+`
+
+const StyledHeading5 = styled(Heading5)`
   max-width:930px;
   width:100%;
   text-align:center;
