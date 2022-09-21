@@ -34,7 +34,7 @@ export const Product = ({
       <StyledProduct className={className}>
         <StyledFavoritesButton 
           onClick={(e) => {
-            if(e.target.id === 'heart'){
+            if(e.target.id === 'heartbutton') {
               e.preventDefault()
             }
             if(myProducts.includes(productId)){

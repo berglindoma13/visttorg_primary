@@ -39,12 +39,20 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
               <MagnifyingGlass />
             </MobileSearchButton>
           </Link>
-
         </>
-      ) : (
-        <Link href='/umokkur'>
-          <NavItem>Um okkur</NavItem>
-        </Link>
+      ) : ( 
+        <SidebarWrapper>
+          <TopbarWrapper>
+            <Link href='/umokkur'>
+              <NavItem>Um okkur</NavItem>
+            </Link>
+          </TopbarWrapper>
+          <TopbarWrapper>
+            <Link href='/myfavorites'>
+              <NavItem>Favorites</NavItem>
+            </Link> 
+          </TopbarWrapper>
+        </SidebarWrapper>
       )}
     </HeaderWrapper>
   )
@@ -90,8 +98,18 @@ const NavItem = styled.span`
   font-variant: small-caps;
   color: #000000;
   cursor: pointer;
+  padding-bottom: 8px;
 
   &:hover{
     color: ${({ theme }) => theme.colors.green};
   }
+`
+
+const SidebarWrapper = styled.span`
+  display:flex;
+  flex-direction: row;
+`
+
+const TopbarWrapper = styled.span`
+  padding-left: 20px;
 `

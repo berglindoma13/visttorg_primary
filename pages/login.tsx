@@ -1,19 +1,17 @@
-import { GetServerSideProps, GetStaticProps } from 'next'
-import React from 'react'
-import styled from 'styled-components'
-import { Banner } from '../components/Banner'
-import { FrontpageCatBox } from '../components/FrontpageCatBox'
-import { Header } from '../components/Header'
-import { mediaMax } from '../constants/breakpoints'
-import { Certificate } from '../types/certificates'
-import { Category, Company, ProductProps } from '../types/products'
+import { GetServerSideProps, GetStaticProps } from 'next';
+import React, { useEffect, useState } from 'react'
 import { prismaInstance } from '../lib/prisma'
-import { SearchPage } from '../components/SearchPage'
-import { Footer } from '../components/Footer'
 import superjson from 'superjson'
-import { H1 } from '../components/Typography'
-import { MainButton } from '../components/Buttons'
-import axios from 'axios'
+import styled from 'styled-components'
+// import { ProductProps } from '../types/products';
+// import { useAppSelector, useAppDispatch } from '../app/hooks'
+// import { addToFavorites, getFavorites } from '../app/features/favorites/favoriteSlice'
+import { Header } from '../components/Header'
+// import { Product } from '../components/Product'
+import { mediaMax } from '../constants/breakpoints'
+import { Heading1 } from '../components/Typography';
+import { TextInput } from '../components/Inputs';
+import { Banner } from '../components/Banner';
 
 export const getServerSideProps: GetServerSideProps = async () => {
 
@@ -26,7 +24,7 @@ type LoginProps = {
   authenticated: boolean
 }
 
-const Home = ({ authenticated } : LoginProps) => {
+const Login = ({ authenticated } : LoginProps) => {
   
   const tryLogin = () => {
     fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
@@ -56,85 +54,35 @@ const Home = ({ authenticated } : LoginProps) => {
     });
   }
   
+  const test = () => {
+
+  }
+
   return(
-   <div>
-    <p>HELLO LOGIN SCREEN</p>
-    <MainButton text="login" onClick={() => { tryLogin() }}/>
-   </div>
+      <Page>
+          <PageContainer>
+              <StyledHeader showSearch={false} />
+              <MainHeading>Innskráning</MainHeading>
+              <LoginContainer>
+                  <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
+                  <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
+                  {/* <StyledMainButton></StyledMainButton> */}
+                  <SubmitButton onClick={test}>Skrá</SubmitButton>
+              </LoginContainer>
+          </PageContainer>
+      </Page>
   )
 }
 
-export default Home
-
-const SmallerBox = styled.div`
-  background-color: ${({ color }) => color};
-  width:50%;
-  min-height: 200px;
-  display:flex;
-  flex-direction:row;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 0;
-
-  >*{
-    max-width: 60%;
-  }
-
-  @media ${mediaMax.tablet}{
-    width:100%;
-    height: auto;
-    min-height:auto;
-    padding: 95px 0 45px 0;
-  }
-`
-
-const FakeH1 = styled.h3`
-  ${H1}
-`
-
-interface BoxProps{
-  color: string
-}
-
-const Box = styled.div<BoxProps>`
-  background-color: ${({ color }) => color};
-  width:50%;
-  min-height: 200px;
-  display:flex;
-  flex-direction:column;
-  justify-content: center;
-  align-items: center;
-
-  >*{
-    max-width: 60%;
-  }
-
-  @media ${mediaMax.tablet}{
-    width:100%;
-    min-height: 355px;
-  }
-`
-
-const SplitBoxes = styled.div`
-  width:100%;
-  display:flex;
-  flex-direction:row;
-  margin-bottom:100px;
-
-  @media ${mediaMax.tablet}{
-    flex-direction:column;
-  }
+const Page = styled.div`
+  background-color: ${({ theme }) => theme.colors.grey_one};
+  min-height:100vh;
 `
 
 const PageContainer = styled.div`
   max-width: 1440px;
   margin: 0 auto;
   padding-bottom:200px;
-`
-
-const Page = styled.div`
-  min-height:100vh;
-  background-color: ${({ theme }) => theme.colors.grey_one};
 `
 
 const StyledHeader = styled(Header)`
@@ -162,3 +110,57 @@ const CategoryBoxes = styled.div`
     margin-bottom:90px;
   }
 `
+
+const MainHeading = styled(Heading1)`
+  max-width:930px;
+  width:100%;
+  text-align:center;
+  margin: 0 auto;
+  padding-bottom:80px;
+`
+
+const StyledInput = styled(TextInput)`
+  width: 390px;
+  margin-bottom:45px;
+
+  @media ${mediaMax.tablet}{
+    width: 90%;
+  }
+`
+
+const LoginContainer = styled.div`
+    display:flex;
+    flex-direction:column;
+    flex-wrap:wrap;
+    width:100%;
+    justify-content: center;
+    align-items: center;
+`
+
+const SubmitButton = styled.button`
+  border:none;
+  background-color: ${({ theme }) => theme.colors.green};
+  height:30px;
+  border-radius: 999px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+  width:60px;
+`
+
+// const StyledProduct = styled(Product)`
+//   margin-right: 15px;
+//   margin-bottom:15px;
+
+//   @media ${mediaMax.tablet}{
+//     margin-right:0;
+//   }
+// `
+
+// const ProductList = styled.div`
+//   display:flex;
+//   flex-direction:row;
+//   flex-wrap:wrap;
+//   width:100%;
+//   justify-content: center;
+// `
+
+export default Login
