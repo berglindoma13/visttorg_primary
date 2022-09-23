@@ -52,24 +52,24 @@ const Login = ({ productListString }: MyFavoritesProps) => {
 
 //   }, [])
 
-    const test = () => {
+  const test = () => {
 
-    }
+  }
 
-    return(
-        <Page>
-            <PageContainer>
-                <StyledHeader showSearch={false} />
-                <MainHeading>Innskráning</MainHeading>
-                <LoginContainer>
-                    <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
-                    <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
-                    {/* <StyledMainButton></StyledMainButton> */}
-                    <SubmitButton onClick={test}>Skrá</SubmitButton>
-                </LoginContainer>
-            </PageContainer>
-        </Page>
-    )
+  return(
+    <Page>
+      <PageContainer>
+        <StyledHeader showSearch={false} />
+        <MainHeading>Innskráning</MainHeading>
+        <LoginContainer>
+          <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
+          <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
+          {/* <StyledMainButton></StyledMainButton> */}
+          <SubmitButton onClick={test}>Skrá</SubmitButton>
+        </LoginContainer>
+      </PageContainer>
+    </Page>
+  )
 }
 
 const Page = styled.div`
