@@ -143,11 +143,11 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }, [router])
 
   useEffect(() => {
-     //Reset pagination 
-     onChangePagination(1)
+    //Reset pagination 
+    onChangePagination(1)
 
-     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
-     setSessionStorageItems()
+    //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
+    setSessionStorageItems()
 
     //if no filters are active, then show all products
     if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
@@ -328,8 +328,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   return (
     <SearchPageContainer>
-      {/* <div id="search">
-      </div> */}
+      <div id="search">
+      </div>
       <StyledTitle>Taktu grænni skref</StyledTitle>
       <StyledInput 
         placeholder='Leitaðu eftir vöru' 
@@ -392,6 +392,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterGroupTitle>Söluaðilar</FilterGroupTitle>
             <FilterItems>
               {companies.map(company => {
+                // console.log('return company map')
                 return(
                   <FilterItem 
                     key={company.id}

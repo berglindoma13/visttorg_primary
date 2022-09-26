@@ -171,13 +171,16 @@ const Product = ({ productString } : ProductPageProps) => {
            <Heading3 style={{marginBottom: 43}}>Vottanir</Heading3>
           <CertificateList>
             {product.certificates.map((certificate : ProductCertificate, index : number) => {
+              if((certificate.certificate.name === "EPD" || certificate.certificate.name === "VOC"  || certificate.certificate.name === "FSC") && certificate.validDate < new Date() ) {
+                return
+              }
+              else {
               return (
                 <SingleCertificateItem key={index}>
                   {getCertImage(certificate.certificate.name)}
-                  {/* <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} clickable={false} /> */}
-                  {/* <Tag key={index} title={certificateMapper[certificate.certificate.name]} style={{marginBottom: 8, marginTop: 20}} clickable={false} /> */}
                 </SingleCertificateItem>
               )
+            }
             })}
           </CertificateList>  
         </ProductCertifications>
