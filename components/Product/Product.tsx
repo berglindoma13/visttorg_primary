@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { addToFavorites, getFavorites, removeFromFavorites } from '../../app/features/favorites/favoriteSlice'
 import { mediaMax } from '../../constants/breakpoints'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 //Product has 3 states -> Desktop, Mobile, Hover
 
 interface SingleProductProps {
@@ -28,6 +29,8 @@ export const Product = ({
 
   const myProducts = useAppSelector((state) => getFavorites(state))
   const dispatch = useAppDispatch()
+
+  const router = useRouter()
   
   return(
     <Link href={`/product/${productId}`}>
@@ -57,7 +60,7 @@ export const Product = ({
           <ProductCompany>{sellingcompany}</ProductCompany>
           <ProductTitle>{title}</ProductTitle>
           <ProductAbstract>{shortdescription.replace(/<[^>]+>/g, '')}</ProductAbstract>
-          <MainButton text='Skoða' onClick={() => console.log('hello')}/>
+          <MainButton text='Skoða' onClick={() =>  router.push(`/product/${productId}`)}/>
         </ProductDetails>
       </StyledProduct>
     </Link>
