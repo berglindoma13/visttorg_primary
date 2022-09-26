@@ -48,7 +48,7 @@ interface Counter {
 export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {
   const [query, setQuery] = useState("");
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
-  
+  const [originalValue, setOriginalValue] = useState(true)
   const router = useRouter()
   // const paginationPageSize = 9
   const isTablet = useIsTablet()
@@ -144,11 +144,15 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }, [router])
 
   useEffect(() => {
-     //Reset pagination 
-     onChangePagination(1)
 
-     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
-     setSessionStorageItems()
+    //dont run this code on load, only on change
+    if(!originalValue){
+      //Reset pagination
+      onChangePagination(1)
+    }
+
+    //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
+    setSessionStorageItems()
 
     //if no filters are active, then show all products
     if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
@@ -164,6 +168,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       })
       setFilteredProductList(results)
     }
+
+    setOriginalValue(false)
   }, [filters, query, subfilters])
 
   const toggleFilters = (filter: string, value: any) => {
@@ -239,8 +245,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     const level1Filters = sessionStorage.getItem('level1Filters')
     const level2Filters = sessionStorage.getItem('level2Filters')
     const queryFilter = sessionStorage.getItem('queryParam')
-
-    console.log('level1filters', level1Filters)
 
     //Scroll to searchPage if any sessionItems are present and open the filterBar
     if((level1Filters !== null && level1Filters !== JSON.stringify(filters))|| (level2Filters !== null && level2Filters !== JSON.stringify(subfilters))|| (queryFilter !== null && queryFilter !== '')){
@@ -329,8 +333,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   return (
     <SearchPageContainer>
-      {/* <div id="search">
-      </div> */}
+      <div id="search">
+      </div>
       <StyledTitle>Taktu grænni skref</StyledTitle>
       <StyledInput 
         placeholder='Leitaðu eftir vöru' 
