@@ -143,6 +143,29 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
   }, [router])
 
+  useEffect(() => {
+     //Reset pagination 
+     onChangePagination(1)
+
+     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
+     setSessionStorageItems()
+
+    //if no filters are active, then show all products
+    if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
+      resetFilteredProductList()
+    }else{
+      const results = SearchProducts({
+        fuseInstance, 
+        query, 
+        activeCategories: filters.categories.map(category => category.name),
+        activeSubCategories: subfilters,
+        activeCertificates: filters.certificates, 
+        activeCompanies: filters.companies
+      })
+      setFilteredProductList(results)
+    }
+  }, [filters, query, subfilters])
+
   const toggleFilters = (filter: string, value: any) => {
 
     //close drawer on filterToggle in tablet and mobile
@@ -216,6 +239,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     const level1Filters = sessionStorage.getItem('level1Filters')
     const level2Filters = sessionStorage.getItem('level2Filters')
     const queryFilter = sessionStorage.getItem('queryParam')
+
+    console.log('level1filters', level1Filters)
 
     //Scroll to searchPage if any sessionItems are present and open the filterBar
     if((level1Filters !== null && level1Filters !== JSON.stringify(filters))|| (level2Filters !== null && level2Filters !== JSON.stringify(subfilters))|| (queryFilter !== null && queryFilter !== '')){
