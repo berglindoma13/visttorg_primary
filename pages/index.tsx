@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import React from 'react'
 import styled from 'styled-components'
 import { Banner } from '../components/Banner'
@@ -13,7 +13,7 @@ import { Footer } from '../components/Footer'
 import superjson from 'superjson'
 import { H1 } from '../components/Typography'
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
 
   const productList = await prismaInstance.product.findMany({
     include: {
