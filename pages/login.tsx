@@ -59,18 +59,18 @@ const Login = ({ authenticated } : LoginProps) => {
   }
 
   return(
-      <Page>
-          <PageContainer>
-              <StyledHeader showSearch={false} />
-              <MainHeading>Innskráning</MainHeading>
-              <LoginContainer>
-                  <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
-                  <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
-                  {/* <StyledMainButton></StyledMainButton> */}
-                  <SubmitButton onClick={test}>Skrá</SubmitButton>
-              </LoginContainer>
-          </PageContainer>
-      </Page>
+    <Page>
+      <PageContainer>
+        <StyledHeader showSearch={false} />
+        <MainHeading>Innskráning</MainHeading>
+        <LoginContainer>
+          <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
+          <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
+          {/* <StyledMainButton></StyledMainButton> */}
+          <SubmitButton onClick={test}>Skrá</SubmitButton>
+        </LoginContainer>
+      </PageContainer>
+    </Page>
   )
 }
 

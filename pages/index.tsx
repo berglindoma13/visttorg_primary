@@ -5,7 +5,7 @@ import { Banner } from '../components/Banner'
 import { FrontpageCatBox } from '../components/FrontpageCatBox'
 import { Header } from '../components/Header'
 import { mediaMax } from '../constants/breakpoints'
-import { Certificate } from '../types/certificates'
+import { Certificate, ProductCertificate } from '../types/certificates'
 import { Category, Company, ProductProps } from '../types/products'
 import { prismaInstance } from '../lib/prisma'
 import { SearchPage } from '../components/SearchPage'
@@ -15,6 +15,22 @@ import { H1 } from '../components/Typography'
 
 export const getServerSideProps: GetServerSideProps = async () => {
 
+  const filterValidDate = (val) => {
+    if(val.certificateid === 1) {
+      return val.validDate > new Date()
+    }
+    if(val.certificateid === 2) {
+      return val.validDate > new Date()
+    }
+    if(val.certificateid === 3) {
+      return val.validDate > new Date()
+    }
+    else {
+      return true
+    }
+  }
+
+  // ALL PRODUCTS
   const productList = await prismaInstance.product.findMany({
     include: {
       sellingcompany: true,
@@ -27,8 +43,30 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
 
+  // remove certificates that are not valid 
+  productList.map(prod => {
+    const ja = prod.certificates.filter(filterValidDate)
+    prod.certificates = ja;
+  })
+
+  // ALL CATEGORIES
   const categories = await prismaInstance.category.findMany()
 
+  // ALL COMPANIES
+  const companiesA = await prismaInstance.company.findMany()
+  const companies = await prismaInstance.company.findMany({
+    include: {
+      products: true
+    }
+  })
+
+  // COMPANY COUNTS
+  const companyCounts = []
+  companies.map(comp => {
+    companyCounts.push({ name: comp.name, count: comp.products.length})
+  })
+
+  // ALL CERTIFICATES
   const certificatesA = await prismaInstance.certificate.findMany()
   const certificates = await prismaInstance.certificate.findMany({
     include: {
@@ -36,25 +74,18 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
   })
   
-  const companiesA = await prismaInstance.company.findMany()
-  const companies = await prismaInstance.company.findMany({
-    include: {
-      products: true
+  // CERTIFICATE COUNTS
+  const certificateCounts = []
+  certificates.map(cert => {
+    if(cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC') {
+      const bla = cert.productcertificate.filter(filterValidDate)
+      certificateCounts.push({ name: cert.name, count: bla.length})
+    }
+    else {
+      certificateCounts.push({ name: cert.name, count: cert.productcertificate.length})
     }
   })
-  // console.log(companies)
 
-  // const bykoproductList = await prismaInstance.product.findMany({
-  //   where: {
-  //     companyid: 1,
-  //   }
-  // });
-
-  // const mariaproductList = await prismaInstance.product.findMany({
-  //   where: {
-  //     companyid: 2,
-  //   }
-  // });
 
   // const companyCounts = [
   //   {name: "Byko", count: bykoproductList.length}, 
@@ -89,16 +120,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   //   companyCounts.push({ name: comp.name, count: filteredList.length})
   // })
 
-  const certificateCounts = []
-  certificates.map(cert => {
-    certificateCounts.push({ name: cert.name, count: cert.productcertificate.length})
-  })
-
-  const companyCounts = []
-  companies.map(comp => {
-    companyCounts.push({ name: comp.name, count: comp.products.length})
-  })
-
   const productListString = superjson.stringify(productList)
 
   return { props: { productListString, categories, certificatesA, companiesA, certificateCounts, companyCounts }}
@@ -121,7 +142,6 @@ type HomeProps = {
 
 const Home = ({ productListString, categories, certificatesA = [], companiesA = [], certificateCounts, companyCounts } : HomeProps) => {
   const productList: Array<ProductProps> = superjson.parse(productListString)
-  
   return(
     <Page>
       <PageContainer>

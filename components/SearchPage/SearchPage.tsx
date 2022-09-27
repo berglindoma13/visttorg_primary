@@ -50,7 +50,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
   const [originalValue, setOriginalValue] = useState(true)
   const router = useRouter()
-  // const paginationPageSize = 9
   const isTablet = useIsTablet()
 
   const [filteredProductList, setFilteredProductList] = useState<Fuse.FuseResult<ProductProps>[]>([])
@@ -136,7 +135,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
     if(!!cat){
       VisttorgCategories.map(item => {
-        if(item.name === cat.toString()) {
+        if(item.name === cat.toString().toLowerCase()) {
           toggleFilters('categories', item)
         }
       })
@@ -397,6 +396,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterGroupTitle>Söluaðilar</FilterGroupTitle>
             <FilterItems>
               {companies.map(company => {
+                // console.log('return company map')
                 return(
                   <FilterItem 
                     key={company.id}
@@ -418,7 +418,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 return(
                   <FilterItem 
                     key={certificate.id}
-                    text={certificateMapper[certificate.name].toLowerCase()} 
+                    text={certificateMapper[certificate.name]/*.toLowerCase()*/} 
                     num={getCertificateCounts(certificate.name)} 
                     onClick={() => {
                       toggleFilters('certificates', certificate.name)
