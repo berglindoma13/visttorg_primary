@@ -17,6 +17,7 @@ import { Close, MagnifyingGlass } from '../Svg'
 import certificateMapper from '../../mappers/certificates'
 import PaintBucket from '../../public/PaintBucketIcon.svg'
 import Image from 'next/image'
+import currentCategoryTemplate from "../../currentCategoryTemplate.json"
 // import InfiniteScroll from "react-infinite-scroll-component";
 // import CloseIcon from '../Svg/Close'
 
@@ -30,7 +31,11 @@ interface SearchPageProps{
 
 interface CategoryProps{
   name: string
-  subCategories: Array<string>
+  subCategories: Array<SubCatergoryProps>
+}
+
+interface SubCatergoryProps {
+  name: string
 }
 
 interface FilterProps{
@@ -87,23 +92,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       'certificates.certificate.name'],
   }
 
-  const VisttorgCategories = [
-    {name: "lýsing og rafmagn", subCategories: ["ljós", "perur"], weight: 1 },
-    {name: "eldhús", subCategories: ["hnífar", "heimilistæki"], weight: 1 },
-    {name: "baðherbergi", subCategories: ["klósett", "sturta"], weight: 1 },
-    {name: "gólfefni", subCategories: ["parket", "flísar"], weight: 1 },
-    {name: "garðurinn", subCategories: ["timbur", "blóm"], weight: 1 },
-    {name: "gluggar", subCategories: ["gler"], weight: 1 },
-    {name: "burðavirki", subCategories: ["veggir"], weight: 2 },
-    {name: "loftaefni", subCategories: ["loft", "málningarvörur"], weight: 2 },
-    {name: "hurðir", subCategories: ["hur1", "hur2", "hur3"], weight: 2 },
-    {name: "lagnir", subCategories: ["lag", "lag2", "lag3"], weight: 2 },
-    {name: "textíll", subCategories: ["tex1", "tex2", "tex3"], weight: 2 },
-    {name: "lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
-    {name: "öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
-    {name: "vélbúnaður", subCategories: ["vél", "húsgögn"], weight: 2 },
-    {name: "málningavörur", subCategories: ["rauður", "gulur"], weight: 2 },
-  ]
+  const VisttorgCategories = currentCategoryTemplate
+
+  // console.log('curr', currentCategoryTemplate)
 
   const fuseInstance = new Fuse(products, options)
 
@@ -457,12 +448,12 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 return( category.subCategories.map(sub => {
                   return(
                     <FilterItem 
-                      key={sub}
-                      text={sub} 
+                      key={sub.name}
+                      text={sub.name} 
                       onClick={() => {
-                        toggleSubFilters(sub)
+                        toggleSubFilters(sub.name)
                       }} 
-                      active={subfilters.includes(sub)}
+                      active={subfilters.includes(sub.name)}
                     />
                   )
                 }))
