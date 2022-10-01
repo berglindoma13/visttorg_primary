@@ -102,7 +102,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     {name: "lyftur", subCategories: ["lyf1", "lyf2", "lyf3"], weight: 2 },
     {name: "öryggi og merkingar", subCategories: ["öry1", "öry2", "öry3"], weight: 2 },
     {name: "vélbúnaður", subCategories: ["vél", "húsgögn"], weight: 2 },
-    {name: "málningavörur", subCategories: ["blár", "gulur"], weight: 2 },
+    {name: "málningavörur", subCategories: ["rauður", "gulur"], weight: 2 },
   ]
 
   const fuseInstance = new Fuse(products, options)
