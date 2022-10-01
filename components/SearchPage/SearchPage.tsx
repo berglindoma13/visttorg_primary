@@ -111,6 +111,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     const resultProducts: Fuse.FuseResult<ProductProps>[] = products.map((product, index) => {
       return { item : product, refIndex: index, score: 1}
     })
+
     setFilteredProductList(resultProducts)
   }
 
