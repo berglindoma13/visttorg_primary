@@ -45,7 +45,7 @@ interface Counter {
   count: number
 }
 
-export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {
+export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {  
   const [query, setQuery] = useState("");
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
   const [originalValue, setOriginalValue] = useState(true)

@@ -16,14 +16,8 @@ import { H1 } from '../components/Typography'
 export const getServerSideProps: GetServerSideProps = async () => {
 
   const filterValidDate = (val) => {
-    if(val.certificateid === 1) {
-      return val.validDate > new Date()
-    }
-    if(val.certificateid === 2) {
-      return val.validDate > new Date()
-    }
-    if(val.certificateid === 3) {
-      return val.validDate > new Date()
+    if(val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
+      return !!val.validDate && val.validDate > new Date()
     }
     else {
       return true
@@ -44,10 +38,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   });
 
   // remove certificates that are not valid 
-  productList.map(prod => {
-    const ja = prod.certificates.filter(filterValidDate)
-    prod.certificates = ja;
+  const filteredProductList = productList.map(prod => {
+    const filteredCertificates = prod.certificates.filter(filterValidDate)
+    prod.certificates = filteredCertificates;
+    return prod
   })
+
+  //remove products that have no certificates after filter above
+  const doubleFilterProductList = filteredProductList.filter(prod => prod.certificates.length > 0)
 
   // ALL CATEGORIES
   const categories = await prismaInstance.category.findMany()
@@ -63,7 +61,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
   // COMPANY COUNTS
   const companyCounts = []
   companies.map(comp => {
-    companyCounts.push({ name: comp.name, count: comp.products.length})
+    let count = 0
+    doubleFilterProductList.map(prod => {
+      if(prod.companyid === comp.id){
+        count++
+      }
+    })
+    companyCounts.push({ name: comp.name, count: count})
   })
 
   // ALL CERTIFICATES
@@ -78,49 +82,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const certificateCounts = []
   certificates.map(cert => {
     if(cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC') {
-      const bla = cert.productcertificate.filter(filterValidDate)
-      certificateCounts.push({ name: cert.name, count: bla.length})
+      const validCertificates = cert.productcertificate.filter(filterValidDate)
+      certificateCounts.push({ name: cert.name, count: validCertificates.length})
     }
     else {
       certificateCounts.push({ name: cert.name, count: cert.productcertificate.length})
     }
   })
 
-
-  // const companyCounts = [
-  //   {name: "Byko", count: bykoproductList.length}, 
-  //   {name: "MariaTestCompany", count: mariaproductList.length}
-  // ]
-
-  // const categoryCounts = []
-  // categories.map(cat => {
-  //   const filteredList = productList.filter(product => {
-  //     const matched = product.categories.filter(prodCat => prodCat.name === cat.name)
-  //     return matched.length > 0
-  //   })
-  //   categoryCounts.push({ name: cat.name, count: filteredList.length})
-  // })
-
-  // const certificateCounts = []
-  // certificates.map(cert => {
-  //   const filteredList = productList.filter(product => {
-  //     const matched = product.certificates.filter(prodCat => {
-  //       return prodCat.certificate.name === cert.name
-  //     })
-  //     return matched.length > 0
-  //   })
-  //   certificateCounts.push({ name: BykoCertificateMapper[cert.name], count: filteredList.length})
-  // })
-
-  // const companyCounts = []
-  // companies.map(comp => {
-  //   const filteredList = productList.filter(product => {
-  //     return product.sellingcompany.name === comp.name
-  //   })
-  //   companyCounts.push({ name: comp.name, count: filteredList.length})
-  // })
-
-  const productListString = superjson.stringify(productList)
+  const productListString = superjson.stringify(doubleFilterProductList)
 
   return { props: { productListString, categories, certificatesA, companiesA, certificateCounts, companyCounts }}
 }

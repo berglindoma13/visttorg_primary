@@ -37,6 +37,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
+  // const filterValidDate = (val) => {
+  //   if(val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
+  //     return !!val.validDate && val.validDate > new Date()
+  //   }else if(val.certificateid === 6){
+  //     return false
+  //   }
+  //   else {
+  //     return true
+  //   }
+  // }
+
+  // const filteredUniqueProduct = uniqueProduct.certificates.filter(cert => filterValidDate)
+
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
   return {
