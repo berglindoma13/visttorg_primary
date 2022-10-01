@@ -7,5 +7,6 @@ export default {
   BREEAM: 'BREEAM',
   BLENGILL: 'Blái engillinn',
   EV: 'Evrópublómið',
-  CE: 'CE'
+  CE: 'CE',
+  ENERGY: 'Orukumiði'
 }
