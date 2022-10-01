@@ -501,6 +501,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                   shortdescription={thisProduct.shortdescription}
                   sellingcompany={thisProduct.sellingcompany.name}
                   productimageurl={thisProduct.productimageurl}
+                  productCompany={thisProduct.sellingcompany.id}
                 />
               )
             }else{

@@ -16,6 +16,7 @@ interface SingleProductProps {
   sellingcompany: string,
   productimageurl: string
   className?: string
+  productCompany: number
 }
 
 export const Product = ({ 
@@ -24,7 +25,8 @@ export const Product = ({
   shortdescription, 
   sellingcompany,
   productimageurl,
-  className
+  className,
+  productCompany
 }: SingleProductProps) => {
 
   const myProducts = useAppSelector((state) => getFavorites(state))
@@ -33,7 +35,7 @@ export const Product = ({
   const router = useRouter()
   
   return(
-    <Link href={`/product/${productId}`}>
+    <Link href={`/product/${productId}?c=${productCompany}`}>
       <StyledProduct className={className}>
         <StyledFavoritesButton 
           onClick={(e) => {
@@ -70,7 +72,7 @@ export const Product = ({
 const StyledProduct = styled.div`
   min-width: 385px;
   width: 32%;
-  height: auto;
+  height: fit-content;
   background: #FFFFFF;
   box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
   border-radius: 16px;

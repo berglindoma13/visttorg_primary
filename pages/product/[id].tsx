@@ -21,15 +21,11 @@ import superjson from 'superjson'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
-  const company = context.params
-
-  console.log('company', company)
-
-  console.log('id', id)
+  const company = parseInt(context.query.c.toString())
 
   const uniqueProduct = await prismaInstance.product.findUnique({
     where: {
-      productIdentifier : { productid: id, companyid: 4}
+      productIdentifier : { productid: id, companyid: company}
     },
     include: {
       sellingcompany: true,
@@ -100,8 +96,6 @@ const Product = ({ productString } : ProductPageProps) => {
     }
   }
 
-  console.log('product', product)
-
   return(
     <Page>
       <PageContainer>
@@ -147,7 +141,7 @@ const Product = ({ productString } : ProductPageProps) => {
               </Swiper>
             ) : (
               <ImageWrapper>
-                {product?.productimageurl !== '' && <Image
+                {product.productimageurl && <Image
                   src={product.productimageurl} 
                   alt={`product image - ${product.title}`} 
                   layout="fill"
