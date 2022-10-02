@@ -127,7 +127,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
     if(!!cat){
       VisttorgCategories.map(item => {
-        if(item.name === cat.toString().toLowerCase()) {
+        if(item.name === cat.toString()) {
           toggleFilters('categories', item)
         }
       })
