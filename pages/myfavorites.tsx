@@ -93,6 +93,7 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
                 shortdescription={prod.shortdescription}
                 sellingcompany={prod.sellingcompany.name}
                 productimageurl={prod.productimageurl}
+                productCompany={prod.sellingcompany.id}
               />
             )
           })}
