@@ -170,7 +170,7 @@ const Product = ({ productString } : ProductPageProps) => {
                   </div>
                 }
               </div>
-              <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description.replace(/<[^>]+>/g, '')}</Heading4>
+              <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description && product.description.replace(/<[^>]+>/g, '')}</Heading4>
               {product.url && <>
                 <UIBig style={{ marginBottom: 15 }}>Sjá vöru á vef</UIBig>
                 <MainButton

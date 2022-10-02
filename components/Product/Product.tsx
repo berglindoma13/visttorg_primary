@@ -61,7 +61,7 @@ export const Product = ({
         <ProductDetails>
           <ProductCompany>{sellingcompany}</ProductCompany>
           <ProductTitle>{title}</ProductTitle>
-          <ProductAbstract>{shortdescription.replace(/<[^>]+>/g, '')}</ProductAbstract>
+          <ProductAbstract>{shortdescription && shortdescription.replace(/<[^>]+>/g, '')}</ProductAbstract>
           <MainButton text='Skoða' onClick={() =>  router.push(`/product/${productId}`)}/>
         </ProductDetails>
       </StyledProduct>
