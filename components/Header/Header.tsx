@@ -49,7 +49,7 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
           </TopbarWrapper>
           <TopbarWrapper>
             <Link href='/myfavorites'>
-              <NavItem>Favorites</NavItem>
+              <NavItem>Þínar vörur</NavItem>
             </Link> 
           </TopbarWrapper>
         </SidebarWrapper>

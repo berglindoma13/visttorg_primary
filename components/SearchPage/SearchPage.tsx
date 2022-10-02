@@ -247,7 +247,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       setFilters(JSON.parse(level1Filters))
     }
     if(level2Filters !== null && level2Filters !== JSON.stringify(subfilters)){
-      setFilters(JSON.parse(level2Filters))
+      console.log('level2filters', level2Filters)
+      // setFilters(JSON.parse(level2Filters))
+      setSubFilters(JSON.parse(level2Filters))
     }
     if(queryFilter !== null && queryFilter !== ''){
       setQuery(queryFilter)
