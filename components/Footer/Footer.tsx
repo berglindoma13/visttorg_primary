@@ -54,7 +54,7 @@ export const Footer = () => {
     <FooterContainer>
       <FooterContent>
         <TopContent>
-          <FooterTitle>Allar umhverfisvottaðar byggingavörur á einum stað</FooterTitle>
+          <FooterTitle>Allar umhverfisvænar byggingavörur á einum stað</FooterTitle>
           <FooterSubText>Viltu vera memm ? <a href="mailto:vistbok@visttorg.is" >Hafðu samband</a></FooterSubText>
         </TopContent>
         <BottomContent>
