@@ -14,7 +14,7 @@ const UmOkkur = () => {
     <Page>
       <PageContainer>
         <StyledHeader showSearch />
-        <StyledHeader1>Fyrsti íslenski gagnabankinn fyrir umhverfisvottaðar byggingarvörur</StyledHeader1>
+        <StyledHeader1>Fyrsti íslenski gagnabankinn fyrir umhverfisvænar byggingarvörur</StyledHeader1>
         <StyledHeader4>Tökum þátt í að stuðla að byggingarstarfsemi og mannvirkjagerð með lágu kolefnisspori.</StyledHeader4>
         <SplitBoxes>
           <Box color={theme.colors.orange}>
