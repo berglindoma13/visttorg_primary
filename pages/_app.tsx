@@ -11,6 +11,12 @@ import NProgress from 'nprogress'; //nprogress module
 import 'nprogress/nprogress.css'; //styles of nprogress
 import ReactGA from 'react-ga';
 
+import TagManager from 'react-gtm-module'
+ 
+const tagManagerArgs = {
+    gtmId: 'GT-KVHJ6D8'
+}
+
 
 store.subscribe(() => {
   saveState(store.getState())
@@ -20,6 +26,8 @@ const Wrapper: React.FC<AppProps> = (props) => {
   useEffect(() => {
     ReactGA.initialize('G-R7PM04TMX6');
     ReactGA.pageview(window.location.pathname + window.location.search);
+
+    TagManager.initialize(tagManagerArgs)
 
     const handlePageChangeStart = () => { 
       
