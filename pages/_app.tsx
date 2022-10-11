@@ -23,11 +23,8 @@ store.subscribe(() => {
 })
 
 const Wrapper: React.FC<AppProps> = (props) => {
-  useEffect(() => {
-    ReactGA.initialize('G-R7PM04TMX6');
-    ReactGA.pageview(window.location.pathname + window.location.search);
 
-    TagManager.initialize(tagManagerArgs)
+  useEffect(() => {
 
     const handlePageChangeStart = () => { 
       
@@ -60,6 +57,13 @@ const Wrapper: React.FC<AppProps> = (props) => {
 }
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+  useEffect(() => {
+    ReactGA.initialize('G-R7PM04TMX6');
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
+    TagManager.initialize(tagManagerArgs)
+  }, [])
+
   return (
     <Component {...pageProps} />
   );

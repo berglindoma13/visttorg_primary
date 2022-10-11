@@ -15,13 +15,13 @@ export const SearchProducts = ({ fuseInstance, query, activeCategories, activeSu
 
   if(query){
     queryMaker.$and.push({
-      $or: [{ 'title': query }, { 'description': query }, { 'brand': query }, { 'sellingcompany.name': query }, { 'categories.name': query }, { 'certificates.certificate.name': query }, { 'shortdescription': query }]
+      $or: [{ 'title': query }, { 'description': query }, { 'brand': query }, { 'sellingcompany.name': query }, { 'categories.name': query }, { 'subcategories.name': query }, { 'certificates.certificate.name': query }, { 'shortdescription': query }]
     })
   }
 
   if(activeSubCategories.length > 0){
     const categoriesOrLogic = activeSubCategories.map(category =>  {
-      return { 'categories.name': category}
+      return { 'subCategories.name': category}
     })
 
     queryMaker.$and.push({
@@ -57,6 +57,7 @@ export const SearchProducts = ({ fuseInstance, query, activeCategories, activeSu
       $or: companiesOrLogic
     })
   }
+
 
   const result = fuseInstance.search(queryMaker)
 

@@ -13,6 +13,14 @@ import { Footer } from '../components/Footer'
 import superjson from 'superjson'
 import { H1 } from '../components/Typography'
 
+import sanityClient from '@sanity/client'
+
+const client = sanityClient({
+  projectId: 'dmvpih9k',
+  dataset: 'production',
+  useCdn: true, // `false` if you want to ensure fresh data
+})
+
 export const getServerSideProps: GetServerSideProps = async () => {
 
   const filterValidDate = (val) => {
@@ -29,6 +37,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     include: {
       sellingcompany: true,
       categories : true,
+      subCategories : true,
       certificates: {
         include: {
           certificate : true
@@ -111,6 +120,11 @@ type HomeProps = {
 }
 
 const Home = ({ productListString, categories, certificatesA = [], companiesA = [], certificateCounts, companyCounts } : HomeProps) => {
+
+  client.getDocument('3000b472-0bb2-48e0-aad0-8d9d832e16fa').then((cert) => {
+    console.log(`${cert.productid}`)
+  })
+
   const productList: Array<ProductProps> = superjson.parse(productListString)
   return(
     <Page>

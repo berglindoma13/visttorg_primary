@@ -89,6 +89,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       'brand',
       'sellingcompany.name',
       'categories.name',
+      'subCategories.name',
       'certificates.certificate.name'],
   }
 
