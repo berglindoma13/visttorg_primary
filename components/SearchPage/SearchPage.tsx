@@ -77,7 +77,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     // findAllMatches: false,
     // minMatchCharLength: 1,
     // location: 0,
-    threshold: 0.4,
+    threshold: 0.1,
     // distance: 100,
     // useExtendedSearch: false,
     // ignoreLocation: false,
@@ -158,6 +158,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         activeCertificates: filters.certificates, 
         activeCompanies: filters.companies
       })
+      console.log('results', results)
       setFilteredProductList(results)
     }
 
