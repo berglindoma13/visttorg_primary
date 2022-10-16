@@ -146,6 +146,14 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     //Reset pagination 
     onChangePagination(1)
 
+    //dont run this code on load, only on change
+    // if(!originalValue){
+      //Reset pagination
+      // onChangePagination(1)
+      // Set pagination to the current page --> má ekki taka þetta alveg út?
+      onChangePagination(paginationNumber)
+    // }
+
     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
     setSessionStorageItems()
 
@@ -166,7 +174,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }, [filters, query, subfilters])
 
   const toggleFilters = (filter: string, value: any) => {
-
+    // reset pagination when a filter is chosen
+    onChangePagination(1)
     //close drawer on filterToggle in tablet and mobile
     if(isTablet){
       setFilterDrawerIsActive(false)
@@ -187,7 +196,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }
 
   const toggleSubFilters = (value: string) => {
-
+    // reset pagination when a subfilter is chosen
+    onChangePagination(1)
     //close drawer on filterToggle in tablet and mobile
     if(isTablet){
       setFilterDrawerIsActive(false)

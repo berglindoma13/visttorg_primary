@@ -18,15 +18,15 @@ export const Pagination = ({ total, currentPage, setCurrentPage, queryParamName,
     const indexStart = currentPage < 5 ? 1 : currentPage > numberOfPages - 5 ? numberOfPages - 5 : currentPage - 2
     if(numberOfPages > 6){
       for(let x = indexStart; x < indexStart + 5; x++){
-        pages.push(<StyledNumberButton key={x} onClick={() => setCurrentPage(x)} className={currentPage === x ? 'active': ''}>{x}</StyledNumberButton>)
+        pages.push(<StyledNumberButton key={x} onClick={() => {setCurrentPage(x); window.scrollTo({ top: 1100, behavior: 'smooth' })}} className={currentPage === x ? 'active': ''}>{x}</StyledNumberButton>)
       }
       if(currentPage <= numberOfPages - 5){
         pages.push(<StyledDots key="...">...</StyledDots>)
       }
-      pages.push(<StyledNumberButton key={numberOfPages} onClick={() => setCurrentPage(numberOfPages)} className={currentPage === numberOfPages ? 'active': ''}>{numberOfPages}</StyledNumberButton>)
+      pages.push(<StyledNumberButton key={numberOfPages} onClick={() => {setCurrentPage(numberOfPages); window.scrollTo({ top: 1100, behavior: 'smooth' })}} className={currentPage === numberOfPages ? 'active': ''}>{numberOfPages}</StyledNumberButton>)
     }else{
       for(let x = 1; x <= Math.ceil(total / pageSize); x++){
-        pages.push(<StyledNumberButton key={x} onClick={() => setCurrentPage(x)} className={currentPage === x ? 'active': ''}>{x}</StyledNumberButton>)
+        pages.push(<StyledNumberButton key={x} onClick={() => {setCurrentPage(x); window.scrollTo({ top: 1100, behavior: 'smooth' })}} className={currentPage === x ? 'active': ''}>{x}</StyledNumberButton>)
       }
     }
 
@@ -37,11 +37,11 @@ export const Pagination = ({ total, currentPage, setCurrentPage, queryParamName,
     <StyledPagination>
       <MainButton 
         text="Til baka" 
-        onClick={() => {
+        onClick={() => {{
           if(currentPage > 1){
             setCurrentPage(currentPage - 1)
           }
-        }} 
+        }; window.scrollTo({ top: 1100, behavior: 'smooth' })}} 
         className={currentPage > 1 ? '' : 'disabled'}
       />
       <DesktopOnly>
@@ -52,11 +52,11 @@ export const Pagination = ({ total, currentPage, setCurrentPage, queryParamName,
       </MobileOnly>
       <MainButton 
         text="Áfram" 
-        onClick={() => {
+        onClick={() => {{
           if(currentPage < Math.ceil(total / pageSize)){
             setCurrentPage(currentPage + 1)
           }
-        }} 
+        }; window.scrollTo({ top: 1100, behavior: 'smooth' })}} 
         className={currentPage < Math.ceil(total / pageSize) ? '' : 'disabled'}
       />
     </StyledPagination>
