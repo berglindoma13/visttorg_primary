@@ -140,16 +140,10 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     //dont run this code on load, only on change
     if(!originalValue){
       //Reset pagination
-      onChangePagination(1)
-    }
-
-    //dont run this code on load, only on change
-    // if(!originalValue){
-      //Reset pagination
       // onChangePagination(1)
       // Set pagination to the current page --> má ekki taka þetta alveg út?
       onChangePagination(paginationNumber)
-    // }
+    }
 
     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
     setSessionStorageItems()
