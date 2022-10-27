@@ -50,6 +50,14 @@ interface Counter {
   count: number
 }
 
+interface CategoryProps{
+  name: string;
+  subCategories: {
+      name: string;
+  }[];
+  weight: number;
+}
+
 export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {  
   const [query, setQuery] = useState("");
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
@@ -93,7 +101,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       'certificates.certificate.name'],
   }
 
-  const VisttorgCategories = currentCategoryTemplate
+  const VisttorgCategories: Array<CategoryProps> = currentCategoryTemplate
 
   // console.log('curr', currentCategoryTemplate)
 
@@ -160,14 +168,14 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         activeCertificates: filters.certificates, 
         activeCompanies: filters.companies
       })
-      console.log('results', results)
+
       setFilteredProductList(results)
     }
 
     setOriginalValue(false)
   }, [filters, query, subfilters])
 
-  const toggleFilters = (filter: string, value: any) => {
+  const toggleFilters = (filter: string, value: CategoryProps | string) => {
     // reset pagination when a filter is chosen
     onChangePagination(1)
     //close drawer on filterToggle in tablet and mobile
@@ -176,9 +184,17 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     }
 
     //if value is already in list -> remove
-    if(filter=="categories" && filters.categories && filters.categories.filter(cat=>cat.name==value.name).length>0){
+    if(filter=="categories" 
+      && filters.categories
+      && typeof value !== "string" 
+      && filters.categories.filter(cat => cat.name == value.name).length > 0
+    ){
       const filteredArray = filters[filter].filter(item => item.name !== value.name)
       setFilters({...filters, [filter]: filteredArray})
+
+      //remove relevant subfilters
+      const filteredSubFilters = subfilters.filter(item => value.subCategories.filter(x => x.name == item).length === 0)
+      setSubFilters(filteredSubFilters)
     }
     else if(filters[filter].includes(value)){
       const filteredArray = filters[filter].filter(item => item !== value)

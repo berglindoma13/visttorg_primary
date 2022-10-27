@@ -10,6 +10,7 @@ import { Router } from 'next/router';
 import NProgress from 'nprogress'; //nprogress module
 import 'nprogress/nprogress.css'; //styles of nprogress
 import ReactGA from 'react-ga';
+import CookieConsent from "react-cookie-consent";
 
 import TagManager from 'react-gtm-module'
  
@@ -51,6 +52,17 @@ const Wrapper: React.FC<AppProps> = (props) => {
         <GlobalStyle />
         <Provider store={store}>
           <MyApp {...props} />
+          <CookieConsent
+            location="bottom"
+            buttonText="Samþykkja"
+            cookieName="generalwebsitecookie"
+            style={{ background: "#ABC5A1", fontFamily: "GT" }}
+            buttonStyle={{ backgroundColor: "#A399FA" , color: "#fff", fontSize: "13px", fontFamily: "GT" }}
+            expires={150}
+          >
+            Þessi vefsíða notar kökur til að bæta upplifunina.{" "}
+            {/* <span style={{ fontSize: "10px" }}>This bit of text is smaller :O</span> */}
+          </CookieConsent>
         </Provider>
     </ThemeProvider>
   )
