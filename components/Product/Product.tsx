@@ -62,7 +62,7 @@ export const Product = ({
           <ProductCompany>{sellingcompany}</ProductCompany>
           <ProductTitle>{title}</ProductTitle>
           <ProductAbstract>{shortdescription && shortdescription.replace(/<[^>]+>/g, '')}</ProductAbstract>
-          <MainButton text='Skoða' onClick={() =>  router.push(`/product/${productId}`)}/>
+          <MainButton text='Skoða' onClick={() =>  router.push(`/product/${productId}?c=${productCompany}`)}/>
         </ProductDetails>
       </StyledProduct>
     </Link>
@@ -70,9 +70,9 @@ export const Product = ({
 }
 
 const StyledProduct = styled.div`
-  min-width: 385px;
-  width: 32%;
-  height: fit-content;
+  min-width: 300px;
+  width: 23%;
+  height: auto;
   background: #FFFFFF;
   box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
   border-radius: 16px;

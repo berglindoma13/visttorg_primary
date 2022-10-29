@@ -8,8 +8,9 @@ interface SearchProductsProps {
   activeSubCategories?: Array<string>
   activeCertificates?: Array<string>
   activeCompanies?: Array<string>
+  activeCertificateSystems?: Array<string>
 }
-export const SearchProducts = ({ fuseInstance, query, activeCategories, activeSubCategories, activeCertificates, activeCompanies} : SearchProductsProps) => {
+export const SearchProducts = ({ fuseInstance, query, activeCategories, activeSubCategories, activeCertificates, activeCompanies, activeCertificateSystems } : SearchProductsProps) => {
 
   let queryMaker = { $and : []}
 
@@ -41,6 +42,16 @@ export const SearchProducts = ({ fuseInstance, query, activeCategories, activeSu
   if(activeCertificates.length > 0 ){
     const certificatesOrLogic = activeCertificates.map(certificate =>  {
       return { 'certificates.certificate.name': certificate}
+    })
+
+    queryMaker.$and.push({
+      $or: certificatesOrLogic
+    })
+  }
+
+  if(activeCertificateSystems.length > 0 ){
+    const certificatesOrLogic = activeCertificateSystems.map(certificateSystem =>  {
+      return { 'certificateSystems.name': certificateSystem}
     })
 
     queryMaker.$and.push({

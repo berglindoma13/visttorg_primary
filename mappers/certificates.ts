@@ -1,12 +1,12 @@
 export default {
-  EPD: 'epd',
-  FSC: 'fsc',
-  VOC: 'voc',
-  SV_ALLOWED: 'leyfilegt í svansvottað hús',
-  SV: 'svanurinn',
-  BREEAM: 'breeam',
-  BLENGILL: 'blái engillinn',
-  EV: 'evrópublómið',
-  CE: 'ce',
-  ENERGY: 'orukumiði'
+  EPD: 'EPD',
+  FSC: 'FSC',
+  VOC: 'VOC',
+  SV_ALLOWED: 'Leyfilegt í svansvottað hús',
+  SV: 'Svanurinn',
+  // BREEAM: 'BREEAM',
+  BLENGILL: 'Blái engillinn',
+  EV: 'Evrópublómið',
+  CE: 'CE',
+  ENERGY: 'Orkumiði'
 }

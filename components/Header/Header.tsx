@@ -95,7 +95,7 @@ const NavItem = styled.span`
   font-size: 16px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   color: #000000;
   cursor: pointer;
   padding-bottom: 8px;

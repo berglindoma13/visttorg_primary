@@ -72,7 +72,7 @@ const StyledTextInput = styled.input<inputStyleProps>`
     font-size: 14px;
     line-height: 104%;
     letter-spacing: 0.09em;
-    font-variant: small-caps;
+    /* font-variant: small-caps; */
     color: ${({ theme }) => theme.colors.grey_five};
   }
 

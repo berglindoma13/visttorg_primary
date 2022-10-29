@@ -36,7 +36,7 @@ export const MainButtonText = styled.span`
   font-size: 14px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   display:block;
   color: ${({ theme }) => theme.colors.black};
 `

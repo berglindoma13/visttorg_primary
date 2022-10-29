@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { mediaMax } from '../../constants/breakpoints'
-import { Certificate } from '../../types/certificates'
+import { Certificate, CertificateSystem } from '../../types/certificates'
 import { Company, ProductProps } from '../../types/products'
 import { TextInput } from '../Inputs'
 import { Heading1Large, Heading3, Heading4, Heading6, UIMedium } from '../Typography'
@@ -27,6 +27,7 @@ interface SearchPageProps{
   companies: Array<Company>
   companyCounts: Array<Counter>
   certificateCounts: Array<Counter>
+  certificateSystems: Array<CertificateSystem>
 }
 
 interface CategoryProps{
@@ -42,6 +43,7 @@ interface FilterProps{
   brand: Array<string>
   companies: Array<string>
   certificates: Array<string>
+  certificateSystems: Array<string>
   categories: Array<CategoryProps>
 }
 
@@ -58,7 +60,7 @@ interface CategoryProps{
   weight: number;
 }
 
-export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts }: SearchPageProps) => {  
+export const SearchPage = ({ products = [], certificates, companies, certificateCounts, companyCounts, certificateSystems }: SearchPageProps) => {  
   const [query, setQuery] = useState("");
   const [paginationNumber, setPaginationNumber] = useState<number>(1)
   const [originalValue, setOriginalValue] = useState(true)
@@ -70,6 +72,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   const [filters, setFilters] = useState<FilterProps>({
     brand: [],
     companies: [],
+    certificateSystems: [],
     certificates: [],
     categories: []
   })
@@ -98,6 +101,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       'sellingcompany.name',
       'categories.name',
       'subCategories.name',
+      'certificateSystems.name',
       'certificates.certificate.name'],
   }
 
@@ -157,7 +161,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     setSessionStorageItems()
 
     //if no filters are active, then show all products
-    if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0){
+    if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0 && filters.certificateSystems.length === 0){
       resetFilteredProductList()
     }else{
       const results = SearchProducts({
@@ -166,9 +170,10 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         activeCategories: filters.categories.map(category => category.name),
         activeSubCategories: subfilters,
         activeCertificates: filters.certificates, 
-        activeCompanies: filters.companies
+        activeCompanies: filters.companies,
+        activeCertificateSystems: filters.certificateSystems
       })
-
+      console.log('results', results)
       setFilteredProductList(results)
     }
 
@@ -232,7 +237,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       brand: [],
       companies: [],
       certificates: [],
-      categories: []
+      categories: [],
+      certificateSystems:[]
     })
     setSubFilters([])
     setQuery("")
@@ -374,7 +380,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             return(
               <StyledMainButton
                 key={cat.name} 
-                text={cat.name.toLowerCase()}
+                text={cat.name}
                 onClick={() => {
                   toggleFilters('categories', cat)
                 }} 
@@ -416,12 +422,30 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                 return(
                   <FilterItem 
                     key={company.id}
-                    text={company.name.toLowerCase()}
+                    text={company.name}
                     num={getCompanyCounts(company.name)} 
                     onClick={() => {
                       toggleFilters('companies', company.name)
                     }} 
                     active={filters.companies.includes(company.name)} 
+                  />
+                )
+              })}
+            </FilterItems>
+          </FilterGroup>
+          <FilterGroup>
+            <FilterGroupTitle>Vottunarkerfi</FilterGroupTitle>
+            <FilterItems>
+              {certificateSystems.map(certSystem => {
+                // console.log('return company map')
+                return(
+                  <FilterItem 
+                    key={certSystem.name}
+                    text={certSystem.name}
+                    onClick={() => {
+                      toggleFilters('certificateSystems', certSystem.name)
+                    }} 
+                    active={filters.certificateSystems.includes(certSystem.name)} 
                   />
                 )
               })}
@@ -453,7 +477,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                   return(
                     <FilterItem 
                       key={item.name}
-                      text={item.name.toLowerCase()} 
+                      text={item.name} 
                       onClick={() => {
                         toggleFilters('categories', item)
                       }} 

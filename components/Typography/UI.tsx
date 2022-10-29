@@ -6,7 +6,7 @@ export const UIBig = styled.span`
   font-size: 16px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   color: #000000;
   display:block;
 `
@@ -17,7 +17,7 @@ export const UIMedium = styled.span`
   font-size: 14px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   color: #000000;
   display:block;
 `
@@ -28,7 +28,7 @@ export const UISmall = styled.span`
   font-size: 12px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   color: #000000;
   display:block;
 `

@@ -34,6 +34,6 @@ const CustomTag = styled.div`
   font-size: 12px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   color: #000000;
 `

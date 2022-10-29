@@ -16,7 +16,7 @@ export const FilterItem = ({ text, num, onClick, active, className }: FilterItem
   return (
     <ModifiedMainButton onClick={onClick} className={[active ? 'active': '', className]}>
       {num === undefined ? <ModifiedMainButtonText>{text}</ModifiedMainButtonText> 
-        : <ModifiedMainButtonText>{text} ({num})</ModifiedMainButtonText> }
+        : <ModifiedMainButtonText>{text}</ModifiedMainButtonText> }
       {active && <StyledCloseIcon fill='#fff' width='10px' height='10px'/>}
     </ModifiedMainButton>
   )
@@ -28,7 +28,7 @@ const ModifiedMainButtonText = styled(MainButtonText)`
   font-size: 12px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  font-variant: small-caps;
+  /* font-variant: small-caps; */
   color: #000000;
 `
 

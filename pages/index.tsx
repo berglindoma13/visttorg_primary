@@ -5,7 +5,7 @@ import { Banner } from '../components/Banner'
 import { FrontpageCatBox } from '../components/FrontpageCatBox'
 import { Header } from '../components/Header'
 import { mediaMax } from '../constants/breakpoints'
-import { Certificate, ProductCertificate } from '../types/certificates'
+import { Certificate, CertificateSystem, ProductCertificate } from '../types/certificates'
 import { Category, Company, ProductProps } from '../types/products'
 import { prismaInstance } from '../lib/prisma'
 import { SearchPage } from '../components/SearchPage'
@@ -38,6 +38,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       sellingcompany: true,
       categories : true,
       subCategories : true,
+      certificateSystems: true,
       certificates: {
         include: {
           certificate : true
@@ -56,12 +57,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
   //remove products that have no certificates after filter above
   const doubleFilterProductList = filteredProductList.filter(prod => prod.certificates.length > 0)
 
-  // ALL CATEGORIES
-  const categories = await prismaInstance.category.findMany()
-
   // ALL COMPANIES
-  const companiesA = await prismaInstance.company.findMany()
   const companies = await prismaInstance.company.findMany({
+    include: {
+      products: true
+    }
+  })
+
+  // ALL CERTIFICATION SYSTEMS
+  const certificateSystems = await prismaInstance.certificatesystem.findMany({
     include: {
       products: true
     }
@@ -80,7 +84,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   })
 
   // ALL CERTIFICATES
-  const certificatesA = await prismaInstance.certificate.findMany()
   const certificates = await prismaInstance.certificate.findMany({
     include: {
       productcertificate: true
@@ -100,8 +103,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
   })
 
   const productListString = superjson.stringify(doubleFilterProductList)
+  const certificateListString = superjson.stringify(certificates)
+  const companyListString = superjson.stringify(companies)
+  const certificateSystemListString = superjson.stringify(certificateSystems)
 
-  return { props: { productListString, categories, certificatesA, companiesA, certificateCounts, companyCounts }}
+  return { props: { productListString, certificates: certificateListString, companies: companyListString, certificateCounts, companyCounts, certificateSystems: certificateSystemListString }}
 }
 
 interface Counter {
@@ -111,21 +117,24 @@ interface Counter {
 
 type HomeProps = {
   productListString: string
-  categories: Category[]
-  certificatesA : Certificate[]
-  companiesA: Company[]
+  certificates : string
+  companies: string
   categoryCounts: Array<Counter>
   certificateCounts: Array<Counter>
   companyCounts: Array<Counter>
+  certificateSystems: string
 }
 
-const Home = ({ productListString, categories, certificatesA = [], companiesA = [], certificateCounts, companyCounts } : HomeProps) => {
+const Home = ({ productListString, certificates, companies, certificateCounts, companyCounts, certificateSystems } : HomeProps) => {
 
   // client.getDocument('3000b472-0bb2-48e0-aad0-8d9d832e16fa').then((cert) => {
   //   console.log(`${cert.productid}`)
   // })
 
   const productList: Array<ProductProps> = superjson.parse(productListString)
+  const certificateList: Array<Certificate> = superjson.parse(certificates)
+  const companyList: Array<Company> = superjson.parse(companies)
+  const certificateSystemList: Array<CertificateSystem> = superjson.parse(certificateSystems)
   return(
     <Page>
       <PageContainer>
@@ -153,10 +162,11 @@ const Home = ({ productListString, categories, certificatesA = [], companiesA = 
         </CategoryBoxes>
         <SearchPage 
           products={productList} 
-          certificates={certificatesA} 
-          companies={companiesA}
+          certificates={certificateList} 
+          companies={companyList}
           companyCounts={companyCounts}
           certificateCounts={certificateCounts}
+          certificateSystems={certificateSystemList}
         />
       </PageContainer>
       <Footer />

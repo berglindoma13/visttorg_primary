@@ -9,3 +9,7 @@ export interface Certificate {
   id : number,
   name : string
 }
+
+export interface CertificateSystem {
+  name: string
+}
