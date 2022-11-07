@@ -6,16 +6,18 @@ import { theme } from '../../styles/theme'
 
 interface MainButtonProps {
   text: string
+  numberString?: string
   onClick: () => void
   active: boolean
   className?: string
 }
 
-export const FilterButton = ({ text, onClick, active, className }: MainButtonProps) => {
+export const FilterButton = ({ text, numberString, onClick, active, className }: MainButtonProps) => {
   return (
     <ModifiedMainButton onClick={onClick} className={[active ? 'active': '', className]}>
       <FilterIcon fill={active ? '#fff' : theme.colors.green}/>
       <ModifiedMainButtonText>{text}</ModifiedMainButtonText>
+      <ModifiedMainButtonText>{numberString}</ModifiedMainButtonText>
     </ModifiedMainButton>
   )
 }

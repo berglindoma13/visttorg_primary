@@ -77,8 +77,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     categories: []
   })
   const [subfilters, setSubFilters] = useState<Array<string>>([])
-
-  const [paginationPageSize, SetPaginationPageSize] = useState(9)
+  const [paginationPageSize, SetPaginationPageSize] = useState(12)
+  const [numberOfActiveFilters, SetNumberOfActiveFilters] = useState(0)
 
   const options = {
     // isCaseSensitive: false,
@@ -122,7 +122,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   //Initialize filteredProductList as all products
   useEffect(() => {
     resetFilteredProductList()
-
     //Initalize the sessionStorage items for the filtering if any, when coming back after pressing on a product card
     getSessionStorageItems()
   }, [])
@@ -148,7 +147,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   }, [router])
 
   useEffect(() => {
-
     //dont run this code on load, only on change
     if(!originalValue){
       //Reset pagination
@@ -163,6 +161,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     //if no filters are active, then show all products
     if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0 && filters.certificateSystems.length === 0){
       resetFilteredProductList()
+      SetNumberOfActiveFilters(0);
+
     }else{
       const results = SearchProducts({
         fuseInstance, 
@@ -173,7 +173,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         activeCompanies: filters.companies,
         activeCertificateSystems: filters.certificateSystems
       })
-      console.log('results', results)
+      // console.log('results', results)
+      const activeFiltersSize = filters.categories.length+subfilters.length+filters.certificates.length+filters.certificateSystems.length+filters.companies.length
+      SetNumberOfActiveFilters(activeFiltersSize);
       setFilteredProductList(results)
     }
 
@@ -183,9 +185,16 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   const toggleFilters = (filter: string, value: CategoryProps | string) => {
     // reset pagination when a filter is chosen
     onChangePagination(1)
-    //close drawer on filterToggle in tablet and mobile
-    if(isTablet){
+  
+    const currentMainFilters = VisttorgCategories.filter(cat => cat.weight == 1 && cat.name == value.name)
+
+    // close drawer on filterToggle in tablet and mobile
+    // check if pressing level1 filters, if they are pressed then filterdrawer stays closed else it stays open
+    if(isTablet && currentMainFilters.length != 0){
       setFilterDrawerIsActive(false)
+    }
+    else if(isTablet) {
+      setFilterDrawerIsActive(true)
     }
 
     //if value is already in list -> remove
@@ -200,13 +209,22 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       //remove relevant subfilters
       const filteredSubFilters = subfilters.filter(item => value.subCategories.filter(x => x.name == item).length === 0)
       setSubFilters(filteredSubFilters)
+
+      // set number in the brackets in the sia button
+      SetNumberOfActiveFilters(numberOfActiveFilters-1);
     }
     else if(filters[filter].includes(value)){
       const filteredArray = filters[filter].filter(item => item !== value)
       setFilters({...filters, [filter]: filteredArray})
+
+      // set number in the brackets in the sia button
+      SetNumberOfActiveFilters(numberOfActiveFilters-1);
     }
     else{
       setFilters({...filters, [filter]: [...filters[filter], value ]})
+
+      // set number in the brackets in the sia button
+      SetNumberOfActiveFilters(numberOfActiveFilters+1);
     }
   }
 
@@ -215,15 +233,21 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     onChangePagination(1)
     //close drawer on filterToggle in tablet and mobile
     if(isTablet){
-      setFilterDrawerIsActive(false)
+      setFilterDrawerIsActive(true)
     }
 
     //if value is already in list -> remove
     if(subfilters.includes(value)){
       const filteredArray = subfilters.filter(item => item !== value)
       setSubFilters(filteredArray)
+
+      // set number in the brackets in the sia button
+      SetNumberOfActiveFilters(numberOfActiveFilters-1);
     }else{
       setSubFilters([...subfilters, value])
+
+       // set number in the brackets in the sia button
+       SetNumberOfActiveFilters(numberOfActiveFilters+1);
     }
   }
 
@@ -242,6 +266,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     })
     setSubFilters([])
     setQuery("")
+    SetNumberOfActiveFilters(0)
   }
 
   const getCompanyCounts = (comp : string) => { 
@@ -269,13 +294,20 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     if((level1Filters !== null && level1Filters !== JSON.stringify(filters))|| (level2Filters !== null && level2Filters !== JSON.stringify(subfilters))|| (queryFilter !== null && queryFilter !== '')){
       document.getElementById("search").scrollIntoView();
       setFilterDrawerIsActive(true)
+      // isTablet does not work here, its always false
+      // if(isTablet) {
+      //   setFilterDrawerIsActive(false)
+      // }
+      if(window.innerWidth <= 760) {
+        setFilterDrawerIsActive(false)
+      }
     }
 
     if(level1Filters !== null && level1Filters !== JSON.stringify(filters)){
       setFilters(JSON.parse(level1Filters))
     }
     if(level2Filters !== null && level2Filters !== JSON.stringify(subfilters)){
-      console.log('level2filters', level2Filters)
+      // console.log('level2filters', level2Filters)
       // setFilters(JSON.parse(level2Filters))
       setSubFilters(JSON.parse(level2Filters))
     }
@@ -374,7 +406,8 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         : <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>
       }
       <CategoryFilters>
-        <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
+        {isTablet ? <StyledFilterButton text='Sía' numberString={"("+numberOfActiveFilters+")"} onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
+          : <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />}
         {VisttorgCategories.map(cat => {
           if(cat.weight == 1) {
             return(
@@ -393,13 +426,13 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       {filteredProductList.length !== 0 &&
         <ShowsizeWrapper>
           <StyledMainButton 
-            text={12}
-            onClick={() => SetPaginationPageSize(12)}
-            active={paginationPageSize===12} />
+            text={20}
+            onClick={() => SetPaginationPageSize(20)}
+            active={paginationPageSize===20} />
           <StyledMainButton 
-            text={30}
-            onClick={() => SetPaginationPageSize(30)}
-            active={paginationPageSize===30} />
+            text={40}
+            onClick={() => SetPaginationPageSize(40)}
+            active={paginationPageSize===40} />
           <StyledMainButton 
             text={60}
             onClick={() => SetPaginationPageSize(60)}
@@ -418,7 +451,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterGroupTitle>Söluaðilar</FilterGroupTitle>
             <FilterItems>
               {companies.map(company => {
-                // console.log('return company map')
                 return(
                   <FilterItem 
                     key={company.id}
@@ -437,7 +469,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             <FilterGroupTitle>Vottunarkerfi</FilterGroupTitle>
             <FilterItems>
               {certificateSystems.map(certSystem => {
-                // console.log('return company map')
                 return(
                   <FilterItem 
                     key={certSystem.name}
@@ -510,9 +541,13 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
             </>}
           </FilterGroup>
-          <StyledClearFilterButton onClick={clearFilters} >
-            <Close fill="#000"/> <StyledClearFilterButtonText> Hreinsa síur </StyledClearFilterButtonText>
-          </StyledClearFilterButton>
+          {isTablet && 
+          <StyledBottomFilterButton onClick={() => setFilterDrawerIsActive(false)} >
+            <MagnifyingGlass fill="#000"/> <StyledBottomFilterButtonText> Leita </StyledBottomFilterButtonText>
+          </StyledBottomFilterButton> }
+          <StyledBottomFilterButton onClick={clearFilters} >
+            <Close fill="#000"/> <StyledBottomFilterButtonText> Hreinsa síur </StyledBottomFilterButtonText>
+          </StyledBottomFilterButton>
         </FilterWrapper>
         <ProductList>
           {filteredProductList.length === 0 &&
@@ -700,16 +735,19 @@ const CategoryFilters = styled.div`
 
     ${StyledMainButton}, ${StyledFilterButton}{
       margin-right:8px;
+      /*margin-bottom:8px;*/
     }
   }
 
   @media ${mediaMax.tablet}{
     height: 117px;
-    
+    /*flex-wrap: wrap;  
+    justify-content: center;
+    padding-bottom: 10px;*/
   }
 `
 
-const StyledClearFilterButton = styled.button`
+const StyledBottomFilterButton = styled.button`
   padding: 8px 18px 10px;
   height: 33px;
   background: none;
@@ -720,7 +758,7 @@ const StyledClearFilterButton = styled.button`
   cursor:pointer;
   float: right;
 `
-const StyledClearFilterButtonText = styled.span`
+const StyledBottomFilterButtonText = styled.span`
   font-family: Space Mono;
   font-style: normal;
   font-weight: 700;
