@@ -1,20 +1,23 @@
-import { ProductCertificate } from './certificates'
+import { ProductCertificate, CertificateSystem } from './certificates'
 
 export interface ProductProps {
-  id : number,
+  id:number
   productid: string,
-  title : string,
-  description : string,
-  shortdescription : string,
-  brand : string,
-  sellingcompany : Company
-  productimageurl : string
-  categories : Array<Category>
-  url : string,
-  fscUrl : string,
-  epdUrl : string,
-  vocUrl : string,
-  certificates : Array<ProductCertificate>
+  title: string,
+  description: string,
+  shortdescription: string,
+  categories: Array<Category>,
+  subCategories: Array<Category>,
+  sellingcompany: Company
+  productimageurl: string,
+  url: string,
+  brand: string,
+  fscUrl: string,
+  epdUrl: string,
+  vocUrl: string,
+  ceUrl: string,
+  certificates: Array<ProductCertificate>
+  certificateSystems?: Array<CertificateSystem>
 }
 
 export interface Company{

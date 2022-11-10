@@ -30,6 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     include: {
       sellingcompany: true,
       categories : true,
+      subCategories: true,
       certificates: {
         include: {
           certificate : true
@@ -158,6 +159,11 @@ const Product = ({ productString } : ProductPageProps) => {
                   <UIBig style={{marginBottom: 15}}>Flokkar</UIBig>
                   <ProductCategories>
                     {product.categories.map((category : Category, index : number) => {
+                      return (
+                        <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={false} />
+                      )
+                    })}
+                    {product.subCategories.map((category : Category, index : number) => {
                       return (
                         <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={false} />
                       )
