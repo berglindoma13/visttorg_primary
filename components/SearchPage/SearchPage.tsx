@@ -186,7 +186,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     // reset pagination when a filter is chosen
     onChangePagination(1)
   
-    const currentMainFilters = VisttorgCategories.filter(cat => cat.weight == 1 && cat.name == value.name)
+    const currentMainFilters = VisttorgCategories.filter(cat => cat.weight == 1 && typeof value !== "string" && cat.name == value.name)
 
     // close drawer on filterToggle in tablet and mobile
     // check if pressing level1 filters, if they are pressed then filterdrawer stays closed else it stays open
@@ -541,14 +541,25 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             </FilterItems>
             </>}
           </FilterGroup>
-          {isTablet && 
-          <StyledBottomFilterButton onClick={() => setFilterDrawerIsActive(false)} >
-            <MagnifyingGlass fill="#000"/> <StyledBottomFilterButtonText> Leita </StyledBottomFilterButtonText>
-          </StyledBottomFilterButton> }
-          <StyledBottomFilterButton onClick={clearFilters} >
-            <Close fill="#000"/> <StyledBottomFilterButtonText> Hreinsa síur </StyledBottomFilterButtonText>
-          </StyledBottomFilterButton>
+            {!isTablet && 
+              <StyledBottomFilterButton onClick={clearFilters} >
+                <Close fill="#000"/> <StyledBottomFilterButtonText> Hreinsa síur </StyledBottomFilterButtonText>
+              </StyledBottomFilterButton>
+            }
         </FilterWrapper>
+        {isTablet && 
+          <MobileFilterButtonWrapper
+            animate={fadeInControls}
+          >
+            <StyledBottomFilterButton onClick={() => setFilterDrawerIsActive(false)} >
+              <MagnifyingGlass fill="#000"/> <StyledBottomFilterButtonText> Leita </StyledBottomFilterButtonText>
+            </StyledBottomFilterButton> 
+            <StyledBottomFilterButton onClick={clearFilters} >
+              <Close fill="#000"/> <StyledBottomFilterButtonText> Hreinsa síur </StyledBottomFilterButtonText>
+            </StyledBottomFilterButton>
+          </MobileFilterButtonWrapper>
+          
+          }
         <ProductList>
           {filteredProductList.length === 0 &&
             <div>
@@ -595,6 +606,17 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     </SearchPageContainer>
   )
 }
+
+const MobileFilterButtonWrapper = styled(motion.div)`
+  position: fixed;
+  bottom: 0;
+  z-index: 10000;
+  width: 100%;
+  background: white;
+  padding-right: 20px;
+  padding-bottom: 10px;
+  
+`
 
 const FilterGroup = styled.div`
   margin-bottom:55px;
