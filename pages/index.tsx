@@ -11,7 +11,8 @@ import { prismaInstance } from '../lib/prisma'
 import { SearchPage } from '../components/SearchPage'
 import { Footer } from '../components/Footer'
 import superjson from 'superjson'
-import { H1 } from '../components/Typography'
+import { H1, Heading5 } from '../components/Typography'
+import { theme } from '../styles'
 
 // import sanityClient from '@sanity/client'
 
@@ -140,21 +141,6 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
       <PageContainer>
         <StyledHeader showSearch={false}/>
         <StyledBanner />
-        {/* <SplitBoxes>
-          <SmallerBox color={theme.colors.green}>
-            <FakeH1>
-              Verkefnið er styrkt af
-            </FakeH1>
-          </SmallerBox>
-          <Box color={theme.colors.beige}>
-            <Heading3>
-              Hönnunarsjóð
-            </Heading3>
-            <Heading3>
-              Ask Mannvirkjarannsóknarsjóð
-            </Heading3>
-          </Box>
-        </SplitBoxes> */}
         <CategoryBoxes>
           <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/?cat=Baðherbergi#search'/>
           <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/?cat=Gólfefni#search'/>
@@ -169,6 +155,21 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
           certificateSystems={certificateSystemList}
         />
       </PageContainer>
+      <SplitBoxes>
+        <SmallerBox color={theme.colors.green}>
+          <FakeH1>
+            Verkefnið er styrkt af
+          </FakeH1>
+        </SmallerBox>
+        <Box color={theme.colors.orange}>
+          <Heading5>
+            Hönnunarsjóð
+          </Heading5>
+          <Heading5>
+            Ask Mannvirkjarannsóknarsjóð
+          </Heading5>
+        </Box>
+      </SplitBoxes>
       <Footer />
     </Page>
   )
