@@ -11,8 +11,9 @@ import { prismaInstance } from '../lib/prisma'
 import { SearchPage } from '../components/SearchPage'
 import { Footer } from '../components/Footer'
 import superjson from 'superjson'
-import { H1, Heading5 } from '../components/Typography'
+import { H1, Heading3, Heading4, Heading5 } from '../components/Typography'
 import { theme } from '../styles'
+import HMSLogoSvg from '../components/Svg/Logos/HMS'
 
 // import sanityClient from '@sanity/client'
 
@@ -162,12 +163,13 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
           </FakeH1>
         </SmallerBox>
         <Box color={theme.colors.orange}>
-          <Heading5>
-            Hönnunarsjóð
-          </Heading5>
-          <Heading5>
-            Ask Mannvirkjarannsóknarsjóð
-          </Heading5>
+          <Heading3>
+            Hönnunarsjóði og HMS
+          </Heading3>
+          <SponsorImages>
+            <img src={'/honnunarsjodurLogo.jpg'} style={{width: '180px', paddingRight: 25}}/>
+            <HMSLogoSvg width="130px"/>
+          </SponsorImages>
         </Box>
       </SplitBoxes>
       <Footer />
@@ -176,6 +178,12 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
 }
 
 export default Home
+
+const SponsorImages = styled.div`
+  display:flex;
+  flex-direction:row;
+  padding-top:20px;
+`
 
 const SmallerBox = styled.div`
   background-color: ${({ color }) => color};
@@ -201,6 +209,7 @@ const SmallerBox = styled.div`
 
 const FakeH1 = styled.h3`
   ${H1}
+  font-size:50px;
 `
 
 interface BoxProps{

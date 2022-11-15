@@ -46,10 +46,7 @@ const Home = () => {
         </SmallerBox>
         <Box color={theme.colors.orange}>
           <Heading5>
-            Hönnunarsjóð
-          </Heading5>
-          <Heading5>
-            Ask Mannvirkjarannsóknarsjóð
+            Hönnunarsjóði og HMS
           </Heading5>
         </Box>
       </SplitBoxes>
