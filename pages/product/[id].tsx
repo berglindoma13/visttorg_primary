@@ -18,6 +18,7 @@ import SvanurinnLogoSVG from "../../components/Svg/Logos/Svanurinn"
 import VocLogoSVG from "../../components/Svg/Logos/Voc"
 import { mediaMax } from "../../constants/breakpoints"
 import superjson from 'superjson'
+import { useRouter } from "next/router"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
@@ -67,6 +68,36 @@ interface ProductPageProps{
 }
 
 const Product = ({ productString } : ProductPageProps) => {
+
+  const router = useRouter()
+
+  const reRouteToSearchPage = (category: string, filterLevel: number) => {
+
+    //add the category to sessionStorage and reset all other sessionStorage items
+    if(filterLevel === 1){
+      
+      const newFilters = []
+      newFilters.push(category)
+      
+      sessionStorage.setItem('level1Filters', JSON.stringify(newFilters))
+      sessionStorage.setItem('level2Filters', JSON.stringify([]))
+      sessionStorage.setItem('queryParam', '')
+      
+    }else {
+
+      const newFilters = []
+      newFilters.push(category)
+      
+      sessionStorage.setItem('level2Filters', JSON.stringify(newFilters))
+      sessionStorage.setItem('level1Filters', JSON.stringify([]))
+      sessionStorage.setItem('queryParam', '')
+    }
+
+
+    //Push to frontpage
+    router.push('/')
+    
+  }
   
   const product: ProductProps = superjson.parse(productString)
 
@@ -160,7 +191,7 @@ const Product = ({ productString } : ProductPageProps) => {
                   <ProductCategories>
                     {product.categories.map((category : Category, index : number) => {
                       return (
-                        <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={false} />
+                        <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={true} onClick={() => reRouteToSearchPage('bull', 1)} />
                       )
                     })}
                     {product.subCategories.map((category : Category, index : number) => {

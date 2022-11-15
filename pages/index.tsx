@@ -11,7 +11,9 @@ import { prismaInstance } from '../lib/prisma'
 import { SearchPage } from '../components/SearchPage'
 import { Footer } from '../components/Footer'
 import superjson from 'superjson'
-import { H1 } from '../components/Typography'
+import { H1, Heading3, Heading4, Heading5 } from '../components/Typography'
+import { theme } from '../styles'
+import HMSLogoSvg from '../components/Svg/Logos/HMS'
 
 // import sanityClient from '@sanity/client'
 
@@ -140,21 +142,6 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
       <PageContainer>
         <StyledHeader showSearch={false}/>
         <StyledBanner />
-        {/* <SplitBoxes>
-          <SmallerBox color={theme.colors.green}>
-            <FakeH1>
-              Verkefnið er styrkt af
-            </FakeH1>
-          </SmallerBox>
-          <Box color={theme.colors.beige}>
-            <Heading3>
-              Hönnunarsjóð
-            </Heading3>
-            <Heading3>
-              Ask Mannvirkjarannsóknarsjóð
-            </Heading3>
-          </Box>
-        </SplitBoxes> */}
         <CategoryBoxes>
           <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/?cat=Baðherbergi#search'/>
           <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/?cat=Gólfefni#search'/>
@@ -169,12 +156,34 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
           certificateSystems={certificateSystemList}
         />
       </PageContainer>
+      <SplitBoxes>
+        <SmallerBox color={theme.colors.green}>
+          <FakeH1>
+            Verkefnið er styrkt af
+          </FakeH1>
+        </SmallerBox>
+        <Box color={theme.colors.orange}>
+          <Heading3>
+            Hönnunarsjóði og HMS
+          </Heading3>
+          <SponsorImages>
+            <img src={'/honnunarsjodurLogo.jpg'} style={{width: '180px', paddingRight: 25}}/>
+            <HMSLogoSvg width="130px"/>
+          </SponsorImages>
+        </Box>
+      </SplitBoxes>
       <Footer />
     </Page>
   )
 }
 
 export default Home
+
+const SponsorImages = styled.div`
+  display:flex;
+  flex-direction:row;
+  padding-top:20px;
+`
 
 const SmallerBox = styled.div`
   background-color: ${({ color }) => color};
@@ -200,6 +209,7 @@ const SmallerBox = styled.div`
 
 const FakeH1 = styled.h3`
   ${H1}
+  font-size:50px;
 `
 
 interface BoxProps{

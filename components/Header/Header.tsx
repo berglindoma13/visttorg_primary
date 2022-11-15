@@ -52,6 +52,11 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
               <NavItem>Þínar vörur</NavItem>
             </Link> 
           </TopbarWrapper>
+          <TopbarWrapper>
+            <Link href='/helpfulmaterial'>
+              <NavItem>Verkfærakistan</NavItem>
+            </Link> 
+          </TopbarWrapper>
         </SidebarWrapper>
       )}
     </HeaderWrapper>
