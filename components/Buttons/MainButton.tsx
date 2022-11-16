@@ -54,9 +54,17 @@ export const StyledMainLink = styled.div`
   cursor:pointer;
   border: 1px solid #fff;
 
-  &:hover{
-    ${MainButtonText}{
-      color: ${({ theme }) => theme.colors.green};
+  // &:hover{
+  //   ${MainButtonText}{
+  //     color: ${({ theme }) => theme.colors.green};
+  //   }
+  // }
+
+  @media (min-width: 760px){
+    &:hover{
+      ${MainButtonText}{
+        color: ${({ theme }) => theme.colors.green};
+      }
     }
   }
 
@@ -96,9 +104,17 @@ export const StyledMainButton = styled.button`
   cursor:pointer;
   border: 1px solid #fff;
 
-  &:hover{
-    ${MainButtonText}{
-      color: ${({ theme }) => theme.colors.green};
+  // &:hover{
+  //   ${MainButtonText}{
+  //     color: ${({ theme }) => theme.colors.green};
+  //   }
+  // }
+
+  @media (min-width: 760px){
+    &:hover{
+      ${MainButtonText}{
+        color: ${({ theme }) => theme.colors.green};
+      }
     }
   }
 

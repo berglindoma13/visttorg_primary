@@ -50,13 +50,24 @@ const ModifiedMainButton = styled.div`
   margin-bottom:15px;
   margin-right:15px;
 
-  &:hover{
-    background-color: ${({ theme }) => theme.colors.green};
+  // &:hover{
+  //   background-color: ${({ theme }) => theme.colors.green};
 
-    ${ModifiedMainButtonText}{
-      color:#fff;
+  //   ${ModifiedMainButtonText}{
+  //     color:#fff;
+  //   }
+  // }
+  
+  @media (min-width: 760px){
+    &:hover{
+      background-color: ${({ theme }) => theme.colors.green};
+  
+      ${ModifiedMainButtonText}{
+        color:#fff;
+      }
     }
   }
+
 
   &.active{
     background-color: ${({ theme }) => theme.colors.green};
