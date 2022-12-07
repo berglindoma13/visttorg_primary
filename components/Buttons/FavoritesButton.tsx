@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import { Heart } from '../Svg'
 
 interface FavoritesButtonProps {
-  onClick: () => void
+  onClick: (e: any) => void
   status: 'enabled' | 'disabled' 
-  className: any
+  className?: any
 }
 
 export const FavoritesButton = ({ onClick, status, className }: FavoritesButtonProps) => {

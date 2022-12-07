@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { MainButtonText } from './MainButton'
-import { Tag } from '../Tag'
 import CloseIcon from '../Svg/Close'
 
 interface FilterItemProps {

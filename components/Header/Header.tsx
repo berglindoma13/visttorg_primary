@@ -9,7 +9,7 @@ import { useRouter } from 'next/router'
 
 interface HeaderProps{
   showSearch: boolean
-  className: string
+  className?: string
 }
 
 export const Header = ({ showSearch, className }: HeaderProps) => {

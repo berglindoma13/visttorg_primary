@@ -62,12 +62,18 @@ export const Product = ({
           <ProductCompany>{sellingcompany}</ProductCompany>
           <ProductTitle>{title}</ProductTitle>
           <ProductAbstract>{shortdescription && shortdescription.replace(/<[^>]+>/g, '')}</ProductAbstract>
-          <MainButton text='Skoða' onClick={() =>  router.push(`/product/${productId}?c=${productCompany}`)}/>
+          <StyledMainButton text='Skoða' onClick={() =>  router.push(`/product/${productId}?c=${productCompany}`)}/>
         </ProductDetails>
       </StyledProduct>
     </Link>
   )
 }
+
+const StyledMainButton = styled(MainButton)`
+  position: absolute;
+  bottom: 10px;
+  left: 45px;
+`
 
 const StyledProduct = styled.div`
   min-width: 300px;
@@ -82,6 +88,7 @@ const StyledProduct = styled.div`
   position:relative;
   transition: box-shadow 0.2s ease-in;
   cursor: pointer;
+  padding-bottom:40px;
 
   &:hover{
     box-shadow: 0px 4px 44px 4px rgba(132, 132, 132, 0.55);
@@ -132,13 +139,22 @@ const ProductTitle = styled.span`
   letter-spacing: -0.025em;
   color: #000000;
   margin-bottom:25px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
 `
 const ProductAbstract = styled.span`
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
   font-weight: normal;
   font-size: 16px;
-  line-height: 104%;
+  line-height: 125%;
   letter-spacing: 0.005em;
   color: #000000;
   margin-bottom:25px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
 `

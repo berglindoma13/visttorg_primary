@@ -5,12 +5,11 @@ interface TagProps{
   style?: any
   clickable: boolean
   onClick?: () => void
-  children?: any 
 }
-export const Tag = ({ title, style, clickable, onClick, children }: TagProps) => {
+export const Tag = ({ title, style, clickable, onClick }: TagProps) => {
   if(clickable){
     return(
-      <CustomTag style={style} onClick={onClick}>{children}</CustomTag> 
+      <CustomTag style={style} onClick={onClick}>{title}</CustomTag> 
     )
   }else{
     return(
