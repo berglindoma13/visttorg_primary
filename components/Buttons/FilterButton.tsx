@@ -9,12 +9,12 @@ interface MainButtonProps {
   numberString?: string
   onClick: () => void
   active: boolean
-  className?: string
+  className?: any
 }
 
 export const FilterButton = ({ text, numberString, onClick, active, className }: MainButtonProps) => {
   return (
-    <ModifiedMainButton onClick={onClick} className={[active ? 'active': '', className]}>
+    <ModifiedMainButton onClick={onClick} className={`${active ? 'active': ''} ${className}`}>
       <FilterIcon fill={active ? '#fff' : theme.colors.green}/>
       <ModifiedMainButtonText>{text}</ModifiedMainButtonText>
       <ModifiedMainButtonText>{numberString}</ModifiedMainButtonText>

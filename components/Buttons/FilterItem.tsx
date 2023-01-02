@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { MainButtonText } from './MainButton'
-import { Tag } from '../Tag'
 import CloseIcon from '../Svg/Close'
 
 interface FilterItemProps {
@@ -14,7 +13,7 @@ interface FilterItemProps {
 
 export const FilterItem = ({ text, num, onClick, active, className }: FilterItemProps) => {
   return (
-    <ModifiedMainButton onClick={onClick} className={[active ? 'active': '', className]}>
+    <ModifiedMainButton onClick={onClick} className={`${active ? 'active': ''} ${className}`}>
       {num === undefined ? <ModifiedMainButtonText>{text}</ModifiedMainButtonText> 
         : <ModifiedMainButtonText>{text}</ModifiedMainButtonText> }
       {active && <StyledCloseIcon fill='#fff' width='10px' height='10px'/>}

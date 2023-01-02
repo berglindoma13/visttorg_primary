@@ -67,6 +67,10 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   const router = useRouter()
   const isTablet = useIsTablet()
 
+  useEffect(() => {
+    setFilterDrawerIsActive(isTablet ? false : true)
+  }, [isTablet])
+
   const [filteredProductList, setFilteredProductList] = useState<Fuse.FuseResult<ProductProps>[]>([])
   const [filterDrawerIsActive, setFilterDrawerIsActive] = useState(false)
   const [filters, setFilters] = useState<FilterProps>({
@@ -121,7 +125,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   //Initialize filteredProductList as all products
   useEffect(() => {
-    resetFilteredProductList()
+    //resetFilteredProductList()
     //Initalize the sessionStorage items for the filtering if any, when coming back after pressing on a product card
     getSessionStorageItems()
   }, [])
@@ -158,7 +162,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     //Set the sessionStorageitems for keeping the state of the filtering when going back after pressing a product card
     setSessionStorageItems()
 
-    //if no filters are active, then show all products
+    //if no filters are active, then show no products
     if(!query && filters.categories && filters.categories.length === 0 && filters.certificates.length === 0 && filters.companies.length === 0 && filters.certificateSystems.length === 0){
       resetFilteredProductList()
       SetNumberOfActiveFilters(0);
@@ -176,6 +180,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       // console.log('results', results)
       const activeFiltersSize = filters.categories.length+subfilters.length+filters.certificates.length+filters.certificateSystems.length+filters.companies.length
       SetNumberOfActiveFilters(activeFiltersSize);
+      console.log('activeFiltersnumber', activeFiltersSize)
       setFilteredProductList(results)
     }
 
@@ -197,7 +202,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       setFilterDrawerIsActive(true)
     }
 
-    //if value is already in list -> remove
+    //if value is already in list -> remove / only categories
     if(filter=="categories" 
       && filters.categories
       && typeof value !== "string" 
@@ -213,6 +218,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       // set number in the brackets in the sia button
       SetNumberOfActiveFilters(numberOfActiveFilters-1);
     }
+    //if value is already in list -> other than categories
     else if(filters[filter].includes(value)){
       const filteredArray = filters[filter].filter(item => item !== value)
       setFilters({...filters, [filter]: filteredArray})
@@ -220,7 +226,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       // set number in the brackets in the sia button
       SetNumberOfActiveFilters(numberOfActiveFilters-1);
     }
+    //if value is not in list, add it to the list
     else{
+      console.log('here 1')
       setFilters({...filters, [filter]: [...filters[filter], value ]})
 
       // set number in the brackets in the sia button
@@ -398,7 +406,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         value={query}
         inputIcon={<MagnifyingGlass />}
       />
-      {filteredProductList.length === 0 ?
+      {filteredProductList.length === 0 && numberOfActiveFilters > 0 ?
         <> 
           <NoResultsSubtext> Þú leitaðir að </NoResultsSubtext> 
           <SearchResultSubtext> "{query.toUpperCase()}" </SearchResultSubtext>
@@ -423,18 +431,18 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           }
         })}
       </CategoryFilters>
-      {filteredProductList.length !== 0 &&
+      {numberOfActiveFilters > 0 && filteredProductList.length !== 0 &&
         <ShowsizeWrapper>
           <StyledMainButton 
-            text={20}
+            text="20"
             onClick={() => SetPaginationPageSize(20)}
             active={paginationPageSize===20} />
           <StyledMainButton 
-            text={40}
+            text="40"
             onClick={() => SetPaginationPageSize(40)}
             active={paginationPageSize===40} />
           <StyledMainButton 
-            text={60}
+            text="60"
             onClick={() => SetPaginationPageSize(60)}
             active={paginationPageSize===60} />
         </ShowsizeWrapper>
@@ -561,7 +569,22 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           
           }
         <ProductList>
-          {filteredProductList.length === 0 &&
+          {
+            numberOfActiveFilters === 0 && 
+            <div>
+              <ImageWrapper>
+                <Image 
+                  src={PaintBucket} 
+                  alt='Icon image' 
+                  layout='fill'
+                  objectFit='contain'
+                />
+              </ImageWrapper>
+              <NoResultsText>Prófaðu að leita til að fá niðurstöður</NoResultsText>
+              {/* <NoResultsSubtext>Endilega prófaðu að leita eftir öðrum leitarskilyrðum.</NoResultsSubtext> */}
+            </div>
+          }
+          {filteredProductList.length === 0 && numberOfActiveFilters > 0 &&
             <div>
               <ImageWrapper>
                 <Image 
@@ -575,7 +598,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
               <NoResultsSubtext>Endilega prófaðu að leita eftir öðrum leitarskilyrðum.</NoResultsSubtext>
             </div>
           }
-          {filteredProductList.map((product, index) => {
+          {numberOfActiveFilters > 0&&  filteredProductList.map((product, index) => {
             if(index >= (paginationNumber - 1) * paginationPageSize && index < paginationNumber * paginationPageSize){
               const thisProduct = product.item
               return (
@@ -595,7 +618,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           })}
         </ProductList>
       </ProductsAndFilter>
-      {filteredProductList.length !== 0 &&
+      {numberOfActiveFilters > 0 && filteredProductList.length !== 0 &&
       <Pagination 
         currentPage={paginationNumber}
         setCurrentPage={onChangePagination}

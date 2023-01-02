@@ -191,7 +191,7 @@ const Product = ({ productString } : ProductPageProps) => {
                   <ProductCategories>
                     {product.categories.map((category : Category, index : number) => {
                       return (
-                        <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={true} onClick={() => reRouteToSearchPage('bull', 1)} />
+                        <Tag key={index} title={category.name} style={{marginBottom: 8}} clickable={false}  /> //onClick={() => reRouteToSearchPage('bull', 1)}
                       )
                     })}
                     {product.subCategories.map((category : Category, index : number) => {
