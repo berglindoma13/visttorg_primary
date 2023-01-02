@@ -580,7 +580,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
                   objectFit='contain'
                 />
               </ImageWrapper>
-              <NoResultsText>Prófaðu að leita til að fá niðurstöður</NoResultsText>
+              <NoResultsText>Prófaðu að leita eða nota síuna til að fá upp vörur</NoResultsText>
               {/* <NoResultsSubtext>Endilega prófaðu að leita eftir öðrum leitarskilyrðum.</NoResultsSubtext> */}
             </div>
           }
