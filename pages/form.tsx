@@ -59,7 +59,7 @@ const FormPage = () => {
     <>
       <PageTitle>Nýskráning á vöru</PageTitle>
       <FormWrapper>
-        <TextInput type="text" placeholder="Nafn á vöru" onChange={(value: string) => newProductChange('name', value)}/>
+        {/* <TextInput type="text" placeholder="Nafn á vöru" onChange={(value: string) => newProductChange('name', value)}/>
         <TextInput type="text" placeholder="Vörunúmer (einstakt)" onChange={(value: string) => newProductChange('productId', value)}/>
         <TextInput type="text" placeholder="Seljandi" onChange={(value: string) => newProductChange('sellingCompany', value)}/>
         <TextareaInput placeholder="Stutt lýsing" onChange={(value: string) => newProductChange('shortDescription', value)}/>
@@ -67,7 +67,7 @@ const FormPage = () => {
         <TextInput type="text" placeholder="Hlekkur á vöru" onChange={(value: string) => newProductChange('link', value)}/>
         <TextInput type="text" placeholder="Vörumerki" onChange={(value: string) => newProductChange('brand', value)}/>
         <TextInput type="file" name="productimage" onChange={productImageChange} />
-        <TextInput type="file" name="certificate" onChange={certificateChange} />
+        <TextInput type="file" name="certificate" onChange={certificateChange} /> */}
       </FormWrapper>
       <SubmitButton onClick={() => fileUploader()}>Senda inn</SubmitButton>
     </>

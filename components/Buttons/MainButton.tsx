@@ -15,7 +15,7 @@ export const MainButton = ({ text, onClick, active, className, isLink, href }: M
   if(isLink){
     return(
       <a href={href} target="_blank">
-        <StyledMainLink className={[active ? 'active': '', className]}>
+        <StyledMainLink className={`${active ? 'active': ''} ${className}`}>
           <MainButtonText>{text}</MainButtonText>
         </StyledMainLink>
       </a>
@@ -23,7 +23,7 @@ export const MainButton = ({ text, onClick, active, className, isLink, href }: M
   }
   
   return (
-    <StyledMainButton onClick={onClick} className={[active ? 'active': '', className]}>
+    <StyledMainButton onClick={onClick} className={`${active ? 'active': ''} ${className}`}>
       <MainButtonText>{text}</MainButtonText>
     </StyledMainButton>
   )
@@ -54,11 +54,11 @@ export const StyledMainLink = styled.div`
   cursor:pointer;
   border: 1px solid #fff;
 
-  // &:hover{
+  /* // &:hover{
   //   ${MainButtonText}{
   //     color: ${({ theme }) => theme.colors.green};
   //   }
-  // }
+  // } */
 
   @media (min-width: 760px){
     &:hover{
@@ -104,11 +104,11 @@ export const StyledMainButton = styled.button`
   cursor:pointer;
   border: 1px solid #fff;
 
-  // &:hover{
+  /* // &:hover{
   //   ${MainButtonText}{
   //     color: ${({ theme }) => theme.colors.green};
   //   }
-  // }
+  // } */
 
   @media (min-width: 760px){
     &:hover{

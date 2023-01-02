@@ -8,6 +8,7 @@ import PaintBucket from '../public/PaintBucketIcon.svg'
 import Earth from '../public/Earth.svg'
 import Image from 'next/image'
 import { mediaMax } from '../constants/breakpoints'
+import BykoLogoSvg from '../components/Svg/Logos/Byko'
 
 const UmOkkur = () => {
   return(
@@ -33,10 +34,11 @@ const UmOkkur = () => {
             </ImageWrapperSmall>
           </Box>
         </SplitBoxes>
-        <FullWidthLowBox>
-          <Heading3 style={{textAlign:'center'}}>
-            Verkefnið er unnið með heimsmarkmið Sameinuðu þjóðanna að leiðarljósi.
+        <FullWidthLowBox style={{backgroundColor: theme.colors.purple }}>
+          <Heading3 style={{textAlign:'center', marginRight: 15}}>
+          Vistbók® er þróuð í samstarfi við 
           </Heading3>
+          <BykoLogoSvg/>
         </FullWidthLowBox>
         <SplitBoxes>
           <SmallerBox color="transparent">
@@ -66,6 +68,11 @@ const UmOkkur = () => {
             <Heading4  style={{ textAlign:'center' }}>Hugsaðu um heilsuna, umhverfið og framtíðina með því að velja umhverfisvænar byggingarvörur</Heading4>
           </Box>
         </SplitBoxes>
+        <FullWidthLowBox>
+          <Heading3 style={{textAlign:'center'}}>
+            Verkefnið er unnið með heimsmarkmið Sameinuðu þjóðanna að leiðarljósi.
+          </Heading3>
+        </FullWidthLowBox>
       </PageContainer>
       <Footer />
     </Page>
