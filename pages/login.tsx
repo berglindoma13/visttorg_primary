@@ -14,6 +14,7 @@ import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
 import jwt_decode from 'jwt-decode';
 import bcrypt from 'bcryptjs'
+import axios, { AxiosError } from 'axios';
 
 const salt = bcrypt.genSaltSync(10)
 
@@ -51,7 +52,7 @@ const Login = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: user.email,
+        email: user.email,
         password: hashedPassword
       })
     }).then((response) => {
@@ -67,7 +68,7 @@ const Login = () => {
       sessionStorage.setItem('jwttoken', responsejson)
     })
     .catch((error) => {
-      console.error('error adding to postlist', error.message)
+      console.error('error logging in', error.message)
       //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
       // setInputError(error.message)
      
@@ -76,34 +77,46 @@ const Login = () => {
 
   const tryRegister = () => {
     const hashedPassword = bcrypt.hashSync(newUser.password, salt)
-    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
-      method: 'POST',
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: newUser.email,
+      data: {
+        email: newUser.email,
         password: hashedPassword,
         fullname: newUser.fullName,
         company: newUser.company,
         jobtitle: newUser.jobTitle
-      })
+      }
     }).then((response) => {
       
-      if (response.ok) {
-        return response.json();
-      }
+      console.log('response', response)
+      
+      // if (response.status === 200) {
+      //   return response.data;
+      // }
 
-      throw new Error(response.statusText);
+
+      // throw new Error(response.statusText);
     })
     .then((responsejson) => {
-      console.log('success', responsejson)
-      sessionStorage.setItem('jwttoken', responsejson)
+      // console.log('success', responsejson)
+      // sessionStorage.setItem('jwttoken', responsejson)
     })
-    .catch((error) => {
-      console.error('error adding to postlist', error.message)
-      //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
-      // setInputError(error.message)
+    .catch((err: Error | AxiosError) => {
+      if (axios.isAxiosError(err))  {
+        console.log('isAxios error', err.response.data)
+        // Access to config, request, and response
+      } else {
+        console.log('is regular error', err)
+        // Just a stock error
+      }
+    })
+    // .catch((error) => {
+    //   console.log('this is the error', error)
+    // //   console.error('error registering - Message:', error.message)
+    //   //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
+    //   // setInputError(error.message)
      
-    });
+    // });
   }
   
 
@@ -119,7 +132,7 @@ const Login = () => {
             <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} ></StyledInput>
             <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} ></StyledInput>
             <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} ></StyledInput>
-            <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
+            <SubmitButton onClick={tryRegister}>Skrá</SubmitButton>
             <TextWithLine>
               <Sideline/>
                 <span style={{marginLeft:5, marginRight:5}} >Áttu nú þegar aðgang?</span>
