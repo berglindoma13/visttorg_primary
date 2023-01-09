@@ -14,6 +14,7 @@ import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
 import Divider from '@material-ui/core/Divider';
 // import { Divider } from 'rsuite';
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
 export const getServerSideProps: GetServerSideProps = async () => {
 
@@ -41,12 +42,23 @@ interface User {
 
 const Login = ({ authenticated } : LoginProps) => {
 
+  const { register, handleSubmit, control, formState: { errors } } = useForm<NewUser>();
+  const onSubmit: SubmitHandler<NewUser> = data => console.log(data);
+
+
   const [isNewUser, setIsNewUser] = useState(false)
 
-  const [newUser, setNewUser] = useState<NewUser>()
+  const [newUser, setNewUser] = useState<NewUser>({fullName: "Fullt nafn", email: "Netfang", company: "Fyrirtæki", jobTitle:"starfsheiti", password:"Lykilorð"})
   const [user, setUser] = useState<User>()
+
+  const [name, setName] = useState('name')
+
+  // useEffect(()=> {
+  // },[newUser])
   
-  const tryLogin = () => {
+  const tryLogin = (data) => {
+    console.log("data", data)
+
     fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -73,6 +85,13 @@ const Login = ({ authenticated } : LoginProps) => {
      
     });
   }
+
+  // const test = async() => {
+  //   // await setNewUser({fullName: event.target.value, ...newUser})
+  //   console.log('name', name)
+  //   await setNewUser({fullName: name, ...newUser})
+  //   console.log('new user', newUser);
+  // }
   
 
   return(
@@ -82,12 +101,23 @@ const Login = ({ authenticated } : LoginProps) => {
         {isNewUser ? 
           <LoginContainer>
             <MainHeading>Nýskráning</MainHeading>
-            <StyledInput placeholder={'Fullt Nafn'} onChange={(e) => setNewUser({fullName: e.target.value, ...newUser})}></StyledInput>
-            <StyledInput placeholder={'Fyrirtæki'} onChange={(e) => setNewUser({company: e.target.value, ...newUser})} ></StyledInput>
-            <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} ></StyledInput>
-            <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} ></StyledInput>
-            <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} ></StyledInput>
-            <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {/* <input placeholder={'Fullt Nafn'} {...register("fullName")} ></input> */}
+              {/* <Controller 
+                control={control}
+                name="company"
+                render={({field}) => <StyledInput placeholder={'Fyrirtæki'} {...field}></StyledInput>}
+              />   */}
+              {/* <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} {...register("jobTitle")} ></StyledInput>
+              <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} {...register("email")} ></StyledInput>
+              <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} {...register("password")} ></StyledInput> */}
+              <Controller
+                control={control}
+                name="fullName"
+                render={({ field }) => <input placeholder={'Fullt Nafn'} {...field}></input> }
+              />
+              <SubmitButton onClick={() => handleSubmit(onSubmit)}>Skrá</SubmitButton>
+            </form>
             <TextWithLine>
               <Sideline/>
                 <span style={{marginLeft:5, marginRight:5}} >Áttu nú þegar aðgang?</span>
