@@ -13,11 +13,9 @@ import { Heading1 } from '../components/Typography';
 import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
 import jwt_decode from 'jwt-decode';
-import bcrypt from 'bcryptjs'
 import axios, { AxiosError } from 'axios';
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-
-const salt = bcrypt.genSaltSync(10)
+import { useRouter } from 'next/router';
 
 interface User {
   fullName?: string
@@ -30,14 +28,16 @@ interface User {
 const Login = () => {
 
   const { handleSubmit, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
+
+  const router = useRouter()
   
   const onSubmitLogin: SubmitHandler<User> = data => {
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
+   
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: hashedPassword
+        password: data.password
       }
     }).then((response) => {
       
@@ -50,6 +50,8 @@ const Login = () => {
     .then((responsejson) => {
       console.log('success', responsejson)
       sessionStorage.setItem('jwttoken', responsejson)
+
+      router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
@@ -63,12 +65,12 @@ const Login = () => {
   };
 
   const onSubmitRegister: SubmitHandler<User> = data => {
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
+   
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: hashedPassword,
+        password: data.password,
         fullname: data.fullName,
         company: data.company,
         jobtitle: data.jobTitle
@@ -84,6 +86,8 @@ const Login = () => {
     .then((responsejson) => {
       console.log('success', responsejson)
       sessionStorage.setItem('jwttoken', responsejson)
+
+      router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
@@ -109,8 +113,7 @@ const Login = () => {
   useEffect(() => {
     const token = sessionStorage.getItem('jwttoken');
     if(!!token){
-      const decoded = jwt_decode(token);
-      console.log(decoded);
+      router.push('/minarsidur')
     }
   }, [])
   
@@ -141,6 +144,7 @@ const Login = () => {
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+                
               />
                <Controller
                 control={control}
