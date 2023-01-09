@@ -12,30 +12,31 @@ import { mediaMax } from '../constants/breakpoints'
 import { Heading1 } from '../components/Typography';
 import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
+import jwt_decode from 'jwt-decode';
+import bcrypt from 'bcryptjs'
 
-export const getServerSideProps: GetServerSideProps = async () => {
+const salt = bcrypt.genSaltSync(10)
 
-  const authenticated = true
-  return { props :{ authenticated } }
-}
+const Login = () => {
 
-
-type LoginProps = {
-  authenticated: boolean
-}
-
-const Login = ({ authenticated } : LoginProps) => {
+  useEffect(() => {
+    const token = sessionStorage.getItem('jwttoken');
+    if(!!token){
+      const decoded = jwt_decode(token);
+      console.log(decoded);
+    }
+  }, [])
   
   const tryLogin = () => {
+    const hashedPassword = bcrypt.hashSync('password', salt)
     fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: 'mylogininfo',
-        password: 'mypassword'
+        password: hashedPassword
       })
     }).then((response) => {
-      
       
       if (response.ok) {
         return response.json();
@@ -45,6 +46,7 @@ const Login = ({ authenticated } : LoginProps) => {
     })
     .then((responsejson) => {
       console.log('success', responsejson)
+      sessionStorage.setItem('jwttoken', responsejson)
     })
     .catch((error) => {
       console.error('error adding to postlist', error.message)
@@ -67,7 +69,7 @@ const Login = ({ authenticated } : LoginProps) => {
           <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
           <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
           {/* <StyledMainButton></StyledMainButton> */}
-          <SubmitButton onClick={test}>Skrá</SubmitButton>
+          <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
         </LoginContainer>
       </PageContainer>
     </Page>

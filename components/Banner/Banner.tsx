@@ -7,7 +7,7 @@ import EarthImage from '../../public/Earth.svg'
 import Image from 'next/image'
 import { mediaMax } from '../../constants/breakpoints'
 
-export const Banner = (props) => {
+export const Banner = (props: any) => {
   return(
     <HeaderWrapper {...props}>
       <HeaderLeftContent>
