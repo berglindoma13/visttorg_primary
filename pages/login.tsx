@@ -145,7 +145,7 @@ const Login = () => {
               <Controller
                 control={control}
                 name="fullName"
-                render={({ field }) => <input placeholder={'Fullt Nafn'} {...field}></input> }
+                render={({ field }) => <StyledInput placeholder={'Fullt Nafn'} {...field}></StyledInput> }
               />
               <SubmitButton onClick={() => handleSubmit(onSubmit)}>Skrá</SubmitButton>
             </form>
