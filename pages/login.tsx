@@ -124,38 +124,47 @@ const Login = () => {
         {isNewUser ? 
           <LoginContainer>
             <MainHeading>Nýskráning</MainHeading>
-            <form onSubmit={handleSubmit(onSubmitRegister)}>
+            <form style={{all:'inherit'}} onSubmit={handleSubmit(onSubmitRegister)}>
               <Controller
                 control={control}
                 name="fullName"
                 render={({ field }) => <StyledInput placeholder={'Fullt Nafn'} {...field}></StyledInput> }
+                rules={{required:true}}
               />
+              {errors.fullName?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn fullt nafn</ErrorMessage>}
                <Controller
                 control={control}
                 name="jobTitle"
                 render={({ field }) => <StyledInput placeholder={'Starfsheiti'} {...field}></StyledInput> }
+                rules={{required:true}}
               />
+              {errors.jobTitle?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn starfsheiti</ErrorMessage>}
                <Controller
                 control={control}
                 name="company"
                 render={({ field }) => <StyledInput placeholder={'Fyrirtæki'} {...field}></StyledInput> }
+                rules={{required:true}}
               />
+              {errors.company?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn fyrirtæki</ErrorMessage>}
                <Controller
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
-                
+                rules={{required:true}}
               />
+              {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
                <Controller
                 control={control}
                 name="password"
                 render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+                rules={{required:true}}
               />
+              {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
               <SubmitButton onClick={() => handleSubmit(onSubmitRegister)}>Skrá</SubmitButton>
             </form>
             <TextWithLine>
               <Sideline/>
-                <span style={{marginLeft:5, marginRight:5}} >Áttu nú þegar aðgang?</span>
+                <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Áttu nú þegar aðgang?</span>
               <Sideline/>
               </TextWithLine>
             <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Innskráning</SubmitButton>
@@ -163,27 +172,29 @@ const Login = () => {
         :
           <LoginContainer>
             <MainHeading>Innskráning</MainHeading> 
-            <form onSubmit={handleSubmit(onSubmitLogin)}>
+            <form style={{all:'inherit'}}  onSubmit={handleSubmit(onSubmitLogin)}>
               <Controller
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+                rules={{required:true}}
               />
+              {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
                <Controller
                 control={control}
                 name="password"
                 render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+                rules={{required:true}}
               />
+              {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
               <SubmitButton onClick={() => handleSubmit(onSubmitLogin)}>Skrá</SubmitButton>
             </form>
-            <NewAccountContainer >
-              <TextWithLine>
+            <TextWithLine>
               <Sideline/>
-                <span style={{marginLeft:5, marginRight:5}} >Viltu búa til nýjann aðgang?</span>
+                <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Viltu búa til nýjann aðgang?</span>
               <Sideline/>
-              </TextWithLine>
-              <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Nýskráning</SubmitButton>
-            </NewAccountContainer>
+            </TextWithLine>
+            <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Nýskráning</SubmitButton>
           </LoginContainer>
         }
       </PageContainer>
@@ -238,10 +249,10 @@ const MainHeading = styled(Heading1)`
 
 const StyledInput = styled(TextInput)`
   width: 390px;
-  margin-bottom:45px;
+  margin-top:20px;
 
   @media ${mediaMax.tablet}{
-    width: 90%;
+    width: 80%;
   }
 `
 
@@ -254,16 +265,6 @@ const LoginContainer = styled.div`
     align-items: center;
 `
 
-const NewAccountContainer = styled.div`
-  display:flex;
-  flex-direction:column;
-  flex-wrap:wrap;
-  width:100%;
-  justify-content: center;
-  align-items: center;
-  margin-top:15px;
-`
-
 const SubmitButton = styled.button`
   border:none;
   background-color: ${({ theme }) => theme.colors.green};
@@ -272,17 +273,24 @@ const SubmitButton = styled.button`
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   width:90px;
   margin:6px;
+  margin-top:15px;
 `
 
 const Sideline = styled.div`
   height:1px;
-  width:50px;
-  background-color:black;
+  width: 8vw;
+  background-color:DarkGray;
 `
 
 const TextWithLine = styled.div`
   display:flex;
   align-items:center;
+  margin-top:10px;
+`
+
+const ErrorMessage = styled.div`
+  margin-top:5px;
+  color:DimGrey;
 `
 
 // const StyledProduct = styled(Product)`
