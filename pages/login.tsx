@@ -16,7 +16,7 @@ import jwt_decode from 'jwt-decode';
 import axios, { AxiosError } from 'axios';
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useRouter } from 'next/router';
-
+import { validateEmail } from '../utils/emailValidation'
 interface User {
   fullName?: string
   email: string
@@ -116,6 +116,10 @@ const Login = () => {
       router.push('/minarsidur')
     }
   }, [])
+
+  useEffect(() => {
+    console.log('errors', errors)
+  }, [errors])
   
   return(
     <Page>
@@ -150,9 +154,10 @@ const Login = () => {
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
-                rules={{required:true}}
+                rules={{required:true, validate: validateEmail}}
               />
               {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
+              {errors.email?.type === 'validate' && <ErrorMessage role="alert">Ekki gilt netfang</ErrorMessage>}
                <Controller
                 control={control}
                 name="password"
