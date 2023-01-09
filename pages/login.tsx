@@ -15,6 +15,7 @@ import { Banner } from '../components/Banner';
 import jwt_decode from 'jwt-decode';
 import bcrypt from 'bcryptjs'
 import axios, { AxiosError } from 'axios';
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
 const salt = bcrypt.genSaltSync(10)
 
@@ -33,9 +34,13 @@ interface User {
 
 const Login = () => {
 
+  const { register, handleSubmit, control, formState: { errors } } = useForm<NewUser>();
+  const onSubmit: SubmitHandler<NewUser> = data => console.log(data);
+
+
   const [isNewUser, setIsNewUser] = useState(false)
 
-  const [newUser, setNewUser] = useState<NewUser>()
+  const [newUser, setNewUser] = useState<NewUser>({fullName: "Fullt nafn", email: "Netfang", company: "Fyrirtæki", jobTitle:"starfsheiti", password:"Lykilorð"})
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
@@ -127,12 +132,23 @@ const Login = () => {
         {isNewUser ? 
           <LoginContainer>
             <MainHeading>Nýskráning</MainHeading>
-            <StyledInput placeholder={'Fullt Nafn'} onChange={(e) => setNewUser({fullName: e.target.value, ...newUser})}></StyledInput>
-            <StyledInput placeholder={'Fyrirtæki'} onChange={(e) => setNewUser({company: e.target.value, ...newUser})} ></StyledInput>
-            <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} ></StyledInput>
-            <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} ></StyledInput>
-            <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} ></StyledInput>
-            <SubmitButton onClick={tryRegister}>Skrá</SubmitButton>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {/* <input placeholder={'Fullt Nafn'} {...register("fullName")} ></input> */}
+              {/* <Controller 
+                control={control}
+                name="company"
+                render={({field}) => <StyledInput placeholder={'Fyrirtæki'} {...field}></StyledInput>}
+              />   */}
+              {/* <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} {...register("jobTitle")} ></StyledInput>
+              <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} {...register("email")} ></StyledInput>
+              <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} {...register("password")} ></StyledInput> */}
+              <Controller
+                control={control}
+                name="fullName"
+                render={({ field }) => <input placeholder={'Fullt Nafn'} {...field}></input> }
+              />
+              <SubmitButton onClick={() => handleSubmit(onSubmit)}>Skrá</SubmitButton>
+            </form>
             <TextWithLine>
               <Sideline/>
                 <span style={{marginLeft:5, marginRight:5}} >Áttu nú þegar aðgang?</span>
