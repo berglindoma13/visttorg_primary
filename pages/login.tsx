@@ -178,13 +178,15 @@ const Login = () => {
           <LoginContainer>
             <MainHeading>Innskráning</MainHeading> 
             <form style={{all:'inherit'}}  onSubmit={handleSubmit(onSubmitLogin)}>
-              <Controller
+            <Controller
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
-                rules={{required:true}}
+                rules={{required:true, validate: validateEmail}}
               />
               {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
+              {errors.email?.type === 'validate' && <ErrorMessage role="alert">Ekki gilt netfang</ErrorMessage>}
+      
                <Controller
                 control={control}
                 name="password"
