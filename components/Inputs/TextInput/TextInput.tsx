@@ -3,7 +3,7 @@ import MagnifyingGlass from '../../Svg/MagnifyingGlass'
 
 interface TextInputProps {
   placeholder: string
-  onSubmit: () => void
+  onSubmit?: () => void
   className?: string
   onChange: (e) => void
   value?: string

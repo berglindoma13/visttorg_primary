@@ -17,7 +17,25 @@ import bcrypt from 'bcryptjs'
 
 const salt = bcrypt.genSaltSync(10)
 
+interface NewUser {
+  fullName: string
+  email: string
+  company: string
+  jobTitle: string
+  password: string
+}
+
+interface User {
+  email: string
+  password: string
+}
+
 const Login = () => {
+
+  const [isNewUser, setIsNewUser] = useState(false)
+
+  const [newUser, setNewUser] = useState<NewUser>()
+  const [user, setUser] = useState<User>()
 
   useEffect(() => {
     const token = sessionStorage.getItem('jwttoken');
@@ -28,12 +46,12 @@ const Login = () => {
   }, [])
   
   const tryLogin = () => {
-    const hashedPassword = bcrypt.hashSync('password', salt)
+    const hashedPassword = bcrypt.hashSync(user.password, salt)
     fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: 'mylogininfo',
+        username: user.email,
         password: hashedPassword
       })
     }).then((response) => {
@@ -55,22 +73,76 @@ const Login = () => {
      
     });
   }
-  
-  const test = () => {
 
+  const tryRegister = () => {
+    const hashedPassword = bcrypt.hashSync(newUser.password, salt)
+    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: newUser.email,
+        password: hashedPassword,
+        fullname: newUser.fullName,
+        company: newUser.company,
+        jobtitle: newUser.jobTitle
+      })
+    }).then((response) => {
+      
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responsejson) => {
+      console.log('success', responsejson)
+      sessionStorage.setItem('jwttoken', responsejson)
+    })
+    .catch((error) => {
+      console.error('error adding to postlist', error.message)
+      //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
+      // setInputError(error.message)
+     
+    });
   }
+  
 
   return(
     <Page>
       <PageContainer>
         <StyledHeader showSearch={false} />
-        <MainHeading>Innskráning</MainHeading>
-        <LoginContainer>
-          <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
-          <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
-          {/* <StyledMainButton></StyledMainButton> */}
-          <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
-        </LoginContainer>
+        {isNewUser ? 
+          <LoginContainer>
+            <MainHeading>Nýskráning</MainHeading>
+            <StyledInput placeholder={'Fullt Nafn'} onChange={(e) => setNewUser({fullName: e.target.value, ...newUser})}></StyledInput>
+            <StyledInput placeholder={'Fyrirtæki'} onChange={(e) => setNewUser({company: e.target.value, ...newUser})} ></StyledInput>
+            <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} ></StyledInput>
+            <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} ></StyledInput>
+            <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} ></StyledInput>
+            <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
+            <TextWithLine>
+              <Sideline/>
+                <span style={{marginLeft:5, marginRight:5}} >Áttu nú þegar aðgang?</span>
+              <Sideline/>
+              </TextWithLine>
+            <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Innskráning</SubmitButton>
+          </LoginContainer>
+        :
+          <LoginContainer>
+            <MainHeading>Innskráning</MainHeading> 
+            <StyledInput placeholder={'Netfang'} onChange={(e) => setUser({email: e.target.value, ...user})} ></StyledInput>
+            <StyledInput placeholder={'Lykilorð'} onChange={(e) => setUser({password: e.target.value, ...user})} ></StyledInput>
+            <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
+            <NewAccountContainer >
+              <TextWithLine>
+              <Sideline/>
+                <span style={{marginLeft:5, marginRight:5}} >Viltu búa til nýjann aðgang?</span>
+              <Sideline/>
+              </TextWithLine>
+              <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Nýskráning</SubmitButton>
+            </NewAccountContainer>
+          </LoginContainer>
+        }
       </PageContainer>
     </Page>
   )
@@ -139,13 +211,35 @@ const LoginContainer = styled.div`
     align-items: center;
 `
 
+const NewAccountContainer = styled.div`
+  display:flex;
+  flex-direction:column;
+  flex-wrap:wrap;
+  width:100%;
+  justify-content: center;
+  align-items: center;
+  margin-top:15px;
+`
+
 const SubmitButton = styled.button`
   border:none;
   background-color: ${({ theme }) => theme.colors.green};
   height:30px;
   border-radius: 999px;
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
-  width:60px;
+  width:90px;
+  margin:6px;
+`
+
+const Sideline = styled.div`
+  height:1px;
+  width:50px;
+  background-color:black;
+`
+
+const TextWithLine = styled.div`
+  display:flex;
+  align-items:center;
 `
 
 // const StyledProduct = styled(Product)`

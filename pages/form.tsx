@@ -55,7 +55,7 @@ const FormPage = () => {
     });
   }
 
-  return(
+  return( 
     <>
       <PageTitle>Nýskráning á vöru</PageTitle>
       <FormWrapper>
