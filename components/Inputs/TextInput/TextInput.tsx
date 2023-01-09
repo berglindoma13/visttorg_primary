@@ -1,5 +1,7 @@
+import { AnyAaaaRecord } from 'dns'
 import styled from 'styled-components'
 import MagnifyingGlass from '../../Svg/MagnifyingGlass'
+import { forwardRef } from 'react'
 
 interface TextInputProps {
   placeholder: string
@@ -8,9 +10,10 @@ interface TextInputProps {
   onChange: (e) => void
   value?: string
   inputIcon?: React.ReactNode
+  ref: any
 }
 
-export const TextInput = ({ placeholder, onSubmit, className, onChange, value, inputIcon }: TextInputProps) => {
+export const TextInput = forwardRef(({ placeholder, onSubmit, className, onChange, value, inputIcon }: TextInputProps, ref) => {
   
   const _onSubmit = (e) => {
     if (e.which === 13) {
@@ -24,7 +27,7 @@ export const TextInput = ({ placeholder, onSubmit, className, onChange, value, i
       <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} onChange={onChange} withIcon={!!inputIcon}/>
     </InputWrapper>
   )
-}
+})
 
 const StyledIcon = styled.div`
   position:absolute;

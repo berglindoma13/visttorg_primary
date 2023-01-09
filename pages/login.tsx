@@ -19,51 +19,30 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
 const salt = bcrypt.genSaltSync(10)
 
-interface NewUser {
-  fullName: string
-  email: string
-  company: string
-  jobTitle: string
-  password: string
-}
-
 interface User {
+  fullName?: string
   email: string
+  company?: string
+  jobTitle?: string
   password: string
 }
 
 const Login = () => {
 
-  const { register, handleSubmit, control, formState: { errors } } = useForm<NewUser>();
-  const onSubmit: SubmitHandler<NewUser> = data => console.log(data);
-
-
-  const [isNewUser, setIsNewUser] = useState(false)
-
-  const [newUser, setNewUser] = useState<NewUser>({fullName: "Fullt nafn", email: "Netfang", company: "Fyrirtæki", jobTitle:"starfsheiti", password:"Lykilorð"})
-  const [user, setUser] = useState<User>()
-
-  useEffect(() => {
-    const token = sessionStorage.getItem('jwttoken');
-    if(!!token){
-      const decoded = jwt_decode(token);
-      console.log(decoded);
-    }
-  }, [])
+  const { handleSubmit, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
   
-  const tryLogin = () => {
-    const hashedPassword = bcrypt.hashSync(user.password, salt)
-    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
-      method: 'POST',
+  const onSubmitLogin: SubmitHandler<User> = data => {
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: user.email,
+      data: {
+        email: data.email,
         password: hashedPassword
-      })
+      }
     }).then((response) => {
       
-      if (response.ok) {
-        return response.json();
+      if (response.status === 200) {
+        return response.data;
       }
 
       throw new Error(response.statusText);
@@ -72,46 +51,46 @@ const Login = () => {
       console.log('success', responsejson)
       sessionStorage.setItem('jwttoken', responsejson)
     })
-    .catch((error) => {
-      console.error('error logging in', error.message)
-      //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
-      // setInputError(error.message)
-     
-    });
-  }
+    .catch((err: Error | AxiosError) => {
+      if (axios.isAxiosError(err))  {
+        console.error('isAxios error', err.response.data)
+        // Access to config, request, and response
+      } else {
+        console.error('is regular error', err)
+        // Just a stock error
+      }
+    })
+  };
 
-  const tryRegister = () => {
-    const hashedPassword = bcrypt.hashSync(newUser.password, salt)
+  const onSubmitRegister: SubmitHandler<User> = data => {
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
-        email: newUser.email,
+        email: data.email,
         password: hashedPassword,
-        fullname: newUser.fullName,
-        company: newUser.company,
-        jobtitle: newUser.jobTitle
+        fullname: data.fullName,
+        company: data.company,
+        jobtitle: data.jobTitle
       }
     }).then((response) => {
-      
-      console.log('response', response)
-      
-      // if (response.status === 200) {
-      //   return response.data;
-      // }
 
+      if (response.status === 200) {
+        return response.data;
+      }
 
-      // throw new Error(response.statusText);
+      throw new Error(response.statusText);
     })
     .then((responsejson) => {
-      // console.log('success', responsejson)
-      // sessionStorage.setItem('jwttoken', responsejson)
+      console.log('success', responsejson)
+      sessionStorage.setItem('jwttoken', responsejson)
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
-        console.log('isAxios error', err.response.data)
+        console.error('isAxios error', err.response.data)
         // Access to config, request, and response
       } else {
-        console.log('is regular error', err)
+        console.error('is regular error', err)
         // Just a stock error
       }
     })
@@ -122,9 +101,19 @@ const Login = () => {
     //   // setInputError(error.message)
      
     // });
-  }
-  
+  };
 
+
+  const [isNewUser, setIsNewUser] = useState(false)
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('jwttoken');
+    if(!!token){
+      const decoded = jwt_decode(token);
+      console.log(decoded);
+    }
+  }, [])
+  
   return(
     <Page>
       <PageContainer>
@@ -132,22 +121,33 @@ const Login = () => {
         {isNewUser ? 
           <LoginContainer>
             <MainHeading>Nýskráning</MainHeading>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              {/* <input placeholder={'Fullt Nafn'} {...register("fullName")} ></input> */}
-              {/* <Controller 
-                control={control}
-                name="company"
-                render={({field}) => <StyledInput placeholder={'Fyrirtæki'} {...field}></StyledInput>}
-              />   */}
-              {/* <StyledInput placeholder={'Starfsheiti'} onChange={(e) => setNewUser({jobTitle: e.target.value, ...newUser})} {...register("jobTitle")} ></StyledInput>
-              <StyledInput placeholder={'Netfang'} onChange={(e) => setNewUser({email: e.target.value, ...newUser})} {...register("email")} ></StyledInput>
-              <StyledInput placeholder={'Lykilorð'} onChange={(e) => setNewUser({password: e.target.value, ...newUser})} {...register("password")} ></StyledInput> */}
+            <form onSubmit={handleSubmit(onSubmitRegister)}>
               <Controller
                 control={control}
                 name="fullName"
                 render={({ field }) => <StyledInput placeholder={'Fullt Nafn'} {...field}></StyledInput> }
               />
-              <SubmitButton onClick={() => handleSubmit(onSubmit)}>Skrá</SubmitButton>
+               <Controller
+                control={control}
+                name="jobTitle"
+                render={({ field }) => <StyledInput placeholder={'Starfsheiti'} {...field}></StyledInput> }
+              />
+               <Controller
+                control={control}
+                name="company"
+                render={({ field }) => <StyledInput placeholder={'Fyrirtæki'} {...field}></StyledInput> }
+              />
+               <Controller
+                control={control}
+                name="email"
+                render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+              />
+               <Controller
+                control={control}
+                name="password"
+                render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+              />
+              <SubmitButton onClick={() => handleSubmit(onSubmitRegister)}>Skrá</SubmitButton>
             </form>
             <TextWithLine>
               <Sideline/>
@@ -159,9 +159,19 @@ const Login = () => {
         :
           <LoginContainer>
             <MainHeading>Innskráning</MainHeading> 
-            <StyledInput placeholder={'Netfang'} onChange={(e) => setUser({email: e.target.value, ...user})} ></StyledInput>
-            <StyledInput placeholder={'Lykilorð'} onChange={(e) => setUser({password: e.target.value, ...user})} ></StyledInput>
-            <SubmitButton onClick={tryLogin}>Skrá</SubmitButton>
+            <form onSubmit={handleSubmit(onSubmitLogin)}>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+              />
+               <Controller
+                control={control}
+                name="password"
+                render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+              />
+              <SubmitButton onClick={() => handleSubmit(onSubmitLogin)}>Skrá</SubmitButton>
+            </form>
             <NewAccountContainer >
               <TextWithLine>
               <Sideline/>
