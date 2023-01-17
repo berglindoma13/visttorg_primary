@@ -55,7 +55,7 @@ const Login = () => {
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
-        console.error('isAxios error', err.response.data)
+        console.error('isAxios error', !!err.response.data && err.response.data)
         // Access to config, request, and response
       } else {
         console.error('is regular error', err)
@@ -91,7 +91,7 @@ const Login = () => {
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
-        console.error('isAxios error', err.response.data)
+        console.error('isAxios error', !!err.response.data && err.response.data)
         // Access to config, request, and response
       } else {
         console.error('is regular error', err)
