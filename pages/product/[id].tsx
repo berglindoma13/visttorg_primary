@@ -19,6 +19,7 @@ import VocLogoSVG from "../../components/Svg/Logos/Voc"
 import { mediaMax } from "../../constants/breakpoints"
 import superjson from 'superjson'
 import { useRouter } from "next/router"
+import certMapper from '../../mappers/certificates'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
@@ -69,8 +70,9 @@ interface ProductPageProps{
 
 const Product = ({ productString } : ProductPageProps) => {
 
+  
   const router = useRouter()
-
+  
   const reRouteToSearchPage = (category: string, filterLevel: number) => {
 
     //add the category to sessionStorage and reset all other sessionStorage items
@@ -84,7 +86,7 @@ const Product = ({ productString } : ProductPageProps) => {
       sessionStorage.setItem('queryParam', '')
       
     }else {
-
+      
       const newFilters = []
       newFilters.push(category)
       
@@ -92,14 +94,17 @@ const Product = ({ productString } : ProductPageProps) => {
       sessionStorage.setItem('level1Filters', JSON.stringify([]))
       sessionStorage.setItem('queryParam', '')
     }
-
-
+    
+    
     //Push to frontpage
     router.push('/')
     
   }
   
-  const product: ProductProps = superjson.parse(productString)
+
+  //TODO FIX PRODUCT TYPES
+  const product: any = superjson.parse(productString)
+  console.log('product', product)
 
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
@@ -201,10 +206,20 @@ const Product = ({ productString } : ProductPageProps) => {
                     })}
                   </ProductCategories>
                 </div>
-                {product.epdUrl || product.fscUrl && 
+                {product.certificates.filter(x => x.certificatedid === 1 || x.certificatedid === 2 || x.certificatedid === 3) && 
                   <div style={{flex:1}}>
                     <UIBig style={{marginBottom: 15}}>Fylgiskjöl</UIBig>
+                    <ProductCategories>
+                    {product.certificates.map((cert : any, index : number) => {
+                      if(cert.fileurl !== ''){
+                        return (
+                          <FileLinks key={index} style={{marginBottom: 8, cursor:'pointer', }} target="_blank" href={cert.fileurl}>{certMapper[cert.certificate.name]}</FileLinks>
+                        )
+                      }
+                    })}
+                    </ProductCategories>
                   </div>
+                  
                 }
               </div>
               <Heading4 style={{marginTop: 65, marginBottom: 50}}>{product.description && product.description.replace(/<[^>]+>/g, '')}</Heading4>
@@ -242,6 +257,14 @@ const Product = ({ productString } : ProductPageProps) => {
 }
 
 export default Product
+
+const FileLinks = styled.a`
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 104%;
+  letter-spacing: 0.09em;
+`
 
 const CertImageWrapper = styled.div`
   position: relative;
