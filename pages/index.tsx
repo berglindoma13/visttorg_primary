@@ -137,6 +137,10 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
   const certificateList: Array<Certificate> = superjson.parse(certificates)
   const companyList: Array<Company> = superjson.parse(companies)
   const certificateSystemList: Array<CertificateSystem> = superjson.parse(certificateSystems)
+
+  const bb = productList.filter(x => x.sellingcompany.id == 5)
+  console.log('bb', bb)
+
   return(
     <Page>
       <PageContainer>

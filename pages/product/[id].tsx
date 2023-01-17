@@ -206,12 +206,12 @@ const Product = ({ productString } : ProductPageProps) => {
                     })}
                   </ProductCategories>
                 </div>
-                {product.certificates.filter(x => x.certificatedid === 1 || x.certificatedid === 2 || x.certificatedid === 3) && 
+                {product.certificates.filter(x => (x.certificatedid === 1 || x.certificatedid === 2 || x.certificatedid === 3) && x.validDate !== null).length > 0 && 
                   <div style={{flex:1}}>
                     <UIBig style={{marginBottom: 15}}>Fylgiskjöl</UIBig>
                     <ProductCategories>
                     {product.certificates.map((cert : any, index : number) => {
-                      if(cert.fileurl !== ''){
+                      if(cert.fileurl !== '' && cert.validDate !== null){
                         return (
                           <FileLinks key={index} style={{marginBottom: 8, cursor:'pointer', }} target="_blank" href={cert.fileurl}>{certMapper[cert.certificate.name]}</FileLinks>
                         )
