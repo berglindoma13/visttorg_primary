@@ -251,11 +251,6 @@
   "resolved" "https://registry.npmjs.org/@next/react-refresh-utils/-/react-refresh-utils-12.0.8.tgz"
   "version" "12.0.8"
 
-"@next/swc-darwin-x64@12.0.8":
-  "integrity" "sha512-todxgQOGP/ucz5UH2kKR3XGDdkWmWr0VZAAbzgTbiFm45Ol4ih602k2nNR3xSbza9IqNhxNuUVsMpBgeo19CFQ=="
-  "resolved" "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-12.0.8.tgz"
-  "version" "12.0.8"
-
 "@panva/asn1.js@^1.0.0":
   "integrity" "sha512-UdkG3mLEqXgnlKsWanWcgb6dOjUzJ+XC5f+aWw30qrtjxeNUSfKX1cd5FBzOaXQumoe9nIqeZUvrRJS03HCCtw=="
   "resolved" "https://registry.npmjs.org/@panva/asn1.js/-/asn1.js-1.0.0.tgz"

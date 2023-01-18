@@ -569,22 +569,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
           
           }
         <ProductList>
-          {
-            numberOfActiveFilters === 0 && 
-            <div>
-              <ImageWrapper>
-                <Image 
-                  src={PaintBucket} 
-                  alt='Icon image' 
-                  layout='fill'
-                  objectFit='contain'
-                />
-              </ImageWrapper>
-              <NoResultsText>Prófaðu að leita eða nota síuna til að fá upp vörur</NoResultsText>
-              {/* <NoResultsSubtext>Endilega prófaðu að leita eftir öðrum leitarskilyrðum.</NoResultsSubtext> */}
-            </div>
-          }
-          {filteredProductList.length === 0 && numberOfActiveFilters > 0 &&
+          {filteredProductList.length === 0 && numberOfActiveFilters >= 0 &&
             <div>
               <ImageWrapper>
                 <Image 
@@ -598,7 +583,20 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
               <NoResultsSubtext>Endilega prófaðu að leita eftir öðrum leitarskilyrðum.</NoResultsSubtext>
             </div>
           }
-          {numberOfActiveFilters > 0&&  filteredProductList.map((product, index) => {
+          {numberOfActiveFilters === 0 && filteredProductList.length === products.length &&
+            <div>
+              <ImageWrapper>
+                <Image 
+                  src={PaintBucket} 
+                  alt='Icon image' 
+                  layout='fill'
+                  objectFit='contain'
+                />
+              </ImageWrapper>
+              <NoResultsText>Prófaðu að leita eða nota síuna til að fá upp vörur</NoResultsText>
+            </div>
+          }
+          {(numberOfActiveFilters > 0 || filteredProductList.length !== products.length) &&  filteredProductList.map((product, index) => {
             if(index >= (paginationNumber - 1) * paginationPageSize && index < paginationNumber * paginationPageSize){
               const thisProduct = product.item
               return (
@@ -823,6 +821,7 @@ const NoResultsText = styled(Heading3)`
   font-family: Space Mono;
   text-align: center;
   padding-top: 20px;
+  max-width:700px;
 `
 
 const NoResultsSubtext = styled(Heading6)`
