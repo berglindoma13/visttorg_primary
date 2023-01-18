@@ -11,9 +11,10 @@ interface TextInputProps {
   value?: string
   inputIcon?: React.ReactNode
   ref: any
+  type?: string
 }
 
-export const TextInput = forwardRef(({ placeholder, onSubmit, className, onChange, value, inputIcon }: TextInputProps, ref) => {
+export const TextInput = forwardRef(({ placeholder, onSubmit, className, onChange, value, inputIcon, type }: TextInputProps, ref) => {
   
   const _onSubmit = (e) => {
     if (e.which === 13) {
@@ -24,7 +25,7 @@ export const TextInput = forwardRef(({ placeholder, onSubmit, className, onChang
   return(
     <InputWrapper className={className}>
       {inputIcon && <StyledIcon>{inputIcon}</StyledIcon>}
-      <StyledTextInput placeholder={placeholder} onKeyPress={_onSubmit} value={value} onChange={onChange} withIcon={!!inputIcon}/>
+      <StyledTextInput type={!!type ? type : "text" } placeholder={placeholder} onKeyPress={_onSubmit} value={value} onChange={onChange} withIcon={!!inputIcon}/>
     </InputWrapper>
   )
 })

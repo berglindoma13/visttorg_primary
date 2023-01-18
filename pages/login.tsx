@@ -153,7 +153,7 @@ const Login = () => {
                <Controller
                 control={control}
                 name="password"
-                render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+                render={({ field }) => <StyledInput type="password" placeholder={'Lykilorð'} {...field}></StyledInput> }
                 rules={{required:true}}
               />
               {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
@@ -180,7 +180,7 @@ const Login = () => {
                <Controller
                 control={control}
                 name="password"
-                render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+                render={({ field }) => <StyledInput type="password" placeholder={'Lykilorð'} {...field}></StyledInput> }
                 rules={{required:true}}
               />
               {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
