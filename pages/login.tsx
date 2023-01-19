@@ -12,63 +12,188 @@ import { mediaMax } from '../constants/breakpoints'
 import { Heading1 } from '../components/Typography';
 import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
+import jwt_decode from 'jwt-decode';
+import bcrypt from 'bcryptjs'
+import axios, { AxiosError } from 'axios';
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
-export const getServerSideProps: GetServerSideProps = async () => {
+const salt = bcrypt.genSaltSync(10)
 
-  const authenticated = true
-  return { props :{ authenticated } }
+interface User {
+  fullName?: string
+  email: string
+  company?: string
+  jobTitle?: string
+  password: string
 }
 
+const Login = () => {
 
-type LoginProps = {
-  authenticated: boolean
-}
-
-const Login = ({ authenticated } : LoginProps) => {
+  const { handleSubmit, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
   
-  const tryLogin = () => {
-    fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
-      method: 'POST',
+  const onSubmitLogin: SubmitHandler<User> = data => {
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: 'mylogininfo',
-        password: 'mypassword'
-      })
+      data: {
+        email: data.email,
+        password: hashedPassword
+      }
     }).then((response) => {
       
-      
-      if (response.ok) {
-        return response.json();
+      if (response.status === 200) {
+        return response.data;
       }
 
       throw new Error(response.statusText);
     })
     .then((responsejson) => {
       console.log('success', responsejson)
+      sessionStorage.setItem('jwttoken', responsejson)
     })
-    .catch((error) => {
-      console.error('error adding to postlist', error.message)
-      //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
-      // setInputError(error.message)
+    .catch((err: Error | AxiosError) => {
+      if (axios.isAxiosError(err))  {
+        console.error('isAxios error', err.response.data)
+        // Access to config, request, and response
+      } else {
+        console.error('is regular error', err)
+        // Just a stock error
+      }
+    })
+  };
+
+  const onSubmitRegister: SubmitHandler<User> = data => {
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: {
+        email: data.email,
+        password: hashedPassword,
+        fullname: data.fullName,
+        company: data.company,
+        jobtitle: data.jobTitle
+      }
+    }).then((response) => {
+
+      if (response.status === 200) {
+        return response.data;
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responsejson) => {
+      console.log('success', responsejson)
+      sessionStorage.setItem('jwttoken', responsejson)
+    })
+    .catch((err: Error | AxiosError) => {
+      if (axios.isAxiosError(err))  {
+        console.error('isAxios error', err.response.data)
+        // Access to config, request, and response
+      } else {
+        console.error('is regular error', err)
+        // Just a stock error
+      }
+    })
+    // .catch((error) => {
+    //   console.log('this is the error', error)
+    // //   console.error('error registering - Message:', error.message)
+    //   //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
+    //   // setInputError(error.message)
      
-    });
-  }
+    // });
+  };
+
+
+  const [isNewUser, setIsNewUser] = useState(false)
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('jwttoken');
+    if(!!token){
+      const decoded = jwt_decode(token);
+      console.log(decoded);
+    }
+  }, [])
   
-  const test = () => {
-
-  }
-
   return(
     <Page>
       <PageContainer>
         <StyledHeader showSearch={false} />
-        <MainHeading>Innskráning</MainHeading>
-        <LoginContainer>
-          <StyledInput placeholder={'Notendanafn'} onChange={test} onSubmit={test} ></StyledInput>
-          <StyledInput placeholder={'Lykilorð'} onChange={test} onSubmit={test} ></StyledInput>
-          {/* <StyledMainButton></StyledMainButton> */}
-          <SubmitButton onClick={test}>Skrá</SubmitButton>
-        </LoginContainer>
+        {isNewUser ? 
+          <LoginContainer>
+            <MainHeading>Nýskráning</MainHeading>
+            <form style={{all:'inherit'}} onSubmit={handleSubmit(onSubmitRegister)}>
+              <Controller
+                control={control}
+                name="fullName"
+                render={({ field }) => <StyledInput placeholder={'Fullt Nafn'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.fullName?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn fullt nafn</ErrorMessage>}
+               <Controller
+                control={control}
+                name="jobTitle"
+                render={({ field }) => <StyledInput placeholder={'Starfsheiti'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.jobTitle?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn starfsheiti</ErrorMessage>}
+               <Controller
+                control={control}
+                name="company"
+                render={({ field }) => <StyledInput placeholder={'Fyrirtæki'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.company?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn fyrirtæki</ErrorMessage>}
+               <Controller
+                control={control}
+                name="email"
+                render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
+               <Controller
+                control={control}
+                name="password"
+                render={({ field }) => <StyledInput type="password" placeholder={'Lykilorð'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
+              <SubmitButton onClick={() => handleSubmit(onSubmitRegister)}>Skrá</SubmitButton>
+            </form>
+            <TextWithLine>
+              <Sideline/>
+                <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Áttu nú þegar aðgang?</span>
+              <Sideline/>
+              </TextWithLine>
+            <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Innskráning</SubmitButton>
+          </LoginContainer>
+        :
+          <LoginContainer>
+            <MainHeading>Innskráning</MainHeading> 
+            <form style={{all:'inherit'}}  onSubmit={handleSubmit(onSubmitLogin)}>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
+               <Controller
+                control={control}
+                name="password"
+                render={({ field }) => <StyledInput type="password" placeholder={'Lykilorð'} {...field}></StyledInput> }
+                rules={{required:true}}
+              />
+              {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
+              <SubmitButton onClick={() => handleSubmit(onSubmitLogin)}>Skrá</SubmitButton>
+            </form>
+            <TextWithLine>
+              <Sideline/>
+                <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Viltu búa til nýjan aðgang?</span>
+              <Sideline/>
+            </TextWithLine>
+            <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Nýskráning</SubmitButton>
+          </LoginContainer>
+        }
       </PageContainer>
     </Page>
   )
@@ -121,10 +246,10 @@ const MainHeading = styled(Heading1)`
 
 const StyledInput = styled(TextInput)`
   width: 390px;
-  margin-bottom:45px;
+  margin-top:20px;
 
   @media ${mediaMax.tablet}{
-    width: 90%;
+    width: 80%;
   }
 `
 
@@ -143,7 +268,26 @@ const SubmitButton = styled.button`
   height:30px;
   border-radius: 999px;
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
-  width:60px;
+  width:90px;
+  margin:6px;
+  margin-top:20px;
+`
+
+const Sideline = styled.div`
+  height:1px;
+  width: 8vw;
+  background-color:DarkGray;
+`
+
+const TextWithLine = styled.div`
+  display:flex;
+  align-items:center;
+  margin-top:14px;
+`
+
+const ErrorMessage = styled.div`
+  margin-top:5px;
+  color:DimGrey;
 `
 
 // const StyledProduct = styled(Product)`

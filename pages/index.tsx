@@ -14,6 +14,7 @@ import superjson from 'superjson'
 import { H1, Heading3, Heading4, Heading5 } from '../components/Typography'
 import { theme } from '../styles'
 import HMSLogoSvg from '../components/Svg/Logos/HMS'
+import { productcertificate } from '@prisma/client'
 
 // import sanityClient from '@sanity/client'
 
@@ -23,9 +24,34 @@ import HMSLogoSvg from '../components/Svg/Logos/HMS'
 //   useCdn: true, // `false` if you want to ensure fresh data
 // })
 
+interface Counter {
+  name: string
+  count: number
+}
+
+type HomeProps = {
+  productListString: string
+  certificates : string
+  companies: string
+  categoryCounts: Array<Counter>
+  certificateCounts: Array<Counter>
+  companyCounts: Array<Counter>
+  certificateSystems: string
+}
+
+interface CertCountProps{
+  name: string
+  count: number
+}
+
+interface CompanyCountProps{
+  name: string
+  count: number
+}
+
 export const getServerSideProps: GetServerSideProps = async () => {
 
-  const filterValidDate = (val) => {
+  const filterValidDate = (val: productcertificate) => {
     if(val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
       return !!val.validDate && val.validDate > new Date()
     }
@@ -74,7 +100,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   })
 
   // COMPANY COUNTS
-  const companyCounts = []
+  const companyCounts: Array<CompanyCountProps> = []
   companies.map(comp => {
     let count = 0
     doubleFilterProductList.map(prod => {
@@ -93,7 +119,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   })
   
   // CERTIFICATE COUNTS
-  const certificateCounts = []
+  const certificateCounts: Array<CertCountProps> = []
   certificates.map(cert => {
     if(cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC') {
       const validCertificates = cert.productcertificate.filter(filterValidDate)
@@ -112,20 +138,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return { props: { productListString, certificates: certificateListString, companies: companyListString, certificateCounts, companyCounts, certificateSystems: certificateSystemListString }}
 }
 
-interface Counter {
-  name: string
-  count: number
-}
 
-type HomeProps = {
-  productListString: string
-  certificates : string
-  companies: string
-  categoryCounts: Array<Counter>
-  certificateCounts: Array<Counter>
-  companyCounts: Array<Counter>
-  certificateSystems: string
-}
 
 const Home = ({ productListString, certificates, companies, certificateCounts, companyCounts, certificateSystems } : HomeProps) => {
 
