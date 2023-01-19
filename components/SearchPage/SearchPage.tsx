@@ -115,6 +115,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   const fuseInstance = new Fuse(products, options)
 
+  const aa = products.filter(x => x.sellingcompany.id == 5)
+  console.log('aa', aa)
+
   const resetFilteredProductList = () => {
     const resultProducts: Fuse.FuseResult<ProductProps>[] = products.map((product, index) => {
       return { item : product, refIndex: index, score: 1}
@@ -182,6 +185,9 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
       SetNumberOfActiveFilters(activeFiltersSize);
       console.log('activeFiltersnumber', activeFiltersSize)
       setFilteredProductList(results)
+
+      console.log('filters', filters)
+      console.log('results', results)
     }
 
     setOriginalValue(false)
