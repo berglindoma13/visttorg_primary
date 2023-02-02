@@ -171,7 +171,7 @@ const Login = () => {
               <Sideline/>
                 <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Áttu nú þegar aðgang?</span>
               <Sideline/>
-              </TextWithLine>
+            </TextWithLine>
             <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Innskráning</SubmitButton>
           </LoginContainer>
         :
