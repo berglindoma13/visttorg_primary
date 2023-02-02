@@ -104,11 +104,13 @@ const Product = ({ productString } : ProductPageProps) => {
 
   //TODO FIX PRODUCT TYPES
   const product: any = superjson.parse(productString)
-  console.log('product', product)
+  // console.log('product', product)
+  // console.log('lenght: ', product.certificates.filter(x => (x.certificateid === 1 || x.certificateid === 2 || x.certificateid === 3) ).length)
 
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
   SwiperCore.use([Pagination])
+
 
   const getCertImage = (cert: string) => {
     switch(cert){
@@ -206,7 +208,7 @@ const Product = ({ productString } : ProductPageProps) => {
                     })}
                   </ProductCategories>
                 </div>
-                {product.certificates.filter(x => (x.certificatedid === 1 || x.certificatedid === 2 || x.certificatedid === 3) && x.validDate !== null).length > 0 && 
+                {product.certificates.filter(x => (x.certificateid === 1 || x.certificateid === 2 || x.certificateid === 3) && x.validDate !== null).length > 0 && 
                   <div style={{flex:1}}>
                     <UIBig style={{marginBottom: 15}}>Fylgiskjöl</UIBig>
                     <ProductCategories>

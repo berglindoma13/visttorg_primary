@@ -161,7 +161,7 @@ const Login = () => {
                <Controller
                 control={control}
                 name="password"
-                render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+                render={({ field }) => <StyledInput type="password" placeholder={'Lykilorð'} {...field}></StyledInput> }
                 rules={{required:true}}
               />
               {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
@@ -190,7 +190,7 @@ const Login = () => {
                <Controller
                 control={control}
                 name="password"
-                render={({ field }) => <StyledInput placeholder={'Lykilorð'} {...field}></StyledInput> }
+                render={({ field }) => <StyledInput type="password" placeholder={'Lykilorð'} {...field}></StyledInput> }
                 rules={{required:true}}
               />
               {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
@@ -198,7 +198,7 @@ const Login = () => {
             </form>
             <TextWithLine>
               <Sideline/>
-                <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Viltu búa til nýjann aðgang?</span>
+                <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Viltu búa til nýjan aðgang?</span>
               <Sideline/>
             </TextWithLine>
             <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Nýskráning</SubmitButton>
@@ -280,7 +280,7 @@ const SubmitButton = styled.button`
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   width:90px;
   margin:6px;
-  margin-top:15px;
+  margin-top:20px;
 `
 
 const Sideline = styled.div`
@@ -292,7 +292,7 @@ const Sideline = styled.div`
 const TextWithLine = styled.div`
   display:flex;
   align-items:center;
-  margin-top:10px;
+  margin-top:14px;
 `
 
 const ErrorMessage = styled.div`

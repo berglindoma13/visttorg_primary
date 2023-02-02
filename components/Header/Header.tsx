@@ -48,7 +48,7 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
             </Link>
           </TopbarWrapper>
           <TopbarWrapper>
-            <Link href='/myfavorites'>
+            <Link href='/thinarvorur'>
               <NavItem>Þínar vörur</NavItem>
             </Link> 
           </TopbarWrapper>
@@ -57,6 +57,11 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
               <NavItem>Verkfærakistan</NavItem>
             </Link> 
           </TopbarWrapper> */}
+          <TopbarWrapper>
+            <Link href='/verkfaerakistan'>
+              <NavItem>Verkfærakistan</NavItem>
+            </Link> 
+          </TopbarWrapper>
         </SidebarWrapper>
       )}
     </HeaderWrapper>
