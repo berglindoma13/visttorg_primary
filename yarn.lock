@@ -335,9 +335,9 @@
   "resolved" "https://registry.npmjs.org/@next/env/-/env-12.3.4.tgz"
   "version" "12.3.4"
 
-"@next/swc-darwin-x64@12.3.4":
-  "integrity" "sha512-PPF7tbWD4k0dJ2EcUSnOsaOJ5rhT3rlEt/3LhZUGiYNL8KvoqczFrETlUx0cUYaXe11dRA3F80Hpt727QIwByQ=="
-  "resolved" "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-12.3.4.tgz"
+"@next/swc-darwin-arm64@12.3.4":
+  "integrity" "sha512-DqsSTd3FRjQUR6ao0E1e2OlOcrF5br+uegcEGPVonKYJpcr0MJrtYmPxd4v5T6UCJZ+XzydF7eQo5wdGvSZAyA=="
+  "resolved" "https://registry.npmjs.org/@next/swc-darwin-arm64/-/swc-darwin-arm64-12.3.4.tgz"
   "version" "12.3.4"
 
 "@panva/asn1.js@^1.0.0":
