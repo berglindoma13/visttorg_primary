@@ -111,12 +111,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   const VisttorgCategories: Array<CategoryProps> = currentCategoryTemplate
 
-  // console.log('curr', currentCategoryTemplate)
-
   const fuseInstance = new Fuse(products, options)
-
-  const aa = products.filter(x => x.sellingcompany.id == 5)
-  console.log('aa', aa)
 
   const resetFilteredProductList = () => {
     const resultProducts: Fuse.FuseResult<ProductProps>[] = products.map((product, index) => {
