@@ -16,6 +16,7 @@ import jwt_decode from 'jwt-decode';
 import Link from 'next/link';
 import VistbokLogo from '../components/Svg/VistbokLogo';
 import { motion, useAnimation } from "framer-motion";
+import { useRouter } from 'next/router';
 
 
 interface User {
@@ -32,12 +33,18 @@ const minarsidur = () => {
   const [open, setOpen] = useState(true);
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
+  const router = useRouter()
+
   useEffect(() => {
     const token = sessionStorage.getItem('jwttoken');
     if(!!token){
       const decoded: any = jwt_decode(token);
       console.log("decoded", decoded);
       setUser({ fullName: decoded.fullname, jobTitle: decoded.jobtitle, company: decoded.company, email: decoded.email, password: decoded.password })
+    }
+    else {
+      // reroute user to the login site when not logged in
+      router.push('/login')
     }
   }, [])
 

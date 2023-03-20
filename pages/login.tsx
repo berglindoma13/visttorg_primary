@@ -27,9 +27,12 @@ interface User {
 
 const Login = () => {
 
-  const { handleSubmit, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
+  const { handleSubmit, control, formState: { errors, isDirty } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
 
   const router = useRouter()
+
+  const [loginError, setLoginError] = useState(false)
+  const [passwordError, setPasswordError] = useState(false)
   
   const onSubmitLogin: SubmitHandler<User> = data => {
    
@@ -57,6 +60,17 @@ const Login = () => {
       if (axios.isAxiosError(err))  {
         console.error('isAxios error', !!err.response.data && err.response.data)
         // Access to config, request, and response
+        // User does not exist, setting error message
+        if(err.response.data == "user not found") {
+          setPasswordError(false)
+          setLoginError(true)
+        }
+        // Wrong password, setting error message
+        else if (err.response.data == "password does not match user") {
+          setLoginError(false)
+          setPasswordError(true)
+        }
+        
       } else {
         console.error('is regular error', err)
         // Just a stock error
@@ -107,7 +121,6 @@ const Login = () => {
     // });
   };
 
-
   const [isNewUser, setIsNewUser] = useState(false)
 
   useEffect(() => {
@@ -120,6 +133,7 @@ const Login = () => {
   useEffect(() => {
     console.log('errors', errors)
   }, [errors])
+
   
   return(
     <Page>
@@ -181,12 +195,11 @@ const Login = () => {
             <Controller
                 control={control}
                 name="email"
-                render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
+                render={({ field }) => <StyledInput placeholder={'Netfang'} {...field} ></StyledInput> }
                 rules={{required:true, validate: validateEmail}}
               />
               {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
               {errors.email?.type === 'validate' && <ErrorMessage role="alert">Ekki gilt netfang</ErrorMessage>}
-      
                <Controller
                 control={control}
                 name="password"
@@ -194,6 +207,8 @@ const Login = () => {
                 rules={{required:true}}
               />
               {errors.password?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn lykilorð</ErrorMessage>}
+              {loginError && <ErrorMessage>Þessi notandi er ekki til</ErrorMessage>}
+              {passwordError && <ErrorMessage>Rangt lykilorð</ErrorMessage>}
               <SubmitButton onClick={() => handleSubmit(onSubmitLogin)}>Skrá</SubmitButton>
             </form>
             <TextWithLine>
