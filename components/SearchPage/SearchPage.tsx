@@ -88,11 +88,11 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     // isCaseSensitive: false,
     includeScore: true,
     shouldSort: true,
-    // includeMatches: false,
-    // findAllMatches: false,
+    includeMatches: true,
+    findAllMatches: true,
     // minMatchCharLength: 1,
     // location: 0,
-    threshold: 0.1,
+    threshold: -1,
     // distance: 100,
     // useExtendedSearch: false,
     // ignoreLocation: false,
@@ -116,7 +116,6 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   const fuseInstance = new Fuse(products, options)
 
   const aa = products.filter(x => x.sellingcompany.id == 5)
-  console.log('aa', aa)
 
   const resetFilteredProductList = () => {
     const resultProducts: Fuse.FuseResult<ProductProps>[] = products.map((product, index) => {
