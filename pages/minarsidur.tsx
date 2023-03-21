@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
-import { Drawer, Button } from 'antd';
+import { Drawer, Button, Modal } from 'antd';
 import { HomeFilled,
         ProfileFilled,
         ToolFilled,
@@ -31,6 +31,24 @@ const minarsidur = () => {
   const [user, setUser] = useState<User>(null)
   const [open, setOpen] = useState(true);
   const [dropDownOpen, setDropDownOpen] = useState(false);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const showModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleSubmitProjectEntry = () => {
+    setConfirmLoading(true);
+    setTimeout(() => {
+      setOpenModal(false);
+      setConfirmLoading(false);
+    }, 2000);
+  };
+  const handleCancelProjectEntry = () => {
+    console.log('Clicked cancel button');
+    setOpenModal(false);
+  };
 
   useEffect(() => {
     const token = sessionStorage.getItem('jwttoken');
@@ -95,7 +113,7 @@ const minarsidur = () => {
             placement="left"
             closable={false}
             onClose={onClose}
-            visible={open}
+            open={open}
             width='300px'
             mask={false}
             headerStyle={{ backgroundColor:'#ABC5A1' }}
@@ -135,7 +153,7 @@ const minarsidur = () => {
             placement="left"
             closable={false}
             onClose={onClose}
-            visible={!open}
+            open={!open}
             width='80px'
             mask={false}
             headerStyle={{ backgroundColor:'#ABC5A1' }}
@@ -185,10 +203,20 @@ const minarsidur = () => {
             <MyProjectsContainer>
               <StyledHeading5> Mín verkefni </StyledHeading5>
               <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
-              <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" >Búa til verkefni <PlusOutlined /> </Button>
+              <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary"onClick={() => showModal()} >Búa til verkefni <PlusOutlined /> </Button>
             </MyProjectsContainer>
           </InformationContainer>
         </ContentContainer>}
+
+        <Modal
+          title="Title"
+          open={openModal}
+          onOk={handleSubmitProjectEntry}
+          confirmLoading={confirmLoading}
+          onCancel={handleCancelProjectEntry}
+        >
+          <p>Hér kemur modal</p>
+      </Modal>
       </PageContainer>
     </Page>
   )
