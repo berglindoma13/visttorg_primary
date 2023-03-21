@@ -79,6 +79,7 @@ const StyledProduct = styled.div`
   min-width: 300px;
   width: 23%;
   height: auto;
+  max-height: 510px;
   background: #FFFFFF;
   box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
   border-radius: 16px;

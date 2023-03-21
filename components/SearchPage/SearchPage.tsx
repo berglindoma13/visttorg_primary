@@ -92,7 +92,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     // findAllMatches: false,
     // minMatchCharLength: 1,
     // location: 0,
-    threshold: 0.1,
+    threshold: -1,
     // distance: 100,
     // useExtendedSearch: false,
     // ignoreLocation: false,
@@ -349,6 +349,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   
         fadeInControls.start({
           opacity: 1,
+          height:'100%',
           transition: { duration : 0.8 }
         })
       }else{
@@ -373,6 +374,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         })
   
         fadeInControls.start({
+          height:"0",
           opacity: 0,
           transition: { duration : 0 }
         })
@@ -705,7 +707,8 @@ const ProductList = styled.div`
   flex-direction:row;
   flex-wrap:wrap;
   width:100%;
-  justify-content: center;
+  justify-content: flex-start;
+  height: 100%;
 `
 
 const StyledProduct = styled(Product)`
@@ -833,10 +836,11 @@ const NoResultsSubtext = styled(Heading6)`
 
 const ImageWrapper = styled.div`
   max-height:100%;
-  height: 25%;
+  min-height: 190px;
   position:relative;
   @media ${mediaMax.tablet}{
     height:auto;
+    min-height:auto;
   }
 `
 
