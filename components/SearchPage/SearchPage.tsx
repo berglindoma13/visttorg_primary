@@ -92,7 +92,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
     // findAllMatches: false,
     // minMatchCharLength: 1,
     // location: 0,
-    threshold: 0.1,
+    threshold: -1,
     // distance: 100,
     // useExtendedSearch: false,
     // ignoreLocation: false,
