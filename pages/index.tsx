@@ -111,9 +111,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     companyCounts.push({ name: comp.name, count: count})
   })
 
-  // ALL CERTIFICATES
+  // ALL CERTIFICATES 
   const certificates = await prismaInstance.certificate.findMany({
-    include: {
+    include: { 
       productcertificate: true
     }
   })
@@ -142,16 +142,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 const Home = ({ productListString, certificates, companies, certificateCounts, companyCounts, certificateSystems } : HomeProps) => {
 
-  // client.getDocument('3000b472-0bb2-48e0-aad0-8d9d832e16fa').then((cert) => {
-  //   console.log(`${cert.productid}`)
-  // })
-
   const productList: Array<ProductProps> = superjson.parse(productListString)
   const certificateList: Array<Certificate> = superjson.parse(certificates)
   const companyList: Array<Company> = superjson.parse(companies)
   const certificateSystemList: Array<CertificateSystem> = superjson.parse(certificateSystems)
-
-  const bb = productList.filter(x => x.sellingcompany.id == 5)
 
   return(
     <Page>
