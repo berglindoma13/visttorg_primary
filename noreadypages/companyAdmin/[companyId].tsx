@@ -89,10 +89,10 @@ const Product = ({ companyProducts, companyInfo } : companyAdminProps) => {
                 <TableRowHeader>Löng lýsing</TableRowHeader>
                 <TableRowHeader>Slóð á vörumynd</TableRowHeader>
                 <TableRowHeader>Slóð á vöru á vef söluaðila</TableRowHeader>
-                <TableRowHeader>Slóð á EPD skjal</TableRowHeader>
+                {/* <TableRowHeader>Slóð á EPD skjal</TableRowHeader>
                 <TableRowHeader>Slóð á VOC skjal</TableRowHeader>
                 <TableRowHeader>Slóð á FSC skjal</TableRowHeader>
-                <TableRowHeader>Slóð á CE skjal</TableRowHeader>
+                <TableRowHeader>Slóð á CE skjal</TableRowHeader> */}
               </tr>
             </thead>
             <tbody>
@@ -120,7 +120,7 @@ const Product = ({ companyProducts, companyInfo } : companyAdminProps) => {
                       <TableRowBody>
                         {thisProduct.url}
                       </TableRowBody>
-                      <TableRowBody>
+                      {/* <TableRowBody>
                         {thisProduct.epdUrl}
                       </TableRowBody>
                       <TableRowBody>
@@ -131,7 +131,7 @@ const Product = ({ companyProducts, companyInfo } : companyAdminProps) => {
                       </TableRowBody>
                       <TableRowBody>
                         {thisProduct.ceUrl}
-                      </TableRowBody>
+                      </TableRowBody> */}
                     </tr>
                   )
                 })
