@@ -338,6 +338,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   //Framer motion controls for showing and hiding filter drawer
   const controls = useAnimation()
   const fadeInControls = useAnimation()
+  const mobileButtonFadeInControls = useAnimation()
   
   useEffect(() => {
     if(filterDrawerIsActive){
@@ -359,6 +360,13 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         })
   
         fadeInControls.start({
+          opacity: 1,
+          x: "0px",
+          height:'100%',
+          transition: { duration : 0.2 }
+        })
+
+        mobileButtonFadeInControls.start({
           opacity: 1,
           x: "0px",
           transition: { duration : 0.2 }
@@ -385,6 +393,12 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         })
   
         fadeInControls.start({
+          opacity: 0,
+          x: "-100%",
+          transition: { duration : 0.2 }
+        })
+        
+        mobileButtonFadeInControls.start({
           opacity: 0,
           x: "-100%",
           transition: { duration : 0.2 }
@@ -560,7 +574,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         </FilterWrapper>
         {isTablet && 
           <MobileFilterButtonWrapper
-            animate={fadeInControls}
+            animate={mobileButtonFadeInControls}
           >
             <StyledBottomFilterButton onClick={() => setFilterDrawerIsActive(false)} >
               <MagnifyingGlass fill="#000"/> <StyledBottomFilterButtonText> Leita </StyledBottomFilterButtonText>
@@ -709,6 +723,10 @@ const ProductList = styled.div`
   width:100%;
   justify-content: flex-start;
   height: 100%;
+
+  @media ${mediaMax.tablet}{
+    justify-content:space-between;
+  }
 `
 
 const StyledProduct = styled(Product)`

@@ -91,7 +91,7 @@ const Product = ({ productString } : ProductPageProps) => {
 
   //TODO FIX PRODUCT TYPES
   const product: ProductProps = superjson.parse(productString)
-f
+
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
   SwiperCore.use([Pagination])
