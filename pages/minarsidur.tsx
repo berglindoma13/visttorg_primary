@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
-import { Drawer, Button } from 'antd';
+import { Button } from 'antd';
 import { HomeFilled,
         ProfileFilled,
         ToolFilled,
@@ -13,11 +13,10 @@ import { HomeFilled,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
-import Link from 'next/link';
-import VistbokLogo from '../components/Svg/VistbokLogo';
+// import Link from 'next/link';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
-
+import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
 
 interface User {
   fullName?: string
@@ -31,7 +30,7 @@ const minarsidur = () => {
 
   const [user, setUser] = useState<User>(null)
   const [open, setOpen] = useState(true);
-  const [dropDownOpen, setDropDownOpen] = useState(false);
+  // const [dropDownOpen, setDropDownOpen] = useState(false);
 
   const router = useRouter()
 
@@ -48,43 +47,42 @@ const minarsidur = () => {
     }
   }, [])
 
-    //Framer motion controls for showing and hiding filter drawer
-    const pageContentControls = useAnimation()
-    const drawerControls = useAnimation()
+  //Framer motion controls for showing and hiding filter drawer
+  const pageContentControls = useAnimation()
+  const drawerControls = useAnimation()
     
-    useEffect(() => {
-      if(open){
-        pageContentControls.start({
-          x: "0px",
-          width: '75%',
-          marginLeft:'340px',
-          transition: { duration : 0.2 }
-        })
+  useEffect(() => {
+    if(open){
+      pageContentControls.start({
+        x: "0px",
+        width: '75%',
+        marginLeft:'340px',
+        transition: { duration : 0.2 }
+      })
 
-        drawerControls.start({
-          opacity: 0.5,
-          transition: { duration : 0.4 }
-        })
+      drawerControls.start({
+        opacity: 0.5,
+        transition: { duration : 0.4 }
+      })
 
-      }
-      else if(!open){
-        pageContentControls.start({
-          x: "20px",
-          width: '85%',
-          transition: { duration : 0.2 },
-          marginLeft:'120px'
-        })
+    }
+    else if(!open){
+      pageContentControls.start({
+        x: "20px",
+        width: '85%',
+        transition: { duration : 0.2 },
+        marginLeft:'120px'
+      })
 
-        drawerControls.start({
-          width:'30px',
-          opacity: 1,
-          transition: { duration : 0.4 },
-        })
-      }
-  
-    }, [open])
+      drawerControls.start({
+        width:'30px',
+        opacity: 1,
+        transition: { duration : 0.4 },
+      })
+    }
+  }, [open])
 
-  const onClose = () => {
+  const onChange = () => {
     setOpen(!open);
   };
 
@@ -98,77 +96,7 @@ const minarsidur = () => {
       <PageContainer>
         {/* <StyledHeader showSearch={true} /> */}
         {!!user && <ContentContainer>
-          {open ? <Drawer
-            placement="left"
-            closable={false}
-            onClose={onClose}
-            visible={open}
-            width='300px'
-            mask={false}
-            headerStyle={{ backgroundColor:'#ABC5A1' }}
-            bodyStyle={{ backgroundColor:'#ABC5A1' }}
-          >
-            <SideContainer
-              // animate={drawerControls}
-            >
-              <DrawerHeaderContainer>
-                <Link href="/" passHref>
-                  <a>
-                    <VistbokLogo style={{cursor:'pointer'}} width="150px"/>
-                  </a>
-                </Link>
-                <LeftOutlined onClick={() => onClose()} style={{ fontSize: '30px', paddingLeft:'10px'}}/>
-              </DrawerHeaderContainer>
-              <DrawerHeadingContainer>
-                <HomeFilled style={{ fontSize: '18px'}} />
-                <DrawerText> Mitt svæði </DrawerText>
-              </DrawerHeadingContainer>
-              <Sideline></Sideline>
-              <DrawerHeadingContainer style={{ paddingBottom:'10px' }}>
-                <ProfileFilled style={{ fontSize: '18px'}} />
-                <DrawerText> Mín verkefni </DrawerText>
-              </DrawerHeadingContainer>
-              <DrawerHeadingContainer>
-                <ToolFilled style={{ fontSize: '18px'}}/>
-                <DrawerText> Mínar vörur </DrawerText>
-              </DrawerHeadingContainer>
-              <DrawerHeadingContainer style={{ paddingTop:'20px' }}>
-                <SearchOutlined style={{ fontSize: '18px', color: '#1976D2' }} />
-                <DrawerText style={{ color: '#1976D2' }} > Leitarvél </DrawerText>
-              </DrawerHeadingContainer>
-            </SideContainer >
-          </Drawer> : 
-          <Drawer
-            placement="left"
-            closable={false}
-            onClose={onClose}
-            visible={!open}
-            width='80px'
-            mask={false}
-            headerStyle={{ backgroundColor:'#ABC5A1' }}
-            bodyStyle={{ backgroundColor:'#ABC5A1' }}
-          >
-            <SideContainer 
-              style={{ width:'30px' }}
-              // animate={drawerControls}
-            >
-              <DrawerHeaderContainer>
-                <RightOutlined onClick={() => onClose()} style={{ fontSize: '30px', paddingLeft:'10px'}}/>
-              </DrawerHeaderContainer>
-              <HomeFilled style={{ fontSize: '18px', paddingTop:'20px' }} />
-              <ProfileFilled style={{ fontSize: '18px', paddingTop:'10px' }} />
-              <ToolFilled style={{ fontSize: '18px', paddingTop:'10px' }}/>
-              <SearchOutlined style={{ fontSize: '18px', paddingTop:'10px' }} />
-            </SideContainer>
-          </Drawer>
-          }
-          {/* {!open &&
-            <Link href="/" passHref>
-              <a>
-                <VistbokLogo style={{cursor:'pointer'}} width="150px"/>
-              </a>
-            </Link>
-          } */}
+          <MyPagesSidebar onClick={onChange} open={open} />
           <UserHeader >
             <UsernameContainer>
               <UserOutlined style={{ fontSize: '20px' }}/>
@@ -288,11 +216,12 @@ const DrawerHeaderContainer = styled.div`
   padding-bottom:20px;
 `
 
-const DrawerHeadingContainer = styled.div`
+const DrawerItemContainer = styled.div`
   display:flex;
   flex-direction: row;
   // width:90%;
   // padding-bottom:10px;
+  cursor: pointer;
 `
 
 const DrawerText = styled(Heading5)`
