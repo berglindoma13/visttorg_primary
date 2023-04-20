@@ -13,10 +13,12 @@ import { Heading1 } from '../components/Typography';
 import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
 import jwt_decode from 'jwt-decode';
+import bcrypt from 'bcryptjs'
 import axios, { AxiosError } from 'axios';
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { useRouter } from 'next/router';
-import { validateEmail } from '../utils/emailValidation'
+
+const salt = bcrypt.genSaltSync(10)
+
 interface User {
   fullName?: string
   email: string
@@ -28,16 +30,14 @@ interface User {
 const Login = () => {
 
   const { handleSubmit, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
-
-  const router = useRouter()
   
   const onSubmitLogin: SubmitHandler<User> = data => {
-   
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: data.password
+        password: hashedPassword
       }
     }).then((response) => {
       
@@ -50,12 +50,10 @@ const Login = () => {
     .then((responsejson) => {
       console.log('success', responsejson)
       sessionStorage.setItem('jwttoken', responsejson)
-
-      router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
-        console.error('isAxios error', !!err.response.data && err.response.data)
+        console.error('isAxios error', err.response.data)
         // Access to config, request, and response
       } else {
         console.error('is regular error', err)
@@ -65,12 +63,12 @@ const Login = () => {
   };
 
   const onSubmitRegister: SubmitHandler<User> = data => {
-   
+    const hashedPassword = bcrypt.hashSync(data.password, salt)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: data.password,
+        password: hashedPassword,
         fullname: data.fullName,
         company: data.company,
         jobtitle: data.jobTitle
@@ -86,12 +84,10 @@ const Login = () => {
     .then((responsejson) => {
       console.log('success', responsejson)
       sessionStorage.setItem('jwttoken', responsejson)
-
-      router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
-        console.error('isAxios error', !!err.response.data && err.response.data)
+        console.error('isAxios error', err.response.data)
         // Access to config, request, and response
       } else {
         console.error('is regular error', err)
@@ -113,13 +109,10 @@ const Login = () => {
   useEffect(() => {
     const token = sessionStorage.getItem('jwttoken');
     if(!!token){
-      router.push('/minarsidur')
+      const decoded = jwt_decode(token);
+      console.log(decoded);
     }
   }, [])
-
-  useEffect(() => {
-    console.log('errors', errors)
-  }, [errors])
   
   return(
     <Page>
@@ -154,10 +147,9 @@ const Login = () => {
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
-                rules={{required:true, validate: validateEmail}}
+                rules={{required:true}}
               />
               {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
-              {errors.email?.type === 'validate' && <ErrorMessage role="alert">Ekki gilt netfang</ErrorMessage>}
                <Controller
                 control={control}
                 name="password"
@@ -171,22 +163,20 @@ const Login = () => {
               <Sideline/>
                 <span style={{marginLeft:5, marginRight:5, color:"DimGrey"}} >Áttu nú þegar aðgang?</span>
               <Sideline/>
-            </TextWithLine>
+              </TextWithLine>
             <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Innskráning</SubmitButton>
           </LoginContainer>
         :
           <LoginContainer>
             <MainHeading>Innskráning</MainHeading> 
             <form style={{all:'inherit'}}  onSubmit={handleSubmit(onSubmitLogin)}>
-            <Controller
+              <Controller
                 control={control}
                 name="email"
                 render={({ field }) => <StyledInput placeholder={'Netfang'} {...field}></StyledInput> }
-                rules={{required:true, validate: validateEmail}}
+                rules={{required:true}}
               />
               {errors.email?.type === 'required' && <ErrorMessage role="alert">Vinsamlegast fylltu inn netfang</ErrorMessage>}
-              {errors.email?.type === 'validate' && <ErrorMessage role="alert">Ekki gilt netfang</ErrorMessage>}
-      
                <Controller
                 control={control}
                 name="password"
