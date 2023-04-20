@@ -111,9 +111,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     companyCounts.push({ name: comp.name, count: count})
   })
 
-  // ALL CERTIFICATES
+  // ALL CERTIFICATES 
   const certificates = await prismaInstance.certificate.findMany({
-    include: {
+    include: { 
       productcertificate: true
     }
   })
