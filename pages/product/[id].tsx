@@ -33,6 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       sellingcompany: true,
       categories : true,
       subCategories: true,
+      certificateSystems: true,
       certificates: {
         include: {
           certificate : true
@@ -40,20 +41,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     },
   });
-
-  // const filterValidDate = (val) => {
-  //   if(val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
-  //     return !!val.validDate && val.validDate > new Date()
-  //   }else if(val.certificateid === 6){
-  //     return false
-  //   }
-  //   else {
-  //     return true
-  //   }
-  // }
-
-  // const filteredUniqueProduct = uniqueProduct.certificates.filter(cert => filterValidDate)
-
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
   return {
@@ -71,42 +58,40 @@ interface ProductPageProps{
 const Product = ({ productString } : ProductPageProps) => {
 
   
-  const router = useRouter()
+  // const router = useRouter()
   
-  const reRouteToSearchPage = (category: string, filterLevel: number) => {
+  // const reRouteToSearchPage = (category: string, filterLevel: number) => {
 
-    //add the category to sessionStorage and reset all other sessionStorage items
-    if(filterLevel === 1){
+  //   //add the category to sessionStorage and reset all other sessionStorage items
+  //   if(filterLevel === 1){
       
-      const newFilters = []
-      newFilters.push(category)
+  //     const newFilters = []
+  //     newFilters.push(category)
       
-      sessionStorage.setItem('level1Filters', JSON.stringify(newFilters))
-      sessionStorage.setItem('level2Filters', JSON.stringify([]))
-      sessionStorage.setItem('queryParam', '')
+  //     sessionStorage.setItem('level1Filters', JSON.stringify(newFilters))
+  //     sessionStorage.setItem('level2Filters', JSON.stringify([]))
+  //     sessionStorage.setItem('queryParam', '')
       
-    }else {
+  //   }else {
       
-      const newFilters = []
-      newFilters.push(category)
+  //     const newFilters = []
+  //     newFilters.push(category)
       
-      sessionStorage.setItem('level2Filters', JSON.stringify(newFilters))
-      sessionStorage.setItem('level1Filters', JSON.stringify([]))
-      sessionStorage.setItem('queryParam', '')
-    }
+  //     sessionStorage.setItem('level2Filters', JSON.stringify(newFilters))
+  //     sessionStorage.setItem('level1Filters', JSON.stringify([]))
+  //     sessionStorage.setItem('queryParam', '')
+  //   }
     
     
-    //Push to frontpage
-    router.push('/')
+  //   //Push to frontpage
+  //   router.push('/')
     
-  }
+  // }
   
 
   //TODO FIX PRODUCT TYPES
-  const product: any = superjson.parse(productString)
-  // console.log('product', product)
-  // console.log('lenght: ', product.certificates.filter(x => (x.certificateid === 1 || x.certificateid === 2 || x.certificateid === 3) ).length)
-
+  const product: ProductProps = superjson.parse(productString)
+f
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
   SwiperCore.use([Pagination])
@@ -212,8 +197,8 @@ const Product = ({ productString } : ProductPageProps) => {
                   <div style={{flex:1}}>
                     <UIBig style={{marginBottom: 15}}>Fylgiskjöl</UIBig>
                     <ProductCategories>
-                    {product.certificates.map((cert : any, index : number) => {
-                      if(cert.fileurl !== '' && cert.validDate !== null){
+                    {product.certificates.map((cert : ProductCertificate, index : number) => {
+                      if((cert.fileurl !== '' && cert.validDate !== null) || (cert.certificate.id === 10 && cert.fileurl !== '')){
                         return (
                           <FileLinks key={index} style={{marginBottom: 8, cursor:'pointer', }} target="_blank" href={cert.fileurl}>{certMapper[cert.certificate.name]}</FileLinks>
                         )

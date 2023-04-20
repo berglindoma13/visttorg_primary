@@ -111,11 +111,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
 
   const VisttorgCategories: Array<CategoryProps> = currentCategoryTemplate
 
-  // console.log('curr', currentCategoryTemplate)
-
   const fuseInstance = new Fuse(products, options)
-
-  const aa = products.filter(x => x.sellingcompany.id == 5)
 
   const resetFilteredProductList = () => {
     const resultProducts: Fuse.FuseResult<ProductProps>[] = products.map((product, index) => {
@@ -353,6 +349,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
   
         fadeInControls.start({
           opacity: 1,
+          height:'100%',
           transition: { duration : 0.8 }
         })
       }else{
@@ -377,6 +374,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         })
   
         fadeInControls.start({
+          height:"0",
           opacity: 0,
           transition: { duration : 0 }
         })
@@ -709,7 +707,8 @@ const ProductList = styled.div`
   flex-direction:row;
   flex-wrap:wrap;
   width:100%;
-  justify-content: center;
+  justify-content: flex-start;
+  height: 100%;
 `
 
 const StyledProduct = styled(Product)`
@@ -837,10 +836,11 @@ const NoResultsSubtext = styled(Heading6)`
 
 const ImageWrapper = styled.div`
   max-height:100%;
-  height: 25%;
+  min-height: 190px;
   position:relative;
   @media ${mediaMax.tablet}{
     height:auto;
+    min-height:auto;
   }
 `
 
