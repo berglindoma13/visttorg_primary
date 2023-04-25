@@ -2,14 +2,9 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
-import { Button } from 'antd';
-import { HomeFilled,
-        ProfileFilled,
-        ToolFilled,
-        SearchOutlined,
-        RightOutlined,
-        LeftOutlined,
-        DownOutlined,
+import { TextInput } from '../components/Inputs'
+import { Button, Modal } from 'antd';
+import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
@@ -26,11 +21,27 @@ interface User {
   password: string
 }
 
+interface NewProject {
+  title: string
+  certSystem: string
+  address: string
+  country: string
+}
+
+interface AllProjects {
+  count: number
+  projects: Array<NewProject>
+}
+
 const minarsidur = () => {
 
   const [user, setUser] = useState<User>(null)
   const [open, setOpen] = useState(true);
   // const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newProjectParam, setNewProjectParam] = useState<NewProject>({title:"", certSystem:"", address:"", country:""})
+
+  const [projects, setProjects] = useState<AllProjects>({count:0,projects:[]})
 
   const router = useRouter()
 
@@ -82,6 +93,22 @@ const minarsidur = () => {
     }
   }, [open])
 
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    // if user presses ok
+    setIsModalOpen(false);
+    setProjects({count: 1, projects: [...projects.projects, newProjectParam] })
+    console.log(" projects", projects)
+  };
+
+  const handleCancel = () => {
+    // if user cancels or closes modal
+    setIsModalOpen(false);
+  };
+
   const onChange = () => {
     setOpen(!open);
   };
@@ -120,7 +147,46 @@ const minarsidur = () => {
             <MyProjectsContainer>
               <StyledHeading5> Mín verkefni </StyledHeading5>
               <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
-              <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" >Búa til verkefni <PlusOutlined /> </Button>
+              <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
+              <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                <div >
+                  <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
+                  {/* <StyledHeading5> Titill </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Titill'
+                      onChange={(input) => {setNewProjectParam({title:input.target.value,certSystem:newProjectParam.certSystem, address:newProjectParam.address,country:newProjectParam.country})}}
+                      value={newProjectParam.title}
+                  />
+                  {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Vottunarkerfi'
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:input.target.value,address:newProjectParam.address,country:newProjectParam.country})}}
+                      value={newProjectParam.certSystem}
+                  />
+                  {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
+                  {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Heimilisfang'
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:newProjectParam.certSystem, address:input.target.value,country:newProjectParam.country})}}
+                      value={newProjectParam.address}
+                  />
+                  {/* <StyledHeading5> Land </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Land'
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:newProjectParam.certSystem, address:newProjectParam.address,country:input.target.value})}}
+                      value={newProjectParam.country}
+                  />
+                </div>
+              </Modal>
+              {projects.count !== 0 && projects.projects.map((item) => {
+                return(
+                <div>
+                  <StyledHeading5> {item.title} </StyledHeading5>
+                  <StyledHeading5> {item.certSystem} </StyledHeading5>
+                  <StyledHeading5> {item.address} </StyledHeading5>
+                  <StyledHeading5> {item.country} </StyledHeading5>
+                </div>)
+              })}
             </MyProjectsContainer>
           </InformationContainer>
         </ContentContainer>}
@@ -210,32 +276,10 @@ const StyledHeading5 = styled(Heading5)`
   width:100%;
 `
 
-const DrawerHeaderContainer = styled.div`
-  display:flex;
-  flex-direction: row;
-  padding-bottom:20px;
-`
-
-const DrawerItemContainer = styled.div`
-  display:flex;
-  flex-direction: row;
-  // width:90%;
-  // padding-bottom:10px;
-  cursor: pointer;
-`
-
-const DrawerText = styled(Heading5)`
-  text-align:center;
-  font-size: 18px;
-  padding-left:10px;
-`
-
-const Sideline = styled.div`
-  height:1px;
-  width: 180px;
-  background-color:black;
-  margin-bottom:10px;
-  margin-top:4px;
+const StyledInput = styled(TextInput)`
+  margin-bottom:20px;
+  margin-top:20px;
+  // background: green;
 `
 
 const NavItem = styled.span`
