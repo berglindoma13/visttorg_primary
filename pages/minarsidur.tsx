@@ -145,9 +145,12 @@ const minarsidur = () => {
               <StyledHeading5> {user.jobTitle}</StyledHeading5> 
             </UserCardContainer>
             <MyProjectsContainer>
-              <StyledHeading5> Mín verkefni </StyledHeading5>
-              <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
-              <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
+              <MyProjectsHeader>
+                <StyledHeading5> Mín verkefni </StyledHeading5>
+                <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
+                <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
+              </MyProjectsHeader>
+              <MyProjectsContent>
               <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <div >
                   <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
@@ -180,13 +183,14 @@ const minarsidur = () => {
               </Modal>
               {projects.count !== 0 && projects.projects.map((item) => {
                 return(
-                <div>
-                  <StyledHeading5> {item.title} </StyledHeading5>
+                <ProjectCard>
+                  <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
                   <StyledHeading5> {item.certSystem} </StyledHeading5>
                   <StyledHeading5> {item.address} </StyledHeading5>
                   <StyledHeading5> {item.country} </StyledHeading5>
-                </div>)
+                </ProjectCard>)
               })}
+              </MyProjectsContent>
             </MyProjectsContainer>
           </InformationContainer>
         </ContentContainer>}
@@ -258,7 +262,45 @@ const UserCardContainer = styled.div`
 
 const MyProjectsContainer = styled.div`
   display:flex;
+  flex-direction:column;
+`
+
+const MyProjectsHeader = styled.div`
+  display:flex;
   flex-direction:row;
+`
+
+// css for all project cards together
+const MyProjectsContent = styled.div`
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  width:100%;
+  justify-content: flex-start;
+  height: 100%;
+`
+
+// css for a single project card
+const ProjectCard = styled.div`
+  // background: #d3d3d3;
+  background: #FFFFFF;
+  // height:200px;
+  // width:180px;
+  margin: 15px 30px 15px 0px;
+  min-width: 250px;
+  width: 18%;
+  height: auto;
+  max-height: 510px;
+  box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
+  border-radius: 16px;
+  display:flex;
+  flex-direction:column;
+  padding: 12px;
+  position:relative;
+  transition: box-shadow 0.2s ease-in;
+  cursor: pointer;
+  padding-bottom:40px;
+
 `
 
 const StyledHeader = styled(Header)`
