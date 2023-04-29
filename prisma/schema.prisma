@@ -99,6 +99,35 @@ model vistbokUser {
   fullname String
   company String
   jobtitle String
+  projects vistbokProject[]
+}
+
+model vistbokProject {
+  id Int @id @default(autoincrement())
+  title String
+  address String
+  country String
+  status String
+  ownerEmail String
+  owner vistbokUser @relation(fields: [ownerEmail], references: [email])
+  // users vistbokUser[]
+  // certificatesystem projectCertificateSystem[]
+}
+
+model projectCertificateSystem {
+  id Int @id @default(autoincrement())
+  title String
+  base  String
+  secondlayer String
+  thirdlayer  String
+  // projects  vistbokProject[]
+  requirements certificateSystemRequirement[]
+}
+
+model certificateSystemRequirement {
+  id  Int @id @default(autoincrement())
+  system  projectCertificateSystem @relation(fields: [id], references: [id])
+  requirement String
 }
 
 // model attachedFile {

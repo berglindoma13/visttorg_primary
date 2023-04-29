@@ -12,6 +12,9 @@ import jwt_decode from 'jwt-decode';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
 import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
+import { GetServerSideProps } from 'next'
+import { prismaInstance } from '../lib/prisma'
+import axios, { AxiosError } from 'axios';
 
 interface User {
   fullName?: string
@@ -21,11 +24,13 @@ interface User {
   password: string
 }
 
+//breyta nafninu í single project
 interface NewProject {
   title: string
   certSystem: string
   address: string
   country: string
+  status?: string
 }
 
 interface AllProjects {
@@ -33,7 +38,28 @@ interface AllProjects {
   projects: Array<NewProject>
 }
 
-const minarsidur = () => {
+interface minarsidurProps {
+  projectList: Array<NewProject>
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+
+  const email = "mariaoma@gmail.com"
+
+  // ALL PROJECTS
+  const projectList = await prismaInstance.vistbokProject.findMany({
+    where: {
+      ownerEmail: email
+    }
+  });
+
+  console.log('project list', projectList)
+
+  return { props: { projectList }}
+}
+
+
+const minarsidur = ({ projectList } : minarsidurProps) => {
 
   const [user, setUser] = useState<User>(null)
   const [open, setOpen] = useState(true);
@@ -41,7 +67,7 @@ const minarsidur = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProjectParam, setNewProjectParam] = useState<NewProject>({title:"", certSystem:"", address:"", country:""})
 
-  const [projects, setProjects] = useState<AllProjects>({count:0,projects:[]})
+  const [projects, setProjects] = useState<AllProjects>({count:projectList.length,projects:projectList})
 
   const router = useRouter()
 
@@ -57,6 +83,31 @@ const minarsidur = () => {
       router.push('/login')
     }
   }, [])
+
+  const onProjectCreation = () => {
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproject`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: {
+        title: newProjectParam.title,
+        address: newProjectParam.address,
+        country: newProjectParam.country,
+        status: "In progress",
+        ownerEmail: user.email,
+      }
+    }).then((response) => {
+      if (response.status === 200) {
+        return response.data;
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responsejson) => {
+      console.log('success', responsejson);
+    })
+    .catch((err: Error | AxiosError) => {
+      console.log("error", err)
+    })
+  };
 
   //Framer motion controls for showing and hiding filter drawer
   const pageContentControls = useAnimation()
@@ -100,8 +151,9 @@ const minarsidur = () => {
   const handleOk = () => {
     // if user presses ok
     setIsModalOpen(false);
-    setProjects({count: 1, projects: [...projects.projects, newProjectParam] })
+    setProjects({count: projects.projects.length+1, projects: [...projects.projects, newProjectParam] })
     console.log(" projects", projects)
+    onProjectCreation()
   };
 
   const handleCancel = () => {
@@ -110,6 +162,7 @@ const minarsidur = () => {
   };
 
   const onChange = () => {
+    console.log("count", projects.count)
     setOpen(!open);
   };
 
@@ -183,11 +236,12 @@ const minarsidur = () => {
               </Modal>
               {projects.count !== 0 && projects.projects.map((item) => {
                 return(
-                <ProjectCard>
+                <ProjectCard key={item.title}>
                   <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
-                  <StyledHeading5> {item.certSystem} </StyledHeading5>
-                  <StyledHeading5> {item.address} </StyledHeading5>
-                  <StyledHeading5> {item.country} </StyledHeading5>
+                  <StyledHeading5> Vottunarkerfi: {item.certSystem} </StyledHeading5>
+                  <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
+                  <StyledHeading5> Land: {item.country} </StyledHeading5>
+                  <StyledHeading5> Staða: {item.status} </StyledHeading5>
                 </ProjectCard>)
               })}
               </MyProjectsContent>
