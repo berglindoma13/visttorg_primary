@@ -138,8 +138,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return { props: { productListString, certificates: certificateListString, companies: companyListString, certificateCounts, companyCounts, certificateSystems: certificateSystemListString }}
 }
 
-
-
 const Home = ({ productListString, certificates, companies, certificateCounts, companyCounts, certificateSystems } : HomeProps) => {
 
   const productList: Array<ProductProps> = superjson.parse(productListString)
@@ -149,14 +147,14 @@ const Home = ({ productListString, certificates, companies, certificateCounts, c
 
   return(
     <Page>
+      <Header showSearch={false}/>
+      <Banner />
       <PageContainer>
-        <StyledHeader showSearch={false}/>
-        <StyledBanner />
-        <CategoryBoxes>
+        {/* <CategoryBoxes>
           <FrontpageCatBox color='orange' iconImage='Sink' title='Baðherbergi' url='/?cat=Baðherbergi#search'/>
           <FrontpageCatBox color='green' iconImage='PaperPen' title='Gólfefni' url='/?cat=Gólfefni#search'/>
           <FrontpageCatBox color='purple' iconImage='PaintBucket' title='Málning' url='/?cat=Málningarvörur#search'/>
-        </CategoryBoxes>
+        </CategoryBoxes> */}
         <SearchPage 
           products={productList} 
           certificates={certificateList} 
@@ -265,18 +263,6 @@ const PageContainer = styled.div`
 const Page = styled.div`
   min-height:100vh;
   background-color: ${({ theme }) => theme.colors.grey_one};
-`
-
-const StyledHeader = styled(Header)`
-  margin-bottom:50px;
-`
-
-const StyledBanner = styled(Banner)`
-  margin-bottom:155px;
-
-  @media ${mediaMax.tablet}{
-    margin-bottom:95px;
-  }
 `
 
 const CategoryBoxes = styled.div`

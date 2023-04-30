@@ -9,35 +9,38 @@ import { mediaMax } from '../../constants/breakpoints'
 
 export const Banner = (props: any) => {
   return(
-    <HeaderWrapper {...props}>
-      <HeaderLeftContent>
+    <BannerWrapper {...props}>
+      <BannerLeftContent>
         <StyledHeading1>Við spörum þér leitina</StyledHeading1>
-        <StyledHeading4>Umhverfisvænar byggingarvörur á einum stað</StyledHeading4>
-        <FakeInputWrapper>
+        <Heading4>Umhverfisvænar byggingarvörur á einum stað</Heading4>
+        {/* <FakeInputWrapper>
           <StyledMagnifyingGlass />
           <FakeTextInputButton href='#search'>
             <FakeTextInputText>Leita eftir vöru</FakeTextInputText>
           </FakeTextInputButton>
-        </FakeInputWrapper>
-      </HeaderLeftContent>
-      <HeaderRightContent>
+        </FakeInputWrapper> */}
+      </BannerLeftContent>
+      <BannerRightContent>
         <Image src={EarthImage} alt='Grafík af jörðinni'/>
-      </HeaderRightContent>
-    </HeaderWrapper>
+      </BannerRightContent>
+    </BannerWrapper>
   )
 }
 
-const HeaderWrapper = styled.div`
-  padding: 42px 11% 0px 5%;
+const BannerWrapper = styled.div`
+  padding: 42px 11% 50px 5%;
   width:100%;
   display:flex;
   flex-direction:row;
   justify-content: space-between;
-  align-items: center;
+  align-items: center;;
+  margin-bottom:50px;
+  background-color: ${({ theme }) => theme.colors.primary.light};
 
   @media ${mediaMax.tablet}{
     flex-direction:column;
-    padding: 0 23px;
+    padding: 40px 23px 0 23px;
+    margin-bottom:45px;
   }
 `
 
@@ -45,17 +48,13 @@ const StyledHeading1 = styled(Heading1)`
   margin-bottom: 30px;
 `
 
-const StyledHeading4 = styled(Heading4)`
-  margin-bottom: 90px;
-`
-
-const HeaderLeftContent = styled.div`
+const BannerLeftContent = styled.div`
   @media ${mediaMax.tablet}{
     margin-bottom:35px;
   }
 `
 
-const HeaderRightContent = styled.div`
+const BannerRightContent = styled.div`
   width: 400px;
 
   @media ${mediaMax.tablet}{
