@@ -19,7 +19,9 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useRouter } from 'next/router';
 import { validateEmail } from '../utils/emailValidation';
 import { Spin } from 'antd';
+import { readCookie } from '../utils/readCookie';
 
+const COOKIE_NAME = 'vistbokUser'
 const salt = bcrypt.genSaltSync(10)
 
 interface User {
@@ -63,15 +65,15 @@ const Login = () => {
     })
     .then((responsejson) => {
       console.log('success', responsejson)
-      sessionStorage.setItem('jwttoken', responsejson)
+      document.cookie = `${COOKIE_NAME}=${JSON.stringify(responsejson)}`
       setIsLoading(false);
       router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
         console.error('isAxios error', err.response.data)
-        // Access to config, request, and response
-        // User does not exist, setting error message
+        setLoginError(true);
+        setMessage("Villa við innskráningu, reyndu aftur seinna");
         setIsLoading(false);
         if(err.response.data == "user not found") {
           setLoginError(true);
@@ -85,6 +87,8 @@ const Login = () => {
       } else {
         console.error('is regular error', err)
         // Just a stock error
+        setLoginError(true);
+        setMessage("Villa við innskráningu, reyndu aftur seinna");
       }
     })
   };
@@ -112,19 +116,23 @@ const Login = () => {
     .then((responsejson) => {
       console.log('success', responsejson);
       setIsLoading(false);
-      sessionStorage.setItem('jwttoken', responsejson)
+      document.cookie = `${COOKIE_NAME}=${JSON.stringify(responsejson)}`
+      router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
         setIsLoading(false);
-        console.error('isAxios error', !!err.response.data && err.response.data)
-        if(err.response.data == "user already exists") {
+        setLoginError(true);
+        setMessage("Villa við innskráningu, reyndu aftur seinna");
+        console.error('isAxios error', err)
+        if(!!err.response && err.response.data == "user already exists") {
           setLoginError(true);
           setMessage("Þetta netfang er í notkun");
         }
-        // Access to config, request, and response
       } else {
         console.error('is regular error', err)
+        setLoginError(true);
+        setMessage("Villa við innskráningu, reyndu aftur seinna");
         // Just a stock error
       }
     })
@@ -140,10 +148,9 @@ const Login = () => {
   const [isNewUser, setIsNewUser] = useState(false)
 
   useEffect(() => {
-    const token = sessionStorage.getItem('jwttoken');
+    const token = readCookie(COOKIE_NAME);
     if(!!token){
-      const decoded = jwt_decode(token);
-      console.log(decoded);
+      router.push('/minarsidur')
     }
   }, [])
 
@@ -334,7 +341,7 @@ const TextWithLine = styled.div`
 
 const ErrorMessage = styled.div`
   margin-top:5px;
-  color:DimGrey;
+  color:red;
 `
 
 // const StyledProduct = styled(Product)`
