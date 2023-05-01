@@ -119,7 +119,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   })
   
   // CERTIFICATE COUNTS
-  const certificateCounts: Array<CertCountProps> = []
+  const certificateCounts: Array<CertCountProps> = [] 
   certificates.map(cert => {
     if(cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC') {
       const validCertificates = cert.productcertificate.filter(filterValidDate)

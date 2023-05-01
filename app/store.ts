@@ -1,9 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { loadState } from './browser-storage';
 import favoriteReducer from './features/favorites/favoriteSlice'
+import authReducer from './features/auth/authSlice'
 
 const reducers = combineReducers({
   favorites: favoriteReducer,
+  auth: authReducer
 });
 
 const store = configureStore({

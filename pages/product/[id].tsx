@@ -134,42 +134,34 @@ const Product = ({ productString } : ProductPageProps) => {
               >
               <SwiperSlide>
                 <ImageWrapper>
-                  <Image
+                  <StyledImage
                     src={product.productimageurl} 
                     alt={`product image - ${product.title}`} 
-                    layout="fill"
-                    objectFit="contain"
                   />
                 </ImageWrapper>
               </SwiperSlide>
               <SwiperSlide>
                 <ImageWrapper>
-                  <Image
+                  <StyledImage
                     src={product.productimageurl} 
                     alt={`product image - ${product.title}`} 
-                    layout="fill"
-                    objectFit="contain"
                   />
                 </ImageWrapper>
               </SwiperSlide>
               <SwiperSlide>
                 <ImageWrapper>
-                  <Image
+                  <StyledImage
                     src={product.productimageurl} 
                     alt={`product image - ${product.title}`} 
-                    layout="fill"
-                    objectFit="contain"
                   />
                 </ImageWrapper>
               </SwiperSlide>
               </Swiper>
             ) : (
               <ImageWrapper>
-                {product.productimageurl && <Image
+                {product.productimageurl && <StyledImage
                   src={product.productimageurl} 
                   alt={`product image - ${product.title}`} 
-                  layout="fill"
-                  objectFit="contain"
                 />}
               </ImageWrapper>
             )}
@@ -244,6 +236,12 @@ const Product = ({ productString } : ProductPageProps) => {
 }
 
 export default Product
+
+const StyledImage = styled.img`
+  object-fit: contain;
+  height:100%;
+  width:100%;
+`
 
 const FileLinks = styled.a`
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
