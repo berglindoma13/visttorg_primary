@@ -12,15 +12,17 @@ import jwt_decode from 'jwt-decode';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
 import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
-import { GetServerSideProps } from 'next'
 import { prismaInstance } from '../lib/prisma'
 import axios, { AxiosError } from 'axios';
+import { useAppSelector, useAppDispatch } from '../app/hooks'
+import { login } from '../app/features/auth/authSlice';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 interface User {
-  fullName?: string
+  fullname?: string
   email: string
   company?: string
-  jobTitle?: string
+  jobtitle?: string
   password: string
 }
 
@@ -38,12 +40,23 @@ interface AllProjects {
   projects: Array<NewProject>
 }
 
-interface minarsidurProps {
+interface MinarSidurProps {
+  user: User
   projectList: Array<NewProject>
-  certificateSystemList: Array<string>
+  certificateSystemList?: Array<string>
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+// interface MinarSidurProps {
+//   user: User
+// }
+
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+
+  console.log('currentUser', context.req.cookies.vistbokUser)
+
+  const currentUser = context.req.cookies.vistbokUser
+
+  const user = jwt_decode(currentUser)
 
   const email = "mariaoma@gmail.com"
 
@@ -64,13 +77,19 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   console.log('cert systems', certificateSystems[0].name)
 
-  return { props: { projectList }}
+  // return { props: { projectList }}
+
+  return {
+    props: {
+      user: user,
+      projectList: projectList,
+    }
+  }
 }
 
+const MinarSidur = ({ user, projectList } : MinarSidurProps) => {
 
-const minarsidur = ({ projectList } : minarsidurProps) => {
-
-  const [user, setUser] = useState<User>(null)
+  // const [user, setUser] = useState<User>(null)
   const [open, setOpen] = useState(true);
   // const [dropDownOpen, setDropDownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,17 +97,16 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
 
   const [projects, setProjects] = useState<AllProjects>({count:projectList.length,projects:projectList})
 
+
+  // const [open, setOpen] = useState(true);
+  // const [dropDownOpen, setDropDownOpen] = useState(false);
+
   const router = useRouter()
 
   useEffect(() => {
-    const token = sessionStorage.getItem('jwttoken');
-    if(!!token){
-      const decoded: any = jwt_decode(token);
-      console.log("decoded", decoded);
-      setUser({ fullName: decoded.fullname, jobTitle: decoded.jobtitle, company: decoded.company, email: decoded.email, password: decoded.password })
-    }
-    else {
-      // reroute user to the login site when not logged in
+    console.log('user', user)
+    if(!user){
+      console.log('in here')
       router.push('/login')
     }
   }, [])
@@ -194,7 +212,7 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
           <UserHeader >
             <UsernameContainer>
               <UserOutlined style={{ fontSize: '20px' }}/>
-              <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {user.fullName}</StyledHeading5> 
+              <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {user.fullname}</StyledHeading5> 
               {/* <NavItem onClick={() => onCloseDropDown()}>
                 <DownOutlined />
               </NavItem> */}
@@ -207,9 +225,9 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
           >
             <StyledHeading5> Mitt svæði </StyledHeading5>
             <UserCardContainer>
-              <MainHeading> {user.fullName}</MainHeading>
+              <MainHeading> {user.fullname}</MainHeading>
               <StyledHeading5> {user.company}</StyledHeading5> 
-              <StyledHeading5> {user.jobTitle}</StyledHeading5> 
+              <StyledHeading5> {user.jobtitle}</StyledHeading5> 
             </UserCardContainer>
             <MyProjectsContainer>
               <MyProjectsHeader>
@@ -277,6 +295,8 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
     </Page>
   )
 }
+
+export default MinarSidur
 
 const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.grey_one};
@@ -418,5 +438,3 @@ const NavItem = styled.span`
     color: ${({ theme }) => theme.colors.green};
   }
 `
-
-export default minarsidur

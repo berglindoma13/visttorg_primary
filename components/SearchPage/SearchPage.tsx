@@ -431,8 +431,7 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
         : <ProductCountText>{`${filteredProductList.length} af ${products.length}`}</ProductCountText>
       }
       <CategoryFilters>
-        {isTablet ? <StyledFilterButton text='Sía' numberString={"("+numberOfActiveFilters+")"} onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
-          : <StyledFilterButton text='Sía' onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />}
+        <StyledFilterButton text='Sía' numberString={"("+numberOfActiveFilters+")"} onClick={() => setFilterDrawerIsActive(!filterDrawerIsActive)} active={filterDrawerIsActive} />
         {VisttorgCategories.map(cat => {
           if(cat.weight == 1) {
             return(
@@ -447,23 +446,24 @@ export const SearchPage = ({ products = [], certificates, companies, certificate
             )
           }
         })}
+        {/* {numberOfActiveFilters > 0 && filteredProductList.length !== 0 &&
+          <ShowsizeWrapper>
+            <StyledMainButton 
+              text="20"
+              onClick={() => SetPaginationPageSize(20)}
+              active={paginationPageSize===20} />
+            <StyledMainButton 
+              text="40"
+              onClick={() => SetPaginationPageSize(40)}
+              active={paginationPageSize===40} />
+            <StyledMainButton 
+              text="60"
+              onClick={() => SetPaginationPageSize(60)}
+              active={paginationPageSize===60} />
+          </ShowsizeWrapper>
+        } */}
       </CategoryFilters>
-      {numberOfActiveFilters > 0 && filteredProductList.length !== 0 &&
-        <ShowsizeWrapper>
-          <StyledMainButton 
-            text="20"
-            onClick={() => SetPaginationPageSize(20)}
-            active={paginationPageSize===20} />
-          <StyledMainButton 
-            text="40"
-            onClick={() => SetPaginationPageSize(40)}
-            active={paginationPageSize===40} />
-          <StyledMainButton 
-            text="60"
-            onClick={() => SetPaginationPageSize(60)}
-            active={paginationPageSize===60} />
-        </ShowsizeWrapper>
-      }
+     
       <ProductsAndFilter
         animate={controls}
         transition={{ type: "Tween" }}
@@ -779,10 +779,11 @@ const StyledFilterButton = styled(FilterButton)``
 const CategoryFilters = styled.div`
   display:flex;
   flex-direction:row;
-  padding: 0 13%;
+  /* padding: 0 13%; */
+  margin-left:30px;
   align-items: center;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   height: 150px;
   overflow:scroll;
 

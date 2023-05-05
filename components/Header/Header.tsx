@@ -95,7 +95,7 @@ const HeaderWrapper = styled.div`
   padding: 0 88px;
 
   @media ${mediaMax.tablet}{
-    padding: 0 35px;
+    padding: 0 35px;    
   }
 `
 
