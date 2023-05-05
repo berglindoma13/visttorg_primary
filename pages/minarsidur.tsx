@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
 import { TextInput } from '../components/Inputs'
-import { Button, Modal } from 'antd';
+import { Button, Modal, Select } from 'antd';
 import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
@@ -40,6 +40,7 @@ interface AllProjects {
 
 interface minarsidurProps {
   projectList: Array<NewProject>
+  certificateSystemList: Array<string>
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
@@ -54,6 +55,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   });
 
   console.log('project list', projectList)
+
+  // Get list of certificate systems
+  const certificateSystems = await prismaInstance.certificatesystem.findMany({});
+  // certificateSystems.map({
+
+  // })
+
+  console.log('cert systems', certificateSystems[0].name)
 
   return { props: { projectList }}
 }
@@ -148,7 +157,7 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
+  const handleOkModal = () => {
     // if user presses ok
     setIsModalOpen(false);
     setProjects({count: projects.projects.length+1, projects: [...projects.projects, newProjectParam] })
@@ -156,16 +165,21 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
     onProjectCreation()
   };
 
-  const handleCancel = () => {
+  const handleCancelModal = () => {
     // if user cancels or closes modal
     setIsModalOpen(false);
   };
 
-  const onChange = () => {
+  const onChangeSidebar = () => {
     console.log("count", projects.count)
     setOpen(!open);
   };
 
+  const handleChangeSelect = (value: string) => {
+    console.log(`selected ${value}`);
+  };
+
+  // fyrir útskráningu
   // const onCloseDropDown = () => {
   //   setDropDownOpen(!dropDownOpen);
   //   console.log('dropdown open', dropDownOpen)
@@ -176,7 +190,7 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
       <PageContainer>
         {/* <StyledHeader showSearch={true} /> */}
         {!!user && <ContentContainer>
-          <MyPagesSidebar onClick={onChange} open={open} />
+          <MyPagesSidebar onClick={onChangeSidebar} open={open} />
           <UserHeader >
             <UsernameContainer>
               <UserOutlined style={{ fontSize: '20px' }}/>
@@ -204,7 +218,7 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
                 <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
               </MyProjectsHeader>
               <MyProjectsContent>
-              <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+              <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
                 <div >
                   <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
                   {/* <StyledHeading5> Titill </StyledHeading5> */}
@@ -214,6 +228,17 @@ const minarsidur = ({ projectList } : minarsidurProps) => {
                       value={newProjectParam.title}
                   />
                   {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
+                  <Select
+                    defaultValue="Vottunarkerfi"
+                    style={{ width: 120 }}
+                    onChange={handleChangeSelect}
+                    options={[
+                      { value: 'jack', label: 'Jack' },
+                      { value: 'lucy', label: 'Lucy' },
+                      { value: 'Yiminghe', label: 'yiminghe' },
+                      { value: 'disabled', label: 'Disabled', disabled: true },
+                    ]}
+                  />
                   <StyledInput 
                       placeholder='Vottunarkerfi'
                       onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:input.target.value,address:newProjectParam.address,country:newProjectParam.country})}}
