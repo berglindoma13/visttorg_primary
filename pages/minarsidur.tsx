@@ -26,39 +26,39 @@ interface User {
   password: string
 }
 
-//breyta nafninu í single project
-interface NewProject {
+interface SingleProject {
   title: string
-  certSystem: string
+  certificatesystem: string
   address: string
   country: string
   status?: string
 }
 
+interface CertificateSystem {
+  value: string
+  label: string
+}
+
 interface AllProjects {
   count: number
-  projects: Array<NewProject>
+  projects: Array<SingleProject>
 }
 
 interface MinarSidurProps {
   user: User
-  projectList: Array<NewProject>
-  certificateSystemList?: Array<string>
+  projectList: Array<SingleProject>
+  certificateSystemList?: Array<CertificateSystem>
 }
-
-// interface MinarSidurProps {
-//   user: User
-// }
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
 
-  console.log('currentUser', context.req.cookies.vistbokUser)
+  // console.log('currentUser', context.req.cookies.vistbokUser)
 
   const currentUser = context.req.cookies.vistbokUser
 
-  const user = jwt_decode(currentUser)
+  const user : User = jwt_decode(currentUser)
 
-  const email = "mariaoma@gmail.com"
+  const email = user.email
 
   // ALL PROJECTS
   const projectList = await prismaInstance.vistbokProject.findMany({
@@ -67,33 +67,28 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     }
   });
 
-  console.log('project list', projectList)
-
   // Get list of certificate systems
   const certificateSystems = await prismaInstance.certificatesystem.findMany({});
-  // certificateSystems.map({
-
-  // })
-
-  console.log('cert systems', certificateSystems[0].name)
-
-  // return { props: { projectList }}
+  const filteredcertificateSystems = certificateSystems.map(cert => {
+    return {value: cert.name, lable: cert.name}
+  })
 
   return {
     props: {
       user: user,
       projectList: projectList,
+      certificateSystemList: filteredcertificateSystems,
     }
   }
 }
 
-const MinarSidur = ({ user, projectList } : MinarSidurProps) => {
+const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurProps) => {
 
   // const [user, setUser] = useState<User>(null)
   const [open, setOpen] = useState(true);
   // const [dropDownOpen, setDropDownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newProjectParam, setNewProjectParam] = useState<NewProject>({title:"", certSystem:"", address:"", country:""})
+  const [newProjectParam, setNewProjectParam] = useState<SingleProject>({title:"", certificatesystem:"", address:"", country:""})
 
   const [projects, setProjects] = useState<AllProjects>({count:projectList.length,projects:projectList})
 
@@ -112,10 +107,12 @@ const MinarSidur = ({ user, projectList } : MinarSidurProps) => {
   }, [])
 
   const onProjectCreation = () => {
+    console.log('new project to create', newProjectParam)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproject`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         title: newProjectParam.title,
+        certificatesystem: newProjectParam.certificatesystem,
         address: newProjectParam.address,
         country: newProjectParam.country,
         status: "In progress",
@@ -193,10 +190,6 @@ const MinarSidur = ({ user, projectList } : MinarSidurProps) => {
     setOpen(!open);
   };
 
-  const handleChangeSelect = (value: string) => {
-    console.log(`selected ${value}`);
-  };
-
   // fyrir útskráningu
   // const onCloseDropDown = () => {
   //   setDropDownOpen(!dropDownOpen);
@@ -242,37 +235,28 @@ const MinarSidur = ({ user, projectList } : MinarSidurProps) => {
                   {/* <StyledHeading5> Titill </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Titill'
-                      onChange={(input) => {setNewProjectParam({title:input.target.value,certSystem:newProjectParam.certSystem, address:newProjectParam.address,country:newProjectParam.country})}}
+                      onChange={(input) => {setNewProjectParam({title:input.target.value,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:newProjectParam.country})}}
                       value={newProjectParam.title}
                   />
                   {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
                   <Select
-                    defaultValue="Vottunarkerfi"
-                    style={{ width: 120 }}
-                    onChange={handleChangeSelect}
-                    options={[
-                      { value: 'jack', label: 'Jack' },
-                      { value: 'lucy', label: 'Lucy' },
-                      { value: 'Yiminghe', label: 'yiminghe' },
-                      { value: 'disabled', label: 'Disabled', disabled: true },
-                    ]}
-                  />
-                  <StyledInput 
-                      placeholder='Vottunarkerfi'
-                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:input.target.value,address:newProjectParam.address,country:newProjectParam.country})}}
-                      value={newProjectParam.certSystem}
+                    placeholder="Vottunarkerfi"
+                    style={{ width: '100%' }}
+                    // onChange={handleChangeSelect}
+                    onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:input,address:newProjectParam.address,country:newProjectParam.country})}}
+                    options={certificateSystemList}
                   />
                   {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
                   {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Heimilisfang'
-                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:newProjectParam.certSystem, address:input.target.value,country:newProjectParam.country})}}
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:input.target.value,country:newProjectParam.country})}}
                       value={newProjectParam.address}
                   />
                   {/* <StyledHeading5> Land </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Land'
-                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certSystem:newProjectParam.certSystem, address:newProjectParam.address,country:input.target.value})}}
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:input.target.value})}}
                       value={newProjectParam.country}
                   />
                 </div>
@@ -281,7 +265,7 @@ const MinarSidur = ({ user, projectList } : MinarSidurProps) => {
                 return(
                 <ProjectCard key={item.title}>
                   <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
-                  <StyledHeading5> Vottunarkerfi: {item.certSystem} </StyledHeading5>
+                  <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
                   <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
                   <StyledHeading5> Land: {item.country} </StyledHeading5>
                   <StyledHeading5> Staða: {item.status} </StyledHeading5>
