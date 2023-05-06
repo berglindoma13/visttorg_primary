@@ -10,6 +10,7 @@ import { UserOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 interface User {
     fullName?: string
@@ -19,25 +20,65 @@ interface User {
     password: string
 }
 
-const minverkefni = () => {
+interface SingleProject {
+  title: string
+  certificatesystem: string
+  address: string
+  country: string
+  status?: string
+}
 
-    const [user, setUser] = useState<User>(null)
+interface MinVerkefniProps {
+  user: User
+}
+
+
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+
+  // console.log('currentUser', context.req.cookies.vistbokUser)
+
+  const bla = context.req
+
+  console.log('context.req', bla)
+
+  const currentUser = context.req.cookies.vistbokUser
+
+  const user : User = jwt_decode(currentUser)
+
+  return {
+    props: {
+      user: user,
+    }
+  }
+}
+
+const minverkefni = ({ user } : MinVerkefniProps) => {
+
+    // const [user, setUser] = useState<User>(null)
     const [open, setOpen] = useState(true);
   
     const router = useRouter()
-  
+
     useEffect(() => {
-        const token = sessionStorage.getItem('jwttoken');
-        if(!!token){
-          const decoded: any = jwt_decode(token);
-          console.log("decoded", decoded);
-          setUser({ fullName: decoded.fullname, jobTitle: decoded.jobtitle, company: decoded.company, email: decoded.email, password: decoded.password })
-        }
-        else {
-          // reroute user to the login site when not logged in
-          router.push('/login')
-        }
-      }, [])
+      console.log('user', user)
+      if(!user){
+        console.log('in here')
+        router.push('/login')
+      }
+    }, [])
+  
+    // useEffect(() => {
+    //     const token = sessionStorage.getItem('jwttoken');
+    //     if(!!token){
+    //       const decoded: any = jwt_decode(token);
+    //       console.log("decoded", decoded);
+    //       setUser({ fullName: decoded.fullname, jobTitle: decoded.jobtitle, company: decoded.company, email: decoded.email, password: decoded.password })
+    //     }
+    //     else {
+    //       // reroute user to the login site when not logged in
+    //       router.push('/login')
+    //     }
+    //   }, [])
     
       //Framer motion controls for showing and hiding filter drawer
       const pageContentControls = useAnimation()
@@ -78,6 +119,7 @@ const minverkefni = () => {
     return(
     <Page>
       <PageContainer>
+            {!!user && <div>
             <MyPagesSidebar onClick={onChange} open={open} />
             <UserHeader >
                 <UsernameContainer>
@@ -91,6 +133,7 @@ const minverkefni = () => {
             >
                 <StyledHeading5> Mín Verkefni </StyledHeading5>
             </InformationContainer>
+            </div>}
       </PageContainer>
     </Page>
   )

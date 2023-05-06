@@ -88,6 +88,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   const [open, setOpen] = useState(true);
   // const [dropDownOpen, setDropDownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [newProjectParam, setNewProjectParam] = useState<SingleProject>({title:"", certificatesystem:"", address:"", country:""})
 
   const [projects, setProjects] = useState<AllProjects>({count:projectList.length,projects:projectList})
@@ -186,9 +187,14 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   };
 
   const onChangeSidebar = () => {
-    console.log("count", projects.count)
+    // console.log("count", projects.count)
     setOpen(!open);
   };
+
+  const test = (item) => {
+    console.log("item", item)
+    router.push({pathname:'/verkefni', query: {title: item.title, certificatesystem: item.certificatesystem, address: item.address, country: item.country, status: item.status}})
+  }
 
   // fyrir útskráningu
   // const onCloseDropDown = () => {
@@ -263,7 +269,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
               </Modal>
               {projects.count !== 0 && projects.projects.map((item) => {
                 return(
-                <ProjectCard key={item.title}>
+                <ProjectCard key={item.title} onClick={() => test(item)} >
                   <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
                   <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
                   <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
