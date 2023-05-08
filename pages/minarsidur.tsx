@@ -52,8 +52,6 @@ interface MinarSidurProps {
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
 
-  // console.log('currentUser', context.req.cookies.vistbokUser)
-
   const currentUser = context.req.cookies.vistbokUser
 
   const user : User = jwt_decode(currentUser)
@@ -177,7 +175,6 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     // if user presses ok
     setIsModalOpen(false);
     setProjects({count: projects.projects.length+1, projects: [...projects.projects, newProjectParam] })
-    console.log(" projects", projects)
     onProjectCreation()
   };
 
@@ -187,7 +184,6 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   };
 
   const onChangeSidebar = () => {
-    // console.log("count", projects.count)
     setOpen(!open);
   };
 

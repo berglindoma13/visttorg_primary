@@ -44,8 +44,6 @@ interface VerkefniProps {
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
 
-  // console.log('currentUser', context.req.cookies.vistbokUser)
-
   const currentUser = context.req.cookies.vistbokUser
 
   const user : User = jwt_decode(currentUser)
@@ -121,7 +119,6 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
     }, [open])
 
     const onProjectUpdate = () => {
-        // console.log('original tilte', originalTitle)
         axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/updateproject`, {
           headers: { 'Content-Type': 'application/json' },
           data: {

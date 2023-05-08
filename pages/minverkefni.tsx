@@ -34,13 +34,6 @@ interface MinVerkefniProps {
 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-
-  // console.log('currentUser', context.req.cookies.vistbokUser)
-
-  const bla = context.req
-
-  console.log('context.req', bla)
-
   const currentUser = context.req.cookies.vistbokUser
 
   const user : User = jwt_decode(currentUser)
