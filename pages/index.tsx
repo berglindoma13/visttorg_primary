@@ -263,6 +263,7 @@ const PageContainer = styled.div`
 const Page = styled.div`
   min-height:100vh;
   background-color: ${({ theme }) => theme.colors.grey_one};
+  padding-top:92px;
 `
 
 const CategoryBoxes = styled.div`
