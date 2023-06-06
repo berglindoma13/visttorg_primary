@@ -9,6 +9,7 @@ import Earth from '../public/Earth.svg'
 import Image from 'next/image'
 import { mediaMax } from '../constants/breakpoints'
 import BykoLogoSvg from '../components/Svg/Logos/Byko'
+import { ServerResponse } from 'http'
 
 const UmOkkur = () => {
   return(
@@ -199,3 +200,7 @@ const Box = styled.div<BoxProps>`
     min-height: 355px;
   }
 `
+
+function getServerSession(req: import("http").IncomingMessage & { cookies: Partial<{ [key: string]: string }> }, res: ServerResponse, authOptions: any) {
+  throw new Error('Function not implemented.')
+}
