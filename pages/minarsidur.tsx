@@ -2,14 +2,9 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
-import { Button } from 'antd';
-import { HomeFilled,
-        ProfileFilled,
-        ToolFilled,
-        SearchOutlined,
-        RightOutlined,
-        LeftOutlined,
-        DownOutlined,
+import { TextInput } from '../components/Inputs'
+import { Button, Modal, Select } from 'antd';
+import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
@@ -17,9 +12,12 @@ import jwt_decode from 'jwt-decode';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
 import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
+import { prismaInstance } from '../lib/prisma'
+import axios, { AxiosError } from 'axios';
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { login } from '../app/features/auth/authSlice';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
 interface User {
   fullname?: string
   email: string
@@ -28,26 +26,76 @@ interface User {
   password: string
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+interface SingleProject {
+  title: string
+  certificatesystem: string
+  address: string
+  country: string
+  status?: string
+}
 
-  console.log('currentUser', context.req.cookies.vistbokUser)
+interface CertificateSystem {
+  value: string
+  label: string
+}
 
-  const currentUser = context.req.cookies.vistbokUser
-
-  const user = jwt_decode(currentUser)
-
-  return {
-    props: {
-       user
-    }
-  }
+interface AllProjects {
+  count: number
+  projects: Array<SingleProject>
 }
 
 interface MinarSidurProps {
   user: User
+  projectList: Array<SingleProject>
+  certificateSystemList?: Array<CertificateSystem>
 }
 
-const MinarSidur = ({ user }: MinarSidurProps ) => {
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+
+  // console.log('currentUser', context.req.cookies.vistbokUser)
+
+  const currentUser = context.req.cookies.vistbokUser
+
+  const user : User = jwt_decode(currentUser)
+
+  const email = user.email
+
+  // ALL PROJECTS
+  const projectList = await prismaInstance.vistbokProject.findMany({
+    where: {
+      ownerEmail: email
+    }
+  });
+
+  // Get list of certificate systems
+  const certificateSystems = await prismaInstance.certificatesystem.findMany({});
+  const filteredcertificateSystems = certificateSystems.map(cert => {
+    return {value: cert.name, lable: cert.name}
+  })
+
+  return {
+    props: {
+      user: user,
+      projectList: projectList,
+      certificateSystemList: filteredcertificateSystems,
+    }
+  }
+}
+
+const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurProps) => {
+
+  // const [user, setUser] = useState<User>(null)
+  const [open, setOpen] = useState(true);
+  // const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newProjectParam, setNewProjectParam] = useState<SingleProject>({title:"", certificatesystem:"", address:"", country:""})
+
+  const [projects, setProjects] = useState<AllProjects>({count:projectList.length,projects:projectList})
+
+
+  // const [open, setOpen] = useState(true);
+  // const [dropDownOpen, setDropDownOpen] = useState(false);
+
   const router = useRouter()
 
   useEffect(() => {
@@ -58,8 +106,32 @@ const MinarSidur = ({ user }: MinarSidurProps ) => {
     }
   }, [])
 
-  const [open, setOpen] = useState(true);
-  // const [dropDownOpen, setDropDownOpen] = useState(false);
+  const onProjectCreation = () => {
+    console.log('new project to create', newProjectParam)
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproject`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: {
+        title: newProjectParam.title,
+        certificatesystem: newProjectParam.certificatesystem,
+        address: newProjectParam.address,
+        country: newProjectParam.country,
+        status: "In progress",
+        ownerEmail: user.email,
+      }
+    }).then((response) => {
+      if (response.status === 200) {
+        return response.data;
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responsejson) => {
+      console.log('success', responsejson);
+    })
+    .catch((err: Error | AxiosError) => {
+      console.log("error", err)
+    })
+  };
 
   //Framer motion controls for showing and hiding filter drawer
   const pageContentControls = useAnimation()
@@ -96,10 +168,29 @@ const MinarSidur = ({ user }: MinarSidurProps ) => {
     }
   }, [open])
 
-  const onChange = () => {
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOkModal = () => {
+    // if user presses ok
+    setIsModalOpen(false);
+    setProjects({count: projects.projects.length+1, projects: [...projects.projects, newProjectParam] })
+    console.log(" projects", projects)
+    onProjectCreation()
+  };
+
+  const handleCancelModal = () => {
+    // if user cancels or closes modal
+    setIsModalOpen(false);
+  };
+
+  const onChangeSidebar = () => {
+    console.log("count", projects.count)
     setOpen(!open);
   };
 
+  // fyrir útskráningu
   // const onCloseDropDown = () => {
   //   setDropDownOpen(!dropDownOpen);
   //   console.log('dropdown open', dropDownOpen)
@@ -110,7 +201,7 @@ const MinarSidur = ({ user }: MinarSidurProps ) => {
       <PageContainer>
         {/* <StyledHeader showSearch={true} /> */}
         {!!user && <ContentContainer>
-          <MyPagesSidebar onClick={onChange} open={open} />
+          <MyPagesSidebar onClick={onChangeSidebar} open={open} />
           <UserHeader >
             <UsernameContainer>
               <UserOutlined style={{ fontSize: '20px' }}/>
@@ -132,9 +223,55 @@ const MinarSidur = ({ user }: MinarSidurProps ) => {
               <StyledHeading5> {user.jobtitle}</StyledHeading5> 
             </UserCardContainer>
             <MyProjectsContainer>
-              <StyledHeading5> Mín verkefni </StyledHeading5>
-              <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
-              <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" >Búa til verkefni <PlusOutlined /> </Button>
+              <MyProjectsHeader>
+                <StyledHeading5> Mín verkefni </StyledHeading5>
+                <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
+                <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
+              </MyProjectsHeader>
+              <MyProjectsContent>
+              <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
+                <div >
+                  <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
+                  {/* <StyledHeading5> Titill </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Titill'
+                      onChange={(input) => {setNewProjectParam({title:input.target.value,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:newProjectParam.country})}}
+                      value={newProjectParam.title}
+                  />
+                  {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
+                  <Select
+                    placeholder="Vottunarkerfi"
+                    style={{ width: '100%' }}
+                    // onChange={handleChangeSelect}
+                    onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:input,address:newProjectParam.address,country:newProjectParam.country})}}
+                    options={certificateSystemList}
+                  />
+                  {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
+                  {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Heimilisfang'
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:input.target.value,country:newProjectParam.country})}}
+                      value={newProjectParam.address}
+                  />
+                  {/* <StyledHeading5> Land </StyledHeading5> */}
+                  <StyledInput 
+                      placeholder='Land'
+                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:input.target.value})}}
+                      value={newProjectParam.country}
+                  />
+                </div>
+              </Modal>
+              {projects.count !== 0 && projects.projects.map((item) => {
+                return(
+                <ProjectCard key={item.title}>
+                  <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
+                  <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
+                  <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
+                  <StyledHeading5> Land: {item.country} </StyledHeading5>
+                  <StyledHeading5> Staða: {item.status} </StyledHeading5>
+                </ProjectCard>)
+              })}
+              </MyProjectsContent>
             </MyProjectsContainer>
           </InformationContainer>
         </ContentContainer>}
@@ -208,7 +345,45 @@ const UserCardContainer = styled.div`
 
 const MyProjectsContainer = styled.div`
   display:flex;
+  flex-direction:column;
+`
+
+const MyProjectsHeader = styled.div`
+  display:flex;
   flex-direction:row;
+`
+
+// css for all project cards together
+const MyProjectsContent = styled.div`
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  width:100%;
+  justify-content: flex-start;
+  height: 100%;
+`
+
+// css for a single project card
+const ProjectCard = styled.div`
+  // background: #d3d3d3;
+  background: #FFFFFF;
+  // height:200px;
+  // width:180px;
+  margin: 15px 30px 15px 0px;
+  min-width: 250px;
+  width: 18%;
+  height: auto;
+  max-height: 510px;
+  box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
+  border-radius: 16px;
+  display:flex;
+  flex-direction:column;
+  padding: 12px;
+  position:relative;
+  transition: box-shadow 0.2s ease-in;
+  cursor: pointer;
+  padding-bottom:40px;
+
 `
 
 const StyledHeader = styled(Header)`
@@ -226,32 +401,10 @@ const StyledHeading5 = styled(Heading5)`
   width:100%;
 `
 
-const DrawerHeaderContainer = styled.div`
-  display:flex;
-  flex-direction: row;
-  padding-bottom:20px;
-`
-
-const DrawerItemContainer = styled.div`
-  display:flex;
-  flex-direction: row;
-  // width:90%;
-  // padding-bottom:10px;
-  cursor: pointer;
-`
-
-const DrawerText = styled(Heading5)`
-  text-align:center;
-  font-size: 18px;
-  padding-left:10px;
-`
-
-const Sideline = styled.div`
-  height:1px;
-  width: 180px;
-  background-color:black;
-  margin-bottom:10px;
-  margin-top:4px;
+const StyledInput = styled(TextInput)`
+  margin-bottom:20px;
+  margin-top:20px;
+  // background: green;
 `
 
 const NavItem = styled.span`
