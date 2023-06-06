@@ -3,6 +3,7 @@ export interface ProductCertificate {
   certificate : Certificate
   validDate : Date
   certificateid: number
+  productid: string
 }
 
 export interface Certificate {

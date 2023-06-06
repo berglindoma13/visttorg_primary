@@ -68,7 +68,7 @@ const Product = ({ companyProducts, companyInfo } : companyAdminProps) => {
 
   const [productsState, setProductsState] = useState<Array<ProductDict>>(allproductsDict)
 
-  console.log('companyInfo', companyInfo)
+  // console.log('companyInfo', companyInfo)
 
   //Table needs to add, edit and delete lines and then update database -> button for resetting product from database
 
