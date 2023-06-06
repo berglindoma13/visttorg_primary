@@ -6,6 +6,8 @@ import { TextInput } from '../Inputs/TextInput/TextInput'
 import MagnifyingGlass from '../Svg/MagnifyingGlass'
 import { mediaMax } from '../../constants/breakpoints'
 import { useRouter } from 'next/router'
+import Hamburger from 'hamburger-react'
+import { useIsTablet } from '../../utils/mediaQuery/useMediaQuery'
 
 interface HeaderProps{
   showSearch: boolean
@@ -15,6 +17,9 @@ interface HeaderProps{
 export const Header = ({ showSearch, className }: HeaderProps) => {
   const router = useRouter()
   const [search, setSearch] = useState<string>('')
+  const isTablet = useIsTablet()
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const Submit = () => {
     router.push(`/?query=${search}#search`)
@@ -42,7 +47,42 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
         </>
       ) : ( 
         <SidebarWrapper>
-          <TopbarWrapper>
+          { !isTablet ?
+            <div>
+              <TopbarWrapper>
+                <Link href='/umokkur'>
+                  <NavItem>Um okkur</NavItem>
+                </Link>
+              </TopbarWrapper>
+              <TopbarWrapper>
+                <Link href='/thinarvorur'>
+                  <NavItem>Þínar vörur</NavItem>
+                </Link> 
+              </TopbarWrapper>
+              <TopbarWrapper>
+                <Link href='/verkfaerakistan'>
+                  <NavItem>Verkfærakistan</NavItem>
+                </Link> 
+              </TopbarWrapper>
+            </div>
+            : (
+              <Hamburger onToggle={() => {
+                if(!mobileMenuOpen){
+                  document.body.style.overflow = 'hidden';
+                }
+                else{
+                  document.body.style.overflow = 'auto';
+                }
+                setMobileMenuOpen(!mobileMenuOpen)} 
+                
+              }/>
+            )
+          }
+          
+        </SidebarWrapper>
+      )}
+      { isTablet && mobileMenuOpen && <MobileMenu>
+        <TopbarWrapper>
             <Link href='/umokkur'>
               <NavItem>Um okkur</NavItem>
             </Link>
@@ -62,11 +102,23 @@ export const Header = ({ showSearch, className }: HeaderProps) => {
               <NavItem>Verkfærakistan</NavItem>
             </Link> 
           </TopbarWrapper>
-        </SidebarWrapper>
-      )}
+      </MobileMenu>}
     </HeaderWrapper>
   )
 }
+
+const MobileMenu = styled.div`
+  width:100%;
+  height:calc(100vh - 92px);
+  background-color: ${({ theme }) => theme.colors.grey_one};
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position: absolute;
+  top: 92px;
+  left: 0;
+`
 
 const MobileSearchButton = styled.a`
   display:none;
@@ -93,9 +145,13 @@ const HeaderWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 88px;
+  position: fixed;
+  background: white;
+  z-index: 19;
+  top:0;
 
   @media ${mediaMax.tablet}{
-    padding: 0 35px;    
+    padding: 0 35px;
   }
 `
 

@@ -782,7 +782,7 @@ const CategoryFilters = styled.div`
   /* padding: 0 13%; */
   margin-left:30px;
   align-items: center;
-  width: 100%;
+  /* width: 100%; */
   justify-content: flex-start;
   height: 150px;
   overflow:scroll;
