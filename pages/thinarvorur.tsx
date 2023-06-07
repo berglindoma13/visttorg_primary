@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticProps } from 'next';
 import React, { useEffect, useState } from 'react'
 import { prismaInstance } from '../lib/prisma'
 import { ProductProps } from '../types/products';
@@ -12,7 +12,7 @@ import { mediaMax } from '../constants/breakpoints'
 import { Heading1, Heading5 } from '../components/Typography';
 
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (req) => {
 
   const productList = await prismaInstance.product.findMany({
     include: {
@@ -38,26 +38,21 @@ interface MyFavoritesProps {
 const MyFavorites = ({ productListString }: MyFavoritesProps) => {
   const productList: Array<ProductProps> = superjson.parse(productListString)
 
-  const myProducts = useAppSelector((state) => state.favorites.products)
-  const dispatch = useAppDispatch()
-
-  const [loading,setLoading] = useState(true)
-
+  // const myProducts = useAppSelector((state) => state.favorites.products)
   const [favorites,setFavorites] = useState([])
 
-  useEffect(() => {
-    const myFavs = window.localStorage.getItem('myFavorites')
-    getCurrentFavorites()
-  }, [])
+  // useEffect(() => {
+  //   getCurrentFavorites()
+  // }, [])
 
-  const getCurrentFavorites = () => {
-    const currentFavorites = productList.map(prod => {
-      if(myProducts.includes(prod.productid.toString())) {
-        return prod
-      }
-    }).filter(item => {return item !== undefined })
-    setFavorites(currentFavorites)
-  }
+  // const getCurrentFavorites = () => {
+  //   const currentFavorites = productList.map(prod => {
+  //     if(myProducts.includes(prod.productid.toString())) {
+  //       return prod
+  //     }
+  //   }).filter(item => {return item !== undefined })
+  //   setFavorites(currentFavorites)
+  // }
 
   return(
     <Page>
@@ -102,6 +97,8 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
     </Page>
   )
 }
+
+export default MyFavorites
 
 const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.grey_one};
@@ -151,4 +148,3 @@ const ProductList = styled.div`
   justify-content: center;
 `
 
-export default MyFavorites

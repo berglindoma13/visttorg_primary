@@ -51,11 +51,11 @@ export const Product = ({
           status={myProducts.includes(productId) ? 'enabled' : 'disabled'} />
         {productimageurl && 
         <ProductImage>
-          <Image
+          <StyledImage
             src={productimageurl}
             alt={`Product image for ${title}`}
-            layout='fill'
-            objectFit='contain'
+            // layout='fill'
+            // objectFit='contain'
           />
         </ProductImage>}
         <ProductDetails>
@@ -73,6 +73,12 @@ const StyledMainButton = styled(MainButton)`
   position: absolute;
   bottom: 10px;
   left: 45px;
+`
+
+const StyledImage = styled.img`
+  object-fit: contain;
+  height:100%;
+  width:100%;
 `
 
 const StyledProduct = styled.div`
