@@ -62,6 +62,7 @@ const PageContainer = styled.div`
 const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.grey_one};
   min-height:100vh;
+  padding-top:92px;
 `
 
 const StyledHeader = styled(Header)`
