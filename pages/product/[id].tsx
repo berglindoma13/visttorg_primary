@@ -122,8 +122,8 @@ const Product = ({ productString } : ProductPageProps) => {
 
   return(
     <Page>
+      <StyledHeader showSearch={true}/>
       <PageContainer>
-        <StyledHeader showSearch={true}/>
         <ProductInfo>
           <ProductInfoLeft>
             {showSwiper ? (
@@ -185,7 +185,8 @@ const Product = ({ productString } : ProductPageProps) => {
                     })}
                   </ProductCategories>
                 </div>
-                {product.certificates.filter(x => (x.certificateid === 1 || x.certificateid === 2 || x.certificateid === 3) && x.validDate !== null).length > 0 && 
+                {/* IF CERTIFICATE IS EPD, VOC, FSC OR ENERGY, THEN SHOW FILES */}
+                {product.certificates.filter(x => ((x.certificateid === 1 || x.certificateid === 2 || x.certificateid === 3 ) && x.validDate !== null) || x.certificateid === 10).length > 0 && 
                   <div style={{flex:1}}>
                     <UIBig style={{marginBottom: 15}}>Fylgiskjöl</UIBig>
                     <ProductCategories>
@@ -302,6 +303,7 @@ const PageContainer = styled.div`
   max-width: 1440px;
   margin: 0 auto;
   padding-bottom:200px;
+  padding-top:40px;
 `
 
 const StyledHeader = styled(Header)`
@@ -311,6 +313,7 @@ const StyledHeader = styled(Header)`
 const Page = styled.div`
   min-height:100vh;
   background-color: ${({ theme }) => theme.colors.grey_one};
+  padding-top:92px;
 `
 
 const ProductInfo = styled.div`
