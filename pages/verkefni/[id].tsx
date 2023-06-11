@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Header } from '../components/Header'
-import { Heading1, Heading5 } from '../components/Typography';
+import { Header } from '../../components/Header'
+import { Heading1, Heading5 } from '../../components/Typography';
 import { Drawer, Button, Modal, Select } from 'antd';
 import Link from 'next/link';
-import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
+import { MyPagesSidebar } from '../../components/Drawer/MyPagesSidebar'
 import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import axios, { AxiosError } from 'axios';
-import { prismaInstance } from '../lib/prisma'
-import { TextInput } from '../components/Inputs'
+import { prismaInstance } from '../../lib/prisma'
+import { TextInput } from '../../components/Inputs'
 
 
 interface User {
@@ -34,19 +34,22 @@ interface SingleProject {
   address: string
   country: string
   status?: string
+  id: string
 }
 
 interface VerkefniProps {
   user: User
   certificateSystemList?: Array<CertificateSystem>
+  thisProject: SingleProject
 }
 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+    const id = context.query.id !== undefined ? context.query.id.toString() : ''
 
-  const currentUser = context.req.cookies.vistbokUser
+    const currentUser = context.req.cookies.vistbokUser
 
-  const user : User = jwt_decode(currentUser)
+    const user : User = jwt_decode(currentUser)
 
     // Get list of certificate systems
     const certificateSystems = await prismaInstance.certificatesystem.findMany({});
@@ -54,21 +57,28 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
       return {value: cert.name, lable: cert.name}
     })
 
-  return {
-    props: {
-        user: user,
-        certificateSystemList: filteredcertificateSystems,
+    const thisProject = await prismaInstance.vistbokProject.findUnique({
+        where: {
+            id: parseInt(id)
+        }
+    })
+
+    return {
+        props: {
+            user,
+            certificateSystemList: filteredcertificateSystems,
+            thisProject
+        }
     }
-  }
 }
 
-const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
+const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) => {
 
     // const [user, setUser] = useState<User>(null)
     const [open, setOpen] = useState(true);
-    const [myProject, setMyProject] = useState<SingleProject>({title:"", certificatesystem:"", address:"", country:"", status:""})
+    const [myProject, setMyProject] = useState<SingleProject>(thisProject)
   
-    const [originalTitle, setOriginalTitle] = useState(null);
+    const [originalTitle, setOriginalTitle] = useState(thisProject.title);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter()
@@ -76,8 +86,8 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
     useEffect(() => {
       const { page, query, cat } = router.query
 
-      setMyProject({title: router.query.title, certificatesystem: router.query.certificatesystem, address: router.query.address, country: router.query.country, status: router.query.status  })
-      setOriginalTitle(router.query.title)
+    //   setMyProject({title: router.query.title, certificatesystem: router.query.certificatesystem, address: router.query.address, country: router.query.country, status: router.query.status  })
+    //   setOriginalTitle(router.query.title)
 
       console.log('user', user)
       if(!user){
@@ -119,10 +129,12 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
     }, [open])
 
     const onProjectUpdate = () => {
-        axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/updateproject`, {
+        axios.put(
+            `${process.env.NODE_ENV === 'development' ?
+             'http://localhost:8000' :
+              'https://vistbokserver.herokuapp.com'}/api/updateproject/${myProject.id}`, {
           headers: { 'Content-Type': 'application/json' },
           data: {
-            oldTitle: originalTitle,
             title: myProject.title,
             certificatesystem: myProject.certificatesystem,
             address: myProject.address,
@@ -148,13 +160,13 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
     };
 
     const onDeleteProject = () => {
-         axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/deleteproject`, {
+         axios.delete(
+             `${process.env.NODE_ENV === 'development' ?
+              'http://localhost:8000' :
+               'https://vistbokserver.herokuapp.com'}/api/deleteproject/${myProject.id}`, {
             headers: { 'Content-Type': 'application/json' },
-            data: {
-              title: myProject.title,
-              ownerEmail: user.email,
-            }
           }).then((response) => {
+              console.log('response.status ', response.status)
             if (response.status === 200) {
               return response.data;
             }
@@ -163,6 +175,7 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
           })
           .then((responsejson) => {
             console.log('success', responsejson);
+            router.push('/minarsidur')
           })
           .catch((err: Error | AxiosError) => {
             console.log("error", err)
@@ -228,7 +241,7 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
                   {/* <StyledHeading5> Titill </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Titill'
-                      onChange={(input) => {setMyProject({title:input.target.value,certificatesystem:myProject.certificatesystem, address:myProject.address,country:myProject.country})}}
+                      onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
                       value={myProject.title}
                   />
                   {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
@@ -236,20 +249,20 @@ const verkefni = ({ user, certificateSystemList } : VerkefniProps) => {
                     placeholder={myProject.certificatesystem}
                     style={{ width: '100%' }}
                     // onChange={handleChangeSelect}
-                    onChange={(input) => {setMyProject({title:myProject.title,certificatesystem:input,address:myProject.address,country:myProject.country})}}
+                    onChange={(input) => {setMyProject({...myProject, certificatesystem:input})}}
                     options={certificateSystemList}
                   />
                   {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
                   {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Heimilisfang'
-                      onChange={(input) => {setMyProject({title:myProject.title,certificatesystem:myProject.certificatesystem, address:input.target.value,country:myProject.country})}}
+                      onChange={(input) => {setMyProject({...myProject, address:input.target.value})}}
                       value={myProject.address}
                   />
                   {/* <StyledHeading5> Land </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Land'
-                      onChange={(input) => {setMyProject({title:myProject.title,certificatesystem:myProject.certificatesystem, address:myProject.address,country:input.target.value})}}
+                      onChange={(input) => {setMyProject({...myProject, country:input.target.value})}}
                       value={myProject.country}
                   />
                 </div>
