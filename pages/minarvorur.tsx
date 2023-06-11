@@ -19,6 +19,7 @@ interface User {
     password: string
 }
 
+
 const minarvorur = () => {
 
     const [user, setUser] = useState<User>(null)
