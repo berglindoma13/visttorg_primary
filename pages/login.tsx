@@ -12,8 +12,6 @@ import { mediaMax } from '../constants/breakpoints'
 import { Heading1 } from '../components/Typography';
 import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
-import jwt_decode from 'jwt-decode';
-import bcrypt from 'bcryptjs'
 import axios, { AxiosError } from 'axios';
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useRouter } from 'next/router';
@@ -22,7 +20,6 @@ import { Spin } from 'antd';
 import { readCookie } from '../utils/readCookie';
 
 const COOKIE_NAME = 'vistbokUser'
-const salt = bcrypt.genSaltSync(10)
 
 interface User {
   fullName?: string
@@ -47,13 +44,12 @@ const Login = () => {
   const onSubmitLogin: SubmitHandler<User> = data => {
     setIsLoading(true);
 
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
 
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: hashedPassword
+        password: data.password
       }
     }).then((response) => {
       
@@ -95,12 +91,11 @@ const Login = () => {
 
   const onSubmitRegister: SubmitHandler<User> = data => {
     setIsLoading(true);
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: hashedPassword,
+        password: data.password,
         fullname: data.fullName,
         company: data.company,
         jobtitle: data.jobTitle

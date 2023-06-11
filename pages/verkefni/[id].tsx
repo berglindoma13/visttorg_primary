@@ -13,29 +13,15 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import axios, { AxiosError } from 'axios';
 import { prismaInstance } from '../../lib/prisma'
 import { TextInput } from '../../components/Inputs'
-
-
-interface User {
-    fullName?: string
-    email: string
-    company?: string
-    jobTitle?: string
-    password: string
-}
+import { User } from '../../types/authentiation'
+import { SingleProject } from '../../types/projects';
 
 interface CertificateSystem {
     value: string
     label: string
 }
 
-interface SingleProject {
-  title: string
-  certificatesystem: string
-  address: string
-  country: string
-  status?: string
-  id: string
-}
+
 
 interface VerkefniProps {
   user: User
@@ -155,8 +141,6 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
         .catch((err: Error | AxiosError) => {
           console.log("error", err)
         })
-        //update path
-        router.push({pathname:'/verkefni', query: {title: myProject.title, certificatesystem: myProject.certificatesystem, address: myProject.address, country: myProject.country, status: myProject.status}})
     };
 
     const onDeleteProject = () => {

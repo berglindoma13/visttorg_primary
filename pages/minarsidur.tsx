@@ -8,48 +8,24 @@ import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
-// import Link from 'next/link';
 import { motion, useAnimation } from "framer-motion";
 import { useRouter } from 'next/router';
 import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
 import { prismaInstance } from '../lib/prisma'
 import axios, { AxiosError } from 'axios';
-import { useAppSelector, useAppDispatch } from '../app/hooks'
-import { login } from '../app/features/auth/authSlice';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { vistbokProject } from '.prisma/client';
+import { User } from '../types/authentiation'
+import { AllProjects, SingleProject } from '../types/projects';
 
-interface User {
-  fullname?: string
-  email: string
-  company?: string
-  jobtitle?: string
-  password: string
-}
-
-interface SingleProject {
-  title: string
-  certificatesystem: string
-  address: string
-  country: string
-  status?: string
-  id: string
-}
-
-interface CertificateSystem {
+interface CertificateSystemOption {
   value: string
   label: string
-}
-
-interface AllProjects {
-  count: number
-  projects: Array<SingleProject>
 }
 
 interface MinarSidurProps {
   user: User
   projectList: Array<SingleProject>
-  certificateSystemList?: Array<CertificateSystem>
+  certificateSystemList?: Array<CertificateSystemOption>
 }
 
 const formInitValues = {title:"", certificatesystem:"", address:"", country:"", id: ""}
@@ -58,16 +34,16 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
   const currentUser = context.req.cookies.vistbokUser
 
-  const user : User = jwt_decode(currentUser)
+  const user : User = !!currentUser ? jwt_decode(currentUser) : null
 
-  const email = user.email
+  const email = user !! ? user.email : null
 
   // ALL PROJECTS
-  const projectList = await prismaInstance.vistbokProject.findMany({
+  const projectList = !!email ?await prismaInstance.vistbokProject.findMany({
     where: {
       ownerEmail: email
     }
-  });
+  }): [];
 
   // Get list of certificate systems
   const certificateSystems = await prismaInstance.certificatesystem.findMany({});

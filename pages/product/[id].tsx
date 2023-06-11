@@ -1,10 +1,9 @@
 import { GetServerSideProps } from "next"
 import { prismaInstance } from '../../lib/prisma'
-import { ProductProps, Company, Category } from '../../types/products'
+import { ProductProps, Category } from '../../types/products'
 import styled from 'styled-components'
 import Image from 'next/image'
-import { Certificate, ProductCertificate } from "../../types/certificates"
-import certificateMapper from '../../mappers/certificates'
+import { ProductCertificate } from "../../types/certificates"
 import { Footer } from "../../components/Footer"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper.min.css';
@@ -13,13 +12,17 @@ import SwiperCore, { Pagination } from 'swiper';
 import { Header } from "../../components/Header"
 import { Tag } from "../../components/Tag"
 import { Heading1, Heading3, Heading4, UIBig } from "../../components/Typography"
-import { MainButton, MainButtonText } from "../../components/Buttons"
+import { MainButton } from "../../components/Buttons"
 import SvanurinnLogoSVG from "../../components/Svg/Logos/Svanurinn"
 import VocLogoSVG from "../../components/Svg/Logos/Voc"
 import { mediaMax } from "../../constants/breakpoints"
 import superjson from 'superjson'
-import { useRouter } from "next/router"
+import jwt_decode from 'jwt-decode';
 import certMapper from '../../mappers/certificates'
+import { User } from '../../types/authentiation'
+import { SingleProject } from "../../types/projects"
+import { Modal } from "antd"
+import { useState } from "react"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
@@ -43,19 +46,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
+  //Get the current user if logged in
+  const currentUser = context.req.cookies.vistbokUser
+
+  const user : User = !!currentUser ? jwt_decode(currentUser) : null
+
+  // ALL PROJECTS
+  const projectList = !!user ? await prismaInstance.vistbokProject.findMany({
+    where: {
+      owner: {
+        id: parseInt(user.id)
+      }
+    }
+  }): [];
+
   return {
     props: {
-      id,
-      productString: uniqueProductString
+      productString: uniqueProductString,
+      myProjects: projectList
     },
   }
 }
 
 interface ProductPageProps{
   productString: string
+  myProjects: Array<SingleProject>
 }
 
-const Product = ({ productString } : ProductPageProps) => {
+const Product = ({ productString, myProjects } : ProductPageProps) => {
 
   
   // const router = useRouter()
@@ -87,6 +105,8 @@ const Product = ({ productString } : ProductPageProps) => {
   //   router.push('/')
     
   // }
+
+  const [showModal, setShowModal] = useState(false)
   
 
   //TODO FIX PRODUCT TYPES
@@ -95,6 +115,20 @@ const Product = ({ productString } : ProductPageProps) => {
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
   SwiperCore.use([Pagination])
+
+  const AddProductToProject = () => {
+    console.log('adding this produt to project')
+  }
+
+  const handleOkModal = () => {
+    AddProductToProject()
+    setShowModal(false)
+  }
+
+  const handleCancelModal = () => {
+    setShowModal(false)
+  }
+
 
 
   const getCertImage = (cert: string) => {
@@ -124,6 +158,12 @@ const Product = ({ productString } : ProductPageProps) => {
     <Page>
       <StyledHeader showSearch={true}/>
       <PageContainer>
+       { !!myProjects && myProjects.length > 0 && <AddButtonContainer>
+          <AddToProjectButton
+            text="+ Bæta vöru við verkefni"
+            onClick={() => setShowModal(true)}
+          ></AddToProjectButton>
+        </AddButtonContainer>}
         <ProductInfo>
           <ProductInfoLeft>
             {showSwiper ? (
@@ -167,7 +207,7 @@ const Product = ({ productString } : ProductPageProps) => {
             )}
           </ProductInfoLeft>
           <ProductInfoRight style={{ marginRight: 160 }}>
-            <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>
+            {!!product.brand && <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>}
             <Heading1 style={{marginTop: 23, marginBottom: 70 }}>{product.title}</Heading1> 
               <div style={{display:'flex'}}>
                 <div style={{flex:1}}>
@@ -231,12 +271,43 @@ const Product = ({ productString } : ProductPageProps) => {
           </CertificateList>  
         </ProductCertifications>
       </PageContainer>
+      <Modal 
+        open={showModal}
+        onOk={handleOkModal} 
+        onCancel={handleCancelModal}
+      >
+        <div>
+          {!!myProjects && myProjects.length > 0 && (
+            myProjects.map(p => {
+              return (
+                <span key={p.id}>{p.title}</span>
+              )
+            })
+          )}
+        </div>
+      </Modal>
       <Footer />
     </Page>
   )
 }
 
 export default Product
+
+const AddToProjectButton = styled(MainButton)`
+
+`
+
+const AddButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content:flex-end;
+  padding: 5px 15px 5px 5px;
+
+  @media ${mediaMax.tablet}{
+    padding-bottom: 40px;
+    justify-content: center;
+  }
+`
 
 const StyledImage = styled.img`
   object-fit: contain;
