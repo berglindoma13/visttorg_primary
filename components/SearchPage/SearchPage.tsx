@@ -690,7 +690,7 @@ const FilterWrapper = styled(motion.div)`
 
   @media ${mediaMax.tablet}{
     position: fixed;
-    z-index: 11;
+    z-index: 30;
     max-width: 100vw;
     min-width: 100vw;
     margin: 0;
