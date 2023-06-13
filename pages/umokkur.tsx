@@ -14,8 +14,8 @@ import { ServerResponse } from 'http'
 const UmOkkur = () => {
   return(
     <Page>
+      <StyledHeader showSearch />
       <PageContainer>
-        <StyledHeader showSearch />
         <StyledHeader1>Fyrsti íslenski gagnabankinn fyrir umhverfisvænar byggingarvörur</StyledHeader1>
         <StyledHeader4>Tökum þátt í að stuðla að byggingarstarfsemi og mannvirkjagerð með lágu kolefnisspori.</StyledHeader4>
         <SplitBoxes>

@@ -165,8 +165,8 @@ const Login = () => {
 
   return(
     <Page>
+      <StyledHeader showSearch={false} />
       <PageContainer>
-        <StyledHeader showSearch={false} />
         {isNewUser ? 
           <LoginContainer>
             <MainHeading>Nýskráning</MainHeading>

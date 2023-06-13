@@ -9,8 +9,8 @@ import { theme } from '../styles/theme'
 const Toolbox = () => {
   return(
     <Page>
+      <StyledHeader showSearch={false} />
       <PageContainer>
-        <StyledHeader showSearch={false} />
         <MainHeading> Verkfærakistan </MainHeading>
         <StyledHeading4> Hér má finna gagnlega hlekki. </StyledHeading4>
         <FullWidthLowBox style={{backgroundColor:theme.colors.beige}}>

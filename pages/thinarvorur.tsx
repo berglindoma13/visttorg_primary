@@ -56,8 +56,8 @@ const MyFavorites = ({ productListString }: MyFavoritesProps) => {
 
   return(
     <Page>
+      <StyledHeader showSearch={false} />
       <PageContainer>
-        <StyledHeader showSearch={false} />
         <MainHeading>Þínar uppáhalds vörur</MainHeading>
         {favorites.length === 0 && <StyledHeading5>Þú átt engar uppáhalds vörur</StyledHeading5> }
         {/* <ProductList>
