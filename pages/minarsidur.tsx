@@ -14,10 +14,7 @@ import { useRouter } from 'next/router';
 import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
 import { prismaInstance } from '../lib/prisma'
 import axios, { AxiosError } from 'axios';
-import { useAppSelector, useAppDispatch } from '../app/hooks'
-import { login } from '../app/features/auth/authSlice';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { vistbokProject } from '.prisma/client';
 
 interface User {
   fullname?: string
