@@ -17,6 +17,7 @@ import axios, { AxiosError } from 'axios';
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { login } from '../app/features/auth/authSlice';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { vistbokProject } from '.prisma/client';
 
 interface User {
   fullname?: string
@@ -32,6 +33,7 @@ interface SingleProject {
   address: string
   country: string
   status?: string
+  id: string
 }
 
 interface CertificateSystem {
@@ -50,9 +52,9 @@ interface MinarSidurProps {
   certificateSystemList?: Array<CertificateSystem>
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+const formInitValues = {title:"", certificatesystem:"", address:"", country:"", id: ""}
 
-  // console.log('currentUser', context.req.cookies.vistbokUser)
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
 
   const currentUser = context.req.cookies.vistbokUser
 
@@ -88,9 +90,10 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   const [open, setOpen] = useState(true);
   // const [dropDownOpen, setDropDownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newProjectParam, setNewProjectParam] = useState<SingleProject>({title:"", certificatesystem:"", address:"", country:""})
+  
+  const [newProjectParam, setNewProjectParam] = useState<SingleProject>(formInitValues)
 
-  const [projects, setProjects] = useState<AllProjects>({count:projectList.length,projects:projectList})
+  const [projects, setProjects] = useState<AllProjects>({count: projectList?.length ,projects:projectList})
 
 
   // const [open, setOpen] = useState(true);
@@ -127,6 +130,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     })
     .then((responsejson) => {
       console.log('success', responsejson);
+      setProjects({count: projects.count+1, projects: [...projects.projects, {...newProjectParam, id: responsejson}]})
     })
     .catch((err: Error | AxiosError) => {
       console.log("error", err)
@@ -175,8 +179,6 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   const handleOkModal = () => {
     // if user presses ok
     setIsModalOpen(false);
-    setProjects({count: projects.projects.length+1, projects: [...projects.projects, newProjectParam] })
-    console.log(" projects", projects)
     onProjectCreation()
   };
 
@@ -186,9 +188,12 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   };
 
   const onChangeSidebar = () => {
-    console.log("count", projects.count)
     setOpen(!open);
   };
+
+  const viewProject = (item : SingleProject) => {
+    router.push({pathname:`/verkefni/${item.id}`, })
+  }
 
   // fyrir útskráningu
   // const onCloseDropDown = () => {
@@ -235,7 +240,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                   {/* <StyledHeading5> Titill </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Titill'
-                      onChange={(input) => {setNewProjectParam({title:input.target.value,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:newProjectParam.country})}}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam, title:input.target.value})}}
                       value={newProjectParam.title}
                   />
                   {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
@@ -243,27 +248,27 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                     placeholder="Vottunarkerfi"
                     style={{ width: '100%' }}
                     // onChange={handleChangeSelect}
-                    onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:input,address:newProjectParam.address,country:newProjectParam.country})}}
+                    onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
                     options={certificateSystemList}
                   />
                   {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
                   {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Heimilisfang'
-                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:input.target.value,country:newProjectParam.country})}}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam, address:input.target.value})}}
                       value={newProjectParam.address}
                   />
                   {/* <StyledHeading5> Land </StyledHeading5> */}
                   <StyledInput 
                       placeholder='Land'
-                      onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:input.target.value})}}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam,country:input.target.value})}}
                       value={newProjectParam.country}
                   />
                 </div>
               </Modal>
               {projects.count !== 0 && projects.projects.map((item) => {
                 return(
-                <ProjectCard key={item.title}>
+                <ProjectCard key={item.title} onClick={() => viewProject(item)} >
                   <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
                   <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
                   <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
