@@ -9,6 +9,7 @@ export const Footer = () => {
 
   const [postlistEmail, setPostlistEmail] = useState('')
   const [postlistDone, setPostlistDone] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const [inputError, setInputError] = useState('')
 
@@ -22,6 +23,7 @@ export const Footer = () => {
   }, [])
 
   const addToPostlist = async() => {
+    setLoading(true)
 
     fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/postlist`, {
       method: 'POST',
@@ -41,12 +43,14 @@ export const Footer = () => {
     .then(() => {
       localStorage.setItem('postlist', 'true')
       setPostlistDone(true)
+      setLoading(false)
     })
     .catch((error) => {
       console.error('error adding to postlist', error.message)
       //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
       // setInputError(error.message)
       setInputError('Villa við skráningu, vinsamlegast reyndu aftur')
+      setLoading(false)
     });
   }
 
@@ -69,7 +73,7 @@ export const Footer = () => {
             ) : (
               <Wrapper>
                 <TextInput placeholder="netfang" onSubmit={() => addToPostlist()} onChange={(e) => setPostlistEmail(e.target.value)}></TextInput>
-                <SubmitButton onClick={() => addToPostlist()}>Skrá</SubmitButton>
+                <SubmitButton onClick={() => addToPostlist()} className={loading && 'disabled'}>Skrá</SubmitButton>
                 {inputError && <StyledError>{inputError}</StyledError>}
               </Wrapper>
             )}
@@ -91,6 +95,10 @@ const StyledError = styled.span`
 
 const Wrapper = styled.div`
   position:relative;
+
+  @media ${mediaMax.tablet}{
+    width: 90%;
+  }
 `
 
 const SubmitButton = styled.button`
@@ -104,6 +112,10 @@ const SubmitButton = styled.button`
   border-radius: 999px;
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   width:60px;
+
+  &.disabled{
+    background-color: ${({ theme }) => theme.colors.grey_five};
+  }
 `
 
 const FooterContainer = styled.div`
@@ -175,6 +187,11 @@ const BottomContent = styled.div`
   display:flex;
   flex-direction: row;
   align-items: flex-end;
+
+  @media ${mediaMax.tablet}{
+    flex-direction: column-reverse;
+    align-items:center;
+  }
 `
 
 const BottomContentLeft = styled(Heading5)`
@@ -201,8 +218,17 @@ const BottomContentMid = styled.div`
   display:flex;
   flex-direction:column;
   justify-content: flex-end;
+
+  @media ${mediaMax.tablet}{
+    width: 100%;
+    margin-bottom: 20px
+  }
 `
 
 const PostlistTitle = styled(Heading4)`
   margin-bottom: 10px;
+
+  @media ${mediaMax.tablet}{
+    text-align: center;
+  }
 `
