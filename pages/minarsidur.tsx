@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
 import { TextInput } from '../components/Inputs'
-import { Button, Modal, Select } from 'antd';
+import { Button, Modal, Select, Layout } from 'antd';
 import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
@@ -200,84 +200,85 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   
   return(
     <Page>
-      <PageContainer>
-        {/* <StyledHeader showSearch={true} /> */}
-        {!!user && <ContentContainer>
+      
+        <Layout>
           <MyPagesSidebar onClick={onChangeSidebar} open={open} />
-          <UserHeader >
-            <UsernameContainer>
-              <UserOutlined style={{ fontSize: '20px' }}/>
-              <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {user.fullname}</StyledHeading5> 
-              {/* <NavItem onClick={() => onCloseDropDown()}>
-                <DownOutlined />
-              </NavItem> */}
-            </UsernameContainer>
-          </UserHeader>
-          <InformationContainer 
-            style={{ marginLeft: open ? '340px' : '120px' }}
-            animate={pageContentControls}
-            // transition={{ type: "Tween" }}
-          >
-            <StyledHeading5> Mitt svæði </StyledHeading5>
-            <UserCardContainer>
-              <MainHeading> {user.fullname}</MainHeading>
-              <StyledHeading5> {user.company}</StyledHeading5> 
-              <StyledHeading5> {user.jobtitle}</StyledHeading5> 
-            </UserCardContainer>
-            <MyProjectsContainer>
-              <MyProjectsHeader>
-                <StyledHeading5> Mín verkefni </StyledHeading5>
-                <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
-                <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
-              </MyProjectsHeader>
-              <MyProjectsContent>
-              <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                <div >
-                  <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
-                  {/* <StyledHeading5> Titill </StyledHeading5> */}
-                  <StyledInput 
-                      placeholder='Titill'
-                      onChange={(input) => {setNewProjectParam({...newProjectParam, title:input.target.value})}}
-                      value={newProjectParam.title}
-                  />
-                  {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
-                  <Select
-                    placeholder="Vottunarkerfi"
-                    style={{ width: '100%' }}
-                    // onChange={handleChangeSelect}
-                    onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
-                    options={certificateSystemList}
-                  />
-                  {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
-                  {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
-                  <StyledInput 
-                      placeholder='Heimilisfang'
-                      onChange={(input) => {setNewProjectParam({...newProjectParam, address:input.target.value})}}
-                      value={newProjectParam.address}
-                  />
-                  {/* <StyledHeading5> Land </StyledHeading5> */}
-                  <StyledInput 
-                      placeholder='Land'
-                      onChange={(input) => {setNewProjectParam({...newProjectParam,country:input.target.value})}}
-                      value={newProjectParam.country}
-                  />
-                </div>
-              </Modal>
-              {projects.count !== 0 && projects.projects.map((item) => {
-                return(
-                <ProjectCard key={item.title} onClick={() => viewProject(item)} >
-                  <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
-                  <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
-                  <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
-                  <StyledHeading5> Land: {item.country} </StyledHeading5>
-                  <StyledHeading5> Staða: {item.status} </StyledHeading5>
-                </ProjectCard>)
-              })}
-              </MyProjectsContent>
-            </MyProjectsContainer>
-          </InformationContainer>
-        </ContentContainer>}
-      </PageContainer>
+          <Layout>
+            <UserHeader >
+              <UsernameContainer>
+                <UserOutlined style={{ fontSize: '20px' }}/>
+                <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {user.fullname}</StyledHeading5> 
+                {/* <NavItem onClick={() => onCloseDropDown()}>
+                  <DownOutlined />
+                </NavItem> */}
+              </UsernameContainer>
+            </UserHeader>
+            <InformationContainer 
+              style={{ marginLeft: open ? '340px' : '120px' }}
+              animate={pageContentControls}
+              // transition={{ type: "Tween" }}
+            >
+              <StyledHeading5> Mitt svæði </StyledHeading5>
+              <UserCardContainer>
+                <MainHeading> {user.fullname}</MainHeading>
+                <StyledHeading5> {user.company}</StyledHeading5> 
+                <StyledHeading5> {user.jobtitle}</StyledHeading5> 
+              </UserCardContainer>
+              <MyProjectsContainer>
+                <MyProjectsHeader>
+                  <StyledHeading5> Mín verkefni </StyledHeading5>
+                  <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
+                  <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
+                </MyProjectsHeader>
+                <MyProjectsContent>
+                <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
+                  <div >
+                    <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
+                    {/* <StyledHeading5> Titill </StyledHeading5> */}
+                    <StyledInput 
+                        placeholder='Titill'
+                        onChange={(input) => {setNewProjectParam({...newProjectParam, title:input.target.value})}}
+                        value={newProjectParam.title}
+                    />
+                    {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
+                    <Select
+                      placeholder="Vottunarkerfi"
+                      style={{ width: '100%' }}
+                      // onChange={handleChangeSelect}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
+                      options={certificateSystemList}
+                    />
+                    {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
+                    {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
+                    <StyledInput 
+                        placeholder='Heimilisfang'
+                        onChange={(input) => {setNewProjectParam({...newProjectParam, address:input.target.value})}}
+                        value={newProjectParam.address}
+                    />
+                    {/* <StyledHeading5> Land </StyledHeading5> */}
+                    <StyledInput 
+                        placeholder='Land'
+                        onChange={(input) => {setNewProjectParam({...newProjectParam,country:input.target.value})}}
+                        value={newProjectParam.country}
+                    />
+                  </div>
+                </Modal>
+                {projects.count !== 0 && projects.projects.map((item) => {
+                  return(
+                  <ProjectCard key={item.title} onClick={() => viewProject(item)} >
+                    <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
+                    <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
+                    <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
+                    <StyledHeading5> Land: {item.country} </StyledHeading5>
+                    <StyledHeading5> Staða: {item.status} </StyledHeading5>
+                  </ProjectCard>)
+                })}
+                </MyProjectsContent>
+              </MyProjectsContainer>
+            </InformationContainer>
+          </Layout>
+        </Layout>      
+      
     </Page>
   )
 }

@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Drawer, Button } from 'antd'
+import { Drawer, Button, Menu, Layout } from 'antd'
 import { HomeFilled,
   ProfileFilled,
-  ToolFilled,
-  SearchOutlined,
-  RightOutlined,
-  LeftOutlined,
-  DownOutlined,
-  UserOutlined, 
-  PlusOutlined } from '@ant-design/icons';
-import { Heading1, Heading5 } from '../Typography';
+  StarOutlined,
+  SearchOutlined
+ } from '@ant-design/icons';
+import { Heading5 } from '../Typography';
 import VistbokLogo from '../Svg/VistbokLogo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { theme } from '../../styles';
 
-
+const { Header, Sider, Content } = Layout;
 
 interface MyPagesSidebarProps {
     text?: string
@@ -25,21 +22,63 @@ interface MyPagesSidebarProps {
 }
 
 export const MyPagesSidebar = ({ text, className, onClick, open }: MyPagesSidebarProps) => {
-  
-  // const [open, setOpen] = useState(true);
 
   const router = useRouter()
 
-  // const onChange = () => {
-  //   setOpen(!open);
-  // };
-
-  const drawerNav = (log: string) => {
+  const useRoute = (log: string) => {
     router.push(log)
   };
 
   return (
-    <div>
+      <Sider 
+        trigger={null} 
+        collapsible
+        collapsed={!open}
+        style={{minHeight: '100vh', backgroundColor: theme.colors.tertiary.base, paddingTop: 20}} 
+      >
+        <Menu
+          mode="inline"
+          defaultSelectedKeys={['1']}
+          style={{minHeight: '100vh', backgroundColor: theme.colors.tertiary.base}}
+          items={[
+            { 
+              key: '0',
+              icon: <VistbokLogo fill="#fff" width="90%"/>,
+              // style:{ paddingLeft: 0, paddingRight: 0, display:'flex', flexDirection:'row', justifyContent:'center' }
+            },
+            {
+              key: '1',
+              icon:  <HomeFilled style={{ fontSize: '18px'}} color="#fff"/>,
+              label: 'Mitt svæði',
+              style: { color: '#fff', backgroundColor: 'transparent', marginTop: 20 },
+              onClick: () => useRoute('/minarsidur')
+            },
+            {
+              key: '2',
+              icon: <ProfileFilled style={{ fontSize: '18px'}} color="#fff" />,
+              label: 'Mín verkefni',
+              style: { color: '#fff', backgroundColor: 'transparent' },
+              onClick: () => useRoute('/')
+            },
+            {
+              key: '3',
+              icon: <StarOutlined style={{ fontSize: '18px'}} color="#fff"/>,
+              label: 'Mínar vörur',
+              style: { color: '#fff', backgroundColor: 'transparent' },
+              onClick: () => useRoute('/')
+            },
+            {
+              key: '4',
+              icon:  <SearchOutlined style={{ fontSize: '18px' }} color="#fff"/>,
+              label: 'Leitarvél',
+              style: { color: '#fff', backgroundColor: 'transparent' },
+              onClick: () => useRoute('/')
+            }
+          ]}
+        />
+      </Sider>
+      )
+    {/* <div>
         {open ? <Drawer
             placement="left"
             closable={false}
@@ -47,8 +86,8 @@ export const MyPagesSidebar = ({ text, className, onClick, open }: MyPagesSideba
             open={open}
             width='300px'
             mask={false}
-            headerStyle={{ backgroundColor:'#ABC5A1' }}
-            bodyStyle={{ backgroundColor:'#ABC5A1' }}
+            headerStyle={{ backgroundColor: theme.colors.primary.base }}
+            bodyStyle={{ backgroundColor: theme.colors.primary.base }}
           >
             <SideContainer>
               <DrawerHeaderContainer>
@@ -101,8 +140,8 @@ export const MyPagesSidebar = ({ text, className, onClick, open }: MyPagesSideba
             </SideContainer>
           </Drawer>
           }
-    </div>
-  )
+    </div> */}
+  
 }
 
 const SideContainer = styled.div`

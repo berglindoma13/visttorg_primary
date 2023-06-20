@@ -30,6 +30,10 @@ const theme = {
       dark: '',
     },
 
+    tertiary: {
+      base: '#21333b'
+    },
+
     highlight: '#FBE35B'
   },
 
