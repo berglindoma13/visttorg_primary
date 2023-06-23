@@ -69,7 +69,7 @@ const minarvorur = () => {
     return(
     <Page>
       <PageContainer>
-            <MyPagesSidebar onClick={onChange} open={open} />
+            <MyPagesSidebar/>
             <UserHeader >
                 <UsernameContainer>
                     <UserOutlined style={{ fontSize: '20px' }}/>

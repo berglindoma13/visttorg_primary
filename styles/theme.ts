@@ -17,6 +17,7 @@ const theme = {
     orange: '#F67147',
     purple: '#A399FA',
     beige: '#F6F3EE',
+    lightGreen: "#9ed3b0",
 
     primary: {
       base: '#3C6F72',

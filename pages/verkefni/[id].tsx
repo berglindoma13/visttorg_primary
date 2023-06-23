@@ -209,7 +209,7 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
     <Page>
       <PageContainer>
             {!!user && <div>
-            <MyPagesSidebar onClick={onChangeSidebar} open={open} />
+            <MyPagesSidebar/>
             <UserHeader >
                 <UsernameContainer>
                     <UserOutlined style={{ fontSize: '20px' }}/>
