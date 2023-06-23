@@ -25,12 +25,12 @@ export const MyPagesSidebar = () => {
         trigger={null} 
         collapsible
         collapsed={false}
-        style={{minHeight: '100vh', backgroundColor: theme.colors.tertiary.base, paddingTop: 20}} 
+        style={{minHeight: '100vh', backgroundColor: theme.colors.tertiary.base}} 
       >
         <Menu
           mode="inline"
           defaultSelectedKeys={['1']}
-          style={{minHeight: '100vh', backgroundColor: theme.colors.tertiary.base}}
+          style={{minHeight: '100vh', backgroundColor: theme.colors.tertiary.base, paddingTop: 20}}
           items={[
             { 
               key: '0',

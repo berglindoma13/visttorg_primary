@@ -9,7 +9,7 @@ const theme = {
 
     //Vistorg colors
     green: '#ABC5A1',
-    black: '#000000;',
+    black: '#000000',
     grey_one: '#FAFAFA',
     grey_two: '#EEEEEE',
     grey_four: '#757575',

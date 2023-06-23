@@ -23,6 +23,8 @@ import HomeFive from '../components/Svg/ProjectIcons/HomeFive';
 import HomeThree from '../components/Svg/ProjectIcons/HomeThree';
 import HomeSix from '../components/Svg/ProjectIcons/HomeSix';
 import HomeTwo from '../components/Svg/ProjectIcons/HomeTwo';
+import { ProjectStates } from '../constants/ProjectStates';
+import { projectStatesMapper } from '../mappers/projectStates';
 
 interface User {
   fullname?: string
@@ -63,21 +65,29 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
   const currentUser = context.req.cookies?.vistbokUser ? context.req.cookies?.vistbokUser : null
 
-  const user : User = jwt_decode(currentUser)
+  let user : User = null
+  let email: string = null
+  if(currentUser){
+    user = jwt_decode(currentUser)
+    email = user.email
+  } 
 
-  const email = user.email
+  let projectList = null
 
-  // ALL PROJECTS
-  const projectList = await prismaInstance.vistbokProject.findMany({
-    where: {
-      ownerEmail: email
-    }
-  });
+  if(email){
+    // ALL PROJECTS
+    projectList = await prismaInstance.vistbokProject.findMany({
+      where: {
+        ownerEmail: email
+      }
+    });
+  }
+
 
   // Get list of certificate systems
   const certificateSystems = await prismaInstance.certificatesystem.findMany({});
   const filteredcertificateSystems = certificateSystems.map(cert => {
-    return {value: cert.name, lable: cert.name}
+    return {value: cert.name, label: cert.name}
   })
 
   return {
@@ -95,15 +105,12 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   
   const [newProjectParam, setNewProjectParam] = useState<SingleProject>(formInitValues)
 
-  const [projects, setProjects] = useState<AllProjects>({count: projectList?.length ,projects:projectList})
-
+  const [projects, setProjects] = useState<AllProjects>({count: projectList && projectList?.length, projects: projectList ? projectList : []})
 
   const router = useRouter()
 
   useEffect(() => {
-    console.log('user', user)
     if(!user){
-      console.log('in here')
       router.push('/login')
     }
   }, [])
@@ -117,7 +124,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
         certificatesystem: newProjectParam.certificatesystem,
         address: newProjectParam.address,
         country: newProjectParam.country,
-        status: "In progress",
+        status: ProjectStates.NotStarted.toString(),
         ownerEmail: user.email,
       }
     }).then((response) => {
@@ -128,7 +135,6 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
       throw new Error(response.statusText);
     })
     .then((responsejson) => {
-      console.log('success', responsejson);
       setProjects({count: projects.count+1, projects: [...projects.projects, {...newProjectParam, id: responsejson}]})
     })
     .catch((err: Error | AxiosError) => {
@@ -174,34 +180,42 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     }
   }
   
+  const getProjectStateOprions = () => {
+    const options = []
+    for (const key in ProjectStates) {
+      const option = {value: ProjectStates[key], label: projectStatesMapper[ProjectStates[key]]}
+      options.push(option)
+    }
+
+    return options
+  }
+  
   return(
     <Page>
         <Layout>
           <MyPagesSidebar/>
           <Layout>
             <InformationContainer>
-              <UserCardContainer>
+              { user && (<UserCardContainer>
                 <MainHeading> {user.fullname}</MainHeading>
                 <Heading3> {user.company}</Heading3> 
                 <Heading3> {user.jobtitle}</Heading3> 
-              </UserCardContainer>
+              </UserCardContainer>)}
               <MyProjectsContainer>
                 <MyProjectsHeader>
                   <StyledHeading2> Mín verkefni </StyledHeading2>
-                  <Button style={{marginRight:"12px", width:"100px", color:theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}}>Í vinnslu <DownOutlined color={theme.colors.black} /> </Button>
+                  {/* <Button style={{marginRight:"12px", width:"100px", color:theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}}>Í vinnslu <DownOutlined color={theme.colors.black} /> </Button> */}
                   <Button style={{marginRight:"20px", width:"140px", backgroundColor: theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
                 </MyProjectsHeader>
                 <MyProjectsContent>
-                <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                  <div >
-                    <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
-                    {/* <StyledHeading5> Titill </StyledHeading5> */}
+                <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal} bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} style={{ backgroundColor: theme.colors.tertiary.base, borderRadius: 8}}>
+                  <ModalContent >
+                    <MainHeading style={{fontSize: "28px", color: "#fff"}}> Nýtt verkefni </MainHeading>
                     <StyledInput 
                         placeholder='Titill'
                         onChange={(input) => {setNewProjectParam({...newProjectParam, title:input.target.value})}}
                         value={newProjectParam.title}
                     />
-                    {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
                     <Select
                       placeholder="Vottunarkerfi"
                       style={{ width: '100%' }}
@@ -209,20 +223,23 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                       onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
                       options={certificateSystemList}
                     />
-                    {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
-                    {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
                     <StyledInput 
                         placeholder='Heimilisfang'
                         onChange={(input) => {setNewProjectParam({...newProjectParam, address:input.target.value})}}
                         value={newProjectParam.address}
                     />
-                    {/* <StyledHeading5> Land </StyledHeading5> */}
                     <StyledInput 
                         placeholder='Land'
                         onChange={(input) => {setNewProjectParam({...newProjectParam,country:input.target.value})}}
                         value={newProjectParam.country}
                     />
-                  </div>
+                    <Select
+                      placeholder="Staða verks"
+                      style={{ width: '100%' }}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam, status:input.value})}}
+                      options={getProjectStateOprions()}
+                    />
+                  </ModalContent>
                 </Modal>
                 {projects.count !== 0 && projects.projects.map((item, index) => {
                   return(
@@ -250,6 +267,15 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
 
 export default MinarSidur
 
+const Page = styled.div`
+  background-color: ${({ theme }) => theme.colors.grey_one};
+  min-height:100vh;
+`
+
+const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.tertiary.base};
+`
+
 const ProjectInformation = styled.div`
 
 `
@@ -265,10 +291,6 @@ const SideBox = styled.div`
   padding: 0px 10px 0px 10px;
 `
 
-const Page = styled.div`
-  background-color: ${({ theme }) => theme.colors.grey_one};
-  min-height:100vh;
-`
 
 const InformationContainer = styled(motion.div)`
  
