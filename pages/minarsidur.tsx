@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5 } from '../components/Typography';
 import { TextInput } from '../components/Inputs'
-import { Button, Modal, Select } from 'antd';
+import { Button, Modal, Select, Dropdown } from 'antd';
 import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
@@ -94,7 +94,6 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
 
 
   // const [open, setOpen] = useState(true);
-  // const [dropDownOpen, setDropDownOpen] = useState(false);
 
   const router = useRouter()
 
@@ -192,11 +191,21 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     router.push({pathname:`/verkefni/${item.id}`, })
   }
 
-  // fyrir útskráningu
-  // const onCloseDropDown = () => {
-  //   setDropDownOpen(!dropDownOpen);
-  //   console.log('dropdown open', dropDownOpen)
-  // };
+  const onLogout = () => {
+    // localStorage.removeItem("username");
+    // localStorage.removeItem("userId");
+    // localStorage.setItem('loggedin', 'false');
+    document.cookie = "vistbokUser= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+    router.push('/login')
+  };
+
+  // dropdown items - called items because they are MenuProps from antd
+  const items = [
+    {
+      label: (<div onClick={() => onLogout()}>Útskrá</div>),
+      key: '1',
+    },
+  ];
   
   return(
     <Page>
@@ -208,9 +217,11 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
             <UsernameContainer>
               <UserOutlined style={{ fontSize: '20px' }}/>
               <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {user.fullname}</StyledHeading5> 
-              {/* <NavItem onClick={() => onCloseDropDown()}>
+              <Dropdown menu={{items}} trigger={['click']}>
+                <NavItem >
                 <DownOutlined />
-              </NavItem> */}
+                </NavItem>
+              </Dropdown>
             </UsernameContainer>
           </UserHeader>
           <InformationContainer 
@@ -316,6 +327,10 @@ const UsernameContainer = styled.div`
   flex-direction: row;
   justify-content: flex-end;
   width:97%;
+`
+
+const UserDropDownMenu = styled.div`
+  
 `
 
 const SideContainer = styled(motion.div)`
