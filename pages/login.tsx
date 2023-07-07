@@ -22,7 +22,6 @@ import { Spin } from 'antd';
 import { readCookie } from '../utils/readCookie';
 
 const COOKIE_NAME = 'vistbokUser'
-const salt = bcrypt.genSaltSync(10)
 
 interface User {
   fullName?: string
@@ -35,8 +34,6 @@ interface User {
 const Login = () => {
 
   const { handleSubmit, watch, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
-
-  const watchAllFields = watch();
 
   const router = useRouter()
 
@@ -134,13 +131,6 @@ const Login = () => {
         // Just a stock error
       }
     })
-    // .catch((error) => {
-    //   console.log('this is the error', error)
-    // //   console.error('error registering - Message:', error.message)
-    //   //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
-    //   // setInputError(error.message)
-     
-    // });
   };
 
   const [isNewUser, setIsNewUser] = useState(false)

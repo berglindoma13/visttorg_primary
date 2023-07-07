@@ -23,7 +23,7 @@ import HomeFive from '../components/Svg/ProjectIcons/HomeFive';
 import HomeThree from '../components/Svg/ProjectIcons/HomeThree';
 import HomeSix from '../components/Svg/ProjectIcons/HomeSix';
 import HomeTwo from '../components/Svg/ProjectIcons/HomeTwo';
-import { ProjectStates } from '../constants/ProjectStates';
+import { ProjectStates } from '../constants/projectStates';
 import { projectStatesMapper } from '../mappers/projectStates';
 
 interface User {
@@ -110,8 +110,9 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   const router = useRouter()
 
   useEffect(() => {
+    console.log('user', user)
     if(!user){
-      router.push('/login')
+      //router.push('/login')
     }
   }, [])
 

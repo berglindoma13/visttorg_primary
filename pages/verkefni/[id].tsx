@@ -13,45 +13,31 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import axios, { AxiosError } from 'axios';
 import { prismaInstance } from '../../lib/prisma'
 import { TextInput } from '../../components/Inputs'
-import { ProjectStates } from '../../constants/ProjectStates';
+import { ProjectStates } from '../../constants/projectStates';
 import { projectStatesMapper } from '../../mappers/projectStates';
-
-
-interface User {
-    fullName?: string
-    email: string
-    company?: string
-    jobTitle?: string
-    password: string
-}
+import { Project } from '../../types/projects';
+import { User } from '../../types/auth';
+import { CustomError } from '../../components/Error/CustomError';
 
 interface CertificateSystem {
     value: string
     label: string
 }
-
-interface SingleProject {
-  title: string
-  certificatesystem: string
-  address: string
-  country: string
-  status?: number
-  id: string
-}
-
 interface VerkefniProps {
   user: User
   certificateSystemList?: Array<CertificateSystem>
-  thisProject: SingleProject
+  thisProject: Project
 }
-
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
     const id = context.query.id !== undefined ? context.query.id.toString() : ''
 
-    const currentUser = context.req.cookies.vistbokUser
+    const currentUser = context.req.cookies?.vistbokUser ? context.req.cookies?.vistbokUser : null
 
-    const user : User = jwt_decode(currentUser)
+    let user : User = null
+    if(currentUser){
+      user = jwt_decode(currentUser)
+    } 
 
     // Get list of certificate systems
     const certificateSystems = await prismaInstance.certificatesystem.findMany({});
@@ -62,6 +48,9 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const thisProject = await prismaInstance.vistbokProject.findUnique({
         where: {
             id: parseInt(id)
+        },
+        include: {
+          owner: true
         }
     })
 
@@ -76,21 +65,18 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
 const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) => {
 
-    // const [user, setUser] = useState<User>(null)
-    const [open, setOpen] = useState(true);
-    const [myProject, setMyProject] = useState<SingleProject>(thisProject)
-  
-    const [originalTitle, setOriginalTitle] = useState(thisProject.title);
+    const [showError, setShowError] = useState(false)
 
+    if(!!user && thisProject.owner.id !== user.id){
+      setShowError(true)
+    }
+
+    const [open, setOpen] = useState(true);
+    const [myProject, setMyProject] = useState<Project>(thisProject)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter()
 
     useEffect(() => {
-      const { page, query, cat } = router.query
-
-    //   setMyProject({title: router.query.title, certificatesystem: router.query.certificatesystem, address: router.query.address, country: router.query.country, status: router.query.status  })
-    //   setOriginalTitle(router.query.title)
-
       if(!user){
         router.push('/login')
       }
@@ -183,64 +169,74 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
 
     return(
     <Page>
-      <Layout>
-          <MyPagesSidebar/>
-          <ProjectActions>
-              <EditOutlined 
-                style={{ fontSize: "24px", marginRight: '15px'}}
-                onClick={() => showModal()} 
-              />
-              <DeleteOutlined 
-                style={{ fontSize: "24px"}} 
-                onClick={() => onDeleteProject()} 
-              />
-          </ProjectActions>
-          <Layout>
-            <InformationContainer>
-              <ProjectCardContainer>
-                <MainHeading> {myProject.title}</MainHeading>
-                <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
-                <Heading3> Heimilisfang: {myProject.address} </Heading3> 
-                <Heading3> Land: {myProject.country} </Heading3> 
-                <Heading3> Staða: {projectStatesMapper[myProject.status]} </Heading3> 
-              </ProjectCardContainer>
-            </InformationContainer>
-            <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                <MainHeading style={{fontSize: "28px"}}> Breyta verkefni </MainHeading>
-                <StyledInput 
-                    placeholder='Titill'
-                    onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
-                    value={myProject.title}
+      {showError ? (
+        <CustomError 
+          title="Aðgangsvilla"
+          description='Þú hefur því miður ekki aðgang að þessu verkefni'
+          errorCode='401'
+          redirectUrl='/minarsidur'
+        />
+      ) : (
+        <Layout>
+            <MyPagesSidebar/>
+            <ProjectActions>
+                <EditOutlined 
+                  style={{ fontSize: "24px", marginRight: '15px'}}
+                  onClick={() => showModal()} 
                 />
-                <Select
-                  placeholder={myProject.certificatesystem}
-                  style={{ width: '100%' }}
-                  onChange={(input) => {setMyProject({...myProject, certificatesystem:input})}}
-                  options={certificateSystemList}
+                <DeleteOutlined 
+                  style={{ fontSize: "24px"}} 
+                  onClick={() => onDeleteProject()} 
                 />
-                <StyledInput 
-                    placeholder='Heimilisfang'
-                    onChange={(input) => {setMyProject({...myProject, address:input.target.value})}}
-                    value={myProject.address}
-                />
-                <StyledInput 
-                    placeholder='Land'
-                    onChange={(input) => {setMyProject({...myProject, country:input.target.value})}}
-                    value={myProject.country}
-                />
-                 <Select
-                    placeholder="Staða verks"
-                    style={{ width: '100%' }}
-                    onChange={(input) => {setMyProject({...myProject, status:input})}}
-                    value={projectStatesMapper[myProject.status]}
-                    options={getProjectStateOprions()}
+            </ProjectActions>
+            <Layout>
+              <InformationContainer>
+                <ProjectCardContainer>
+                  <MainHeading> {myProject.title}</MainHeading>
+                  <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
+                  <Heading3> Heimilisfang: {myProject.address} </Heading3> 
+                  <Heading3> Land: {myProject.country} </Heading3> 
+                  <Heading3> Staða: {projectStatesMapper[myProject.status]} </Heading3> 
+                </ProjectCardContainer>
+              </InformationContainer>
+              <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
+                  <MainHeading style={{fontSize: "28px"}}> Breyta verkefni </MainHeading>
+                  <StyledInput 
+                      placeholder='Titill'
+                      onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
+                      value={myProject.title}
                   />
-              </Modal>
-            <InformationContainer>
-                <StyledHeading5> Vörur </StyledHeading5>
-            </InformationContainer>
-          </Layout>
-      </Layout>
+                  <Select
+                    placeholder={myProject.certificatesystem}
+                    style={{ width: '100%' }}
+                    onChange={(input) => {setMyProject({...myProject, certificatesystem:input})}}
+                    options={certificateSystemList}
+                  />
+                  <StyledInput 
+                      placeholder='Heimilisfang'
+                      onChange={(input) => {setMyProject({...myProject, address:input.target.value})}}
+                      value={myProject.address}
+                  />
+                  <StyledInput 
+                      placeholder='Land'
+                      onChange={(input) => {setMyProject({...myProject, country:input.target.value})}}
+                      value={myProject.country}
+                  />
+                   <Select
+                      placeholder="Staða verks"
+                      style={{ width: '100%' }}
+                      onChange={(input) => {setMyProject({...myProject, status:input})}}
+                      value={projectStatesMapper[myProject.status]}
+                      options={getProjectStateOprions()}
+                    />
+                </Modal>
+              <InformationContainer>
+                  <StyledHeading5> Vörur </StyledHeading5>
+              </InformationContainer>
+            </Layout>
+        </Layout>
+
+      )}
     </Page>
   )
 }
