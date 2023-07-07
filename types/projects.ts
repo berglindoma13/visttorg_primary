@@ -5,12 +5,12 @@ export interface Project {
   certificatesystem: string
   address: string
   country: string
-  status?: number
-  id: string
+  status?: number | string
+  id: string | number
   ownerEmail: string
   owner: ProjectOwner
 }
 
 export interface ProjectOwner extends User {
   projects: Array<Project>
-}   
+}

@@ -112,7 +112,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   useEffect(() => {
     console.log('user', user)
     if(!user){
-      //router.push('/login')
+      //TODO: Fix this
+      // router.push('/login')
     }
   }, [])
 

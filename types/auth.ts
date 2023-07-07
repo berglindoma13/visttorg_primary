@@ -1,7 +1,8 @@
 export interface User {
-  id: string
-  fullName: string
+  id: string | number
+  fullname: string
   email: string
   company?: string
-  jobTitle?: string
+  jobtitle?: string
+  password?: string
 }

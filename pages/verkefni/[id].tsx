@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../../components/Header'
-import { Heading1, Heading3, Heading5 } from '../../components/Typography';
+import { Heading1, Heading3, Heading2 } from '../../components/Typography';
 import { Drawer, Button, Modal, Select, Layout } from 'antd';
 import Link from 'next/link';
 import { MyPagesSidebar } from '../../components/Drawer/MyPagesSidebar'
@@ -54,11 +54,22 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         }
     })
 
+    // Exclude keys from user 
+    const exclude = (user: User, key: string) => {
+        return Object.fromEntries(
+          Object.entries(user).filter(([userKey]) => userKey !== key)
+        )
+    }
+
+    const userWithoutPassword = exclude(thisProject.owner as User, 'password')
+
+    const project = {...thisProject, owner: userWithoutPassword}
+
     return {
         props: {
             user,
             certificateSystemList: filteredcertificateSystems,
-            thisProject
+            thisProject: project
         }
     }
 }
@@ -68,7 +79,8 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
     const [showError, setShowError] = useState(false)
 
     if(!!user && thisProject.owner.id !== user.id){
-      setShowError(true)
+      console.log('error here', user, thisProject.owner.id, user.id)
+      // setShowError(true)
     }
 
     const [open, setOpen] = useState(true);
@@ -76,9 +88,11 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter()
 
+    console.log('myProject', myProject)
+
     useEffect(() => {
       if(!user){
-        router.push('/login')
+      //  router.push('/login')
       }
     }, [])
     
@@ -111,6 +125,7 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
         })
     };
 
+    //TODO: Vantar "staðfesta" modal þegar notandi ýtir á eyða takkann
     const onDeleteProject = () => {
          axios.delete(
              `${process.env.NODE_ENV === 'development' ?
@@ -132,7 +147,7 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
           .catch((err: Error | AxiosError) => {
             console.log("error", err)
           })
-          // væri til í að sleppa þessu og bara gera þetta þegar að axios post er búið
+          // TODO: væri til í að sleppa þessu og bara gera þetta þegar að axios post er búið
           setTimeout(() => {
             router.push('/minarsidur')
           }, 1000)
@@ -151,10 +166,6 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
     const handleCancelModal = () => {
         // if user cancels or closes modal
         setIsModalOpen(false);
-    };
-
-    const onChangeSidebar = () => {
-        setOpen(!open);
     };
 
     const getProjectStateOprions = () => {
@@ -190,17 +201,15 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
                 />
             </ProjectActions>
             <Layout>
-              <InformationContainer>
-                <ProjectCardContainer>
-                  <MainHeading> {myProject.title}</MainHeading>
-                  <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
-                  <Heading3> Heimilisfang: {myProject.address} </Heading3> 
-                  <Heading3> Land: {myProject.country} </Heading3> 
-                  <Heading3> Staða: {projectStatesMapper[myProject.status]} </Heading3> 
-                </ProjectCardContainer>
-              </InformationContainer>
+              <ProjectCardContainer>
+                <StyledHeading1> {myProject.title}</StyledHeading1>
+                <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
+                <Heading3> Heimilisfang: {myProject.address} </Heading3> 
+                <Heading3> Land: {myProject.country} </Heading3> 
+                <Heading3> Staða: {projectStatesMapper[myProject.status]} </Heading3> 
+              </ProjectCardContainer>
               <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                  <MainHeading style={{fontSize: "28px"}}> Breyta verkefni </MainHeading>
+                  <ModalHeading style={{fontSize: "28px"}}> Breyta verkefni </ModalHeading>
                   <StyledInput 
                       placeholder='Titill'
                       onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
@@ -231,7 +240,8 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
                     />
                 </Modal>
               <InformationContainer>
-                  <StyledHeading5> Vörur </StyledHeading5>
+                <StyledHeading2>Vörulisti verkefnis</StyledHeading2>
+
               </InformationContainer>
             </Layout>
         </Layout>
@@ -273,7 +283,7 @@ const ProjectActions = styled.div`
 `
 
 const InformationContainer = styled.div`
-
+  padding-left:40px;
 `
 
 const StyledInput = styled(TextInput)`
@@ -281,13 +291,18 @@ const StyledInput = styled(TextInput)`
   margin-top:20px;
 `
 
-const MainHeading = styled(Heading1)`
+const StyledHeading1 = styled(Heading1)`
   font-size: 48px;
   width:100%;
   padding-bottom:15px;
 `
 
-const StyledHeading5 = styled(Heading5)`
+const ModalHeading = styled(Heading2)`
+    padding-bottom:15px;
+    font-size: 28px;
+`
+
+const StyledHeading2 = styled(Heading2)`
   padding-bottom:4px;
   width:100%;
 `
