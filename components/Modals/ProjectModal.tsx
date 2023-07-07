@@ -7,6 +7,7 @@ import VistbokLogo from '../Svg/VistbokLogo';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { TextInput } from '../Inputs'
+import { theme } from '../../styles';
 
 
 
@@ -50,40 +51,38 @@ export const ProjectModal = ({ text, className, certList, onClick, handleCancel,
 
 
   return (
-    <div>
-        <Modal open={open} onOk={onClick} onCancel={handleCancel}>
-            <div >
-                <MainHeading style={{fontSize: "28px"}}> {text} </MainHeading>
-                {/* <StyledHeading5> Titill </StyledHeading5> */}
-                <StyledInput 
-                    placeholder='Titill'
-                    onChange={(input) => {setNewProjectParam({title:input.target.value,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:newProjectParam.country})}}
-                    value={newProjectParam.title}
-                />
-                {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
-                <Select
-                placeholder="Vottunarkerfi"
-                style={{ width: '100%' }}
-                // onChange={handleChangeSelect}
-                onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:input,address:newProjectParam.address,country:newProjectParam.country})}}
-                options={certList}
-                />
-                {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
-                {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
-                <StyledInput 
-                    placeholder='Heimilisfang'
-                    onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:input.target.value,country:newProjectParam.country})}}
-                    value={newProjectParam.address}
-                />
-                {/* <StyledHeading5> Land </StyledHeading5> */}
-                <StyledInput 
-                    placeholder='Land'
-                    onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:input.target.value})}}
-                    value={newProjectParam.country}
-                />
-            </div>
-        </Modal>
-    </div>
+      <Modal open={open} onOk={onClick} onCancel={handleCancel} style={{backgroundColor: theme.colors.tertiary.base}}>
+          <div >
+              <MainHeading style={{fontSize: "28px"}}> {text} </MainHeading>
+              {/* <StyledHeading5> Titill </StyledHeading5> */}
+              <StyledInput 
+                  placeholder='Titill'
+                  onChange={(input) => {setNewProjectParam({title:input.target.value,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:newProjectParam.country})}}
+                  value={newProjectParam.title}
+              />
+              {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
+              <Select
+              placeholder="Vottunarkerfi"
+              style={{ width: '100%' }}
+              // onChange={handleChangeSelect}
+              onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:input,address:newProjectParam.address,country:newProjectParam.country})}}
+              options={certList}
+              />
+              {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
+              {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
+              <StyledInput 
+                  placeholder='Heimilisfang'
+                  onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:input.target.value,country:newProjectParam.country})}}
+                  value={newProjectParam.address}
+              />
+              {/* <StyledHeading5> Land </StyledHeading5> */}
+              <StyledInput 
+                  placeholder='Land'
+                  onChange={(input) => {setNewProjectParam({title:newProjectParam.title,certificatesystem:newProjectParam.certificatesystem, address:newProjectParam.address,country:input.target.value})}}
+                  value={newProjectParam.country}
+              />
+          </div>
+      </Modal>
   )
 }
 

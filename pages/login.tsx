@@ -22,7 +22,6 @@ import { Spin } from 'antd';
 import { readCookie } from '../utils/readCookie';
 
 const COOKIE_NAME = 'vistbokUser'
-const salt = bcrypt.genSaltSync(10)
 
 interface User {
   fullName?: string
@@ -36,8 +35,6 @@ const Login = () => {
 
   const { handleSubmit, watch, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
 
-  const watchAllFields = watch();
-
   const router = useRouter()
 
   const [loginError, setLoginError] = useState(false)
@@ -47,13 +44,11 @@ const Login = () => {
   const onSubmitLogin: SubmitHandler<User> = data => {
     setIsLoading(true);
 
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
-
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: hashedPassword
+        password: data.password
       }
     }).then((response) => {
       
@@ -71,16 +66,16 @@ const Login = () => {
     })
     .catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err))  {
-        console.error('isAxios error', err.response.data)
+        console.error('isAxios error', err)
         setLoginError(true);
         setMessage("Villa við innskráningu, reyndu aftur seinna");
         setIsLoading(false);
-        if(err.response.data == "user not found") {
+        if(err?.response?.data == "user not found") {
           setLoginError(true);
           setMessage("Þessi notandi er ekki til");
         }
         // Wrong password, setting error message
-        else if (err.response.data == "password does not match user") {
+        else if (err?.response?.data == "password does not match user") {
           setLoginError(true);
           setMessage("Rangt lykilorð");
         } 
@@ -95,12 +90,12 @@ const Login = () => {
 
   const onSubmitRegister: SubmitHandler<User> = data => {
     setIsLoading(true);
-    const hashedPassword = bcrypt.hashSync(data.password, salt)
+    
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
-        password: hashedPassword,
+        password: data.password,
         fullname: data.fullName,
         company: data.company,
         jobtitle: data.jobTitle
@@ -136,13 +131,6 @@ const Login = () => {
         // Just a stock error
       }
     })
-    // .catch((error) => {
-    //   console.log('this is the error', error)
-    // //   console.error('error registering - Message:', error.message)
-    //   //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
-    //   // setInputError(error.message)
-     
-    // });
   };
 
   const [isNewUser, setIsNewUser] = useState(false)

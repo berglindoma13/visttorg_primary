@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../components/Header'
-import { Heading1, Heading5 } from '../components/Typography';
+import { Heading1, Heading5, Heading2, Heading3, H3 } from '../components/Typography';
 import { TextInput } from '../components/Inputs'
-import { Button, Modal, Select, Dropdown } from 'antd';
+import { Button, Modal, Select, Dropdown, Layout  } from 'antd';
 import { DownOutlined,
         UserOutlined, 
         PlusOutlined } from '@ant-design/icons';
@@ -15,6 +15,16 @@ import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
 import { prismaInstance } from '../lib/prisma'
 import axios, { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { theme } from '../styles';
+import InteriorDesign from '../components/Svg/ProjectIcons/InteriorDesign';
+import HomeOne from '../components/Svg/ProjectIcons/HomeOne';
+import HomeFour from '../components/Svg/ProjectIcons/HomeFour';
+import HomeFive from '../components/Svg/ProjectIcons/HomeFive';
+import HomeThree from '../components/Svg/ProjectIcons/HomeThree';
+import HomeSix from '../components/Svg/ProjectIcons/HomeSix';
+import HomeTwo from '../components/Svg/ProjectIcons/HomeTwo';
+import { ProjectStates } from '../constants/projectStates';
+import { projectStatesMapper } from '../mappers/projectStates';
 
 interface User {
   fullname?: string
@@ -53,23 +63,31 @@ const formInitValues = {title:"", certificatesystem:"", address:"", country:"", 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
 
-  const currentUser = context.req.cookies.vistbokUser
+  const currentUser = context.req.cookies?.vistbokUser ? context.req.cookies?.vistbokUser : null
 
-  const user : User = jwt_decode(currentUser)
+  let user : User = null
+  let email: string = null
+  if(currentUser){
+    user = jwt_decode(currentUser)
+    email = user.email
+  } 
 
-  const email = user.email
+  let projectList = null
 
-  // ALL PROJECTS
-  const projectList = await prismaInstance.vistbokProject.findMany({
-    where: {
-      ownerEmail: email
-    }
-  });
+  if(email){
+    // ALL PROJECTS
+    projectList = await prismaInstance.vistbokProject.findMany({
+      where: {
+        ownerEmail: email
+      }
+    });
+  }
+
 
   // Get list of certificate systems
   const certificateSystems = await prismaInstance.certificatesystem.findMany({});
   const filteredcertificateSystems = certificateSystems.map(cert => {
-    return {value: cert.name, lable: cert.name}
+    return {value: cert.name, label: cert.name}
   })
 
   return {
@@ -83,25 +101,18 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
 const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurProps) => {
 
-  // const [user, setUser] = useState<User>(null)
-  const [open, setOpen] = useState(true);
-  // const [dropDownOpen, setDropDownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [newProjectParam, setNewProjectParam] = useState<SingleProject>(formInitValues)
 
-  const [projects, setProjects] = useState<AllProjects>({count: projectList?.length ,projects:projectList})
-
-
-  // const [open, setOpen] = useState(true);
+  const [projects, setProjects] = useState<AllProjects>({count: projectList && projectList?.length, projects: projectList ? projectList : []})
 
   const router = useRouter()
 
   useEffect(() => {
     console.log('user', user)
     if(!user){
-      console.log('in here')
-      router.push('/login')
+      //router.push('/login')
     }
   }, [])
 
@@ -114,7 +125,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
         certificatesystem: newProjectParam.certificatesystem,
         address: newProjectParam.address,
         country: newProjectParam.country,
-        status: "In progress",
+        status: ProjectStates.NotStarted.toString(),
         ownerEmail: user.email,
       }
     }).then((response) => {
@@ -125,48 +136,12 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
       throw new Error(response.statusText);
     })
     .then((responsejson) => {
-      console.log('success', responsejson);
       setProjects({count: projects.count+1, projects: [...projects.projects, {...newProjectParam, id: responsejson}]})
     })
     .catch((err: Error | AxiosError) => {
       console.log("error", err)
     })
   };
-
-  //Framer motion controls for showing and hiding filter drawer
-  const pageContentControls = useAnimation()
-  const drawerControls = useAnimation()
-    
-  useEffect(() => {
-    if(open){
-      pageContentControls.start({
-        x: "0px",
-        width: '75%',
-        marginLeft:'340px',
-        transition: { duration : 0.2 }
-      })
-
-      drawerControls.start({
-        opacity: 0.5,
-        transition: { duration : 0.4 }
-      })
-
-    }
-    else if(!open){
-      pageContentControls.start({
-        x: "20px",
-        width: '85%',
-        transition: { duration : 0.2 },
-        marginLeft:'120px'
-      })
-
-      drawerControls.start({
-        width:'30px',
-        opacity: 1,
-        transition: { duration : 0.4 },
-      })
-    }
-  }, [open])
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -183,18 +158,13 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     setIsModalOpen(false);
   };
 
-  const onChangeSidebar = () => {
-    setOpen(!open);
-  };
+
 
   const viewProject = (item : SingleProject) => {
     router.push({pathname:`/verkefni/${item.id}`, })
   }
 
   const onLogout = () => {
-    // localStorage.removeItem("username");
-    // localStorage.removeItem("userId");
-    // localStorage.setItem('loggedin', 'false');
     document.cookie = "vistbokUser= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
     router.push('/login')
   };
@@ -206,89 +176,99 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
       key: '1',
     },
   ];
+
+  const getProjectIcon = (index: number) => {
+    switch(index){
+      case 0: return <HomeOne height="100%" width="100%"/>
+      case 1: return <HomeTwo height="100%" width="100%"/>
+      case 2: return <HomeThree height="100%" width="100%"/>
+      case 3: return <HomeFour height="100%" width="100%"/>
+      case 4: return <HomeFive height="100%" width="100%"/>
+      case 5: return <HomeSix height="100%" width="100%"/>
+    }
+  }
+  
+  const getProjectStateOprions = () => {
+    const options = []
+    for (const key in ProjectStates) {
+      const option = {value: ProjectStates[key], label: projectStatesMapper[ProjectStates[key]]}
+      options.push(option)
+    }
+
+    return options
+  }
   
   return(
     <Page>
-      <PageContainer>
-        {/* <StyledHeader showSearch={true} /> */}
-        {!!user && <ContentContainer>
-          <MyPagesSidebar onClick={onChangeSidebar} open={open} />
-          <UserHeader >
-            <UsernameContainer>
-              <UserOutlined style={{ fontSize: '20px' }}/>
-              <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {user.fullname}</StyledHeading5> 
-              <Dropdown menu={{items}} trigger={['click']}>
-                <NavItem >
-                <DownOutlined />
-                </NavItem>
-              </Dropdown>
-            </UsernameContainer>
-          </UserHeader>
-          <InformationContainer 
-            style={{ marginLeft: open ? '340px' : '120px' }}
-            animate={pageContentControls}
-            // transition={{ type: "Tween" }}
-          >
-            <StyledHeading5> Mitt svæði </StyledHeading5>
-            <UserCardContainer>
-              <MainHeading> {user.fullname}</MainHeading>
-              <StyledHeading5> {user.company}</StyledHeading5> 
-              <StyledHeading5> {user.jobtitle}</StyledHeading5> 
-            </UserCardContainer>
-            <MyProjectsContainer>
-              <MyProjectsHeader>
-                <StyledHeading5> Mín verkefni </StyledHeading5>
-                <Button style={{marginRight:"12px", width:"100px", color:"#ABC5A1"}}>Í vinnslu <DownOutlined /> </Button>
-                <Button style={{marginRight:"20px", width:"140px", backgroundColor:"#ABC5A1"}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
-              </MyProjectsHeader>
-              <MyProjectsContent>
-              <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                <div >
-                  <MainHeading style={{fontSize: "28px"}}> Nýtt verkefni </MainHeading>
-                  {/* <StyledHeading5> Titill </StyledHeading5> */}
-                  <StyledInput 
-                      placeholder='Titill'
-                      onChange={(input) => {setNewProjectParam({...newProjectParam, title:input.target.value})}}
-                      value={newProjectParam.title}
-                  />
-                  {/* <StyledHeading5> Vottunarkerfi </StyledHeading5> */}
-                  <Select
-                    placeholder="Vottunarkerfi"
-                    style={{ width: '100%' }}
-                    // onChange={handleChangeSelect}
-                    onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
-                    options={certificateSystemList}
-                  />
-                  {/* <StyledHeading5> Nánar um vottunarkerfi </StyledHeading5> */}
-                  {/* <StyledHeading5> Heimilisfang </StyledHeading5> */}
-                  <StyledInput 
-                      placeholder='Heimilisfang'
-                      onChange={(input) => {setNewProjectParam({...newProjectParam, address:input.target.value})}}
-                      value={newProjectParam.address}
-                  />
-                  {/* <StyledHeading5> Land </StyledHeading5> */}
-                  <StyledInput 
-                      placeholder='Land'
-                      onChange={(input) => {setNewProjectParam({...newProjectParam,country:input.target.value})}}
-                      value={newProjectParam.country}
-                  />
-                </div>
-              </Modal>
-              {projects.count !== 0 && projects.projects.map((item) => {
-                return(
-                <ProjectCard key={item.title} onClick={() => viewProject(item)} >
-                  <MainHeading style={{fontSize: "28px"}}> {item.title} </MainHeading>
-                  <StyledHeading5> Vottunarkerfi: {item.certificatesystem} </StyledHeading5>
-                  <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
-                  <StyledHeading5> Land: {item.country} </StyledHeading5>
-                  <StyledHeading5> Staða: {item.status} </StyledHeading5>
-                </ProjectCard>)
-              })}
-              </MyProjectsContent>
-            </MyProjectsContainer>
-          </InformationContainer>
-        </ContentContainer>}
-      </PageContainer>
+        <Layout>
+          <MyPagesSidebar/>
+          <Layout>
+            <InformationContainer>
+              { user && (<UserCardContainer>
+                <MainHeading> {user.fullname}</MainHeading>
+                <Heading3> {user.company}</Heading3> 
+                <Heading3> {user.jobtitle}</Heading3> 
+              </UserCardContainer>)}
+              <MyProjectsContainer>
+                <MyProjectsHeader>
+                  <StyledHeading2> Mín verkefni </StyledHeading2>
+                  {/* <Button style={{marginRight:"12px", width:"100px", color:theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}}>Í vinnslu <DownOutlined color={theme.colors.black} /> </Button> */}
+                  <Button style={{marginRight:"20px", width:"140px", backgroundColor: theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
+                </MyProjectsHeader>
+                <MyProjectsContent>
+                <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal} bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} style={{ backgroundColor: theme.colors.tertiary.base, borderRadius: 8}}>
+                  <ModalContent >
+                    <MainHeading style={{fontSize: "28px", color: "#fff"}}> Nýtt verkefni </MainHeading>
+                    <StyledInput 
+                        placeholder='Titill'
+                        onChange={(input) => {setNewProjectParam({...newProjectParam, title:input.target.value})}}
+                        value={newProjectParam.title}
+                    />
+                    <Select
+                      placeholder="Vottunarkerfi"
+                      style={{ width: '100%' }}
+                      // onChange={handleChangeSelect}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
+                      options={certificateSystemList}
+                    />
+                    <StyledInput 
+                        placeholder='Heimilisfang'
+                        onChange={(input) => {setNewProjectParam({...newProjectParam, address:input.target.value})}}
+                        value={newProjectParam.address}
+                    />
+                    <StyledInput 
+                        placeholder='Land'
+                        onChange={(input) => {setNewProjectParam({...newProjectParam,country:input.target.value})}}
+                        value={newProjectParam.country}
+                    />
+                    <Select
+                      placeholder="Staða verks"
+                      style={{ width: '100%' }}
+                      onChange={(input) => {setNewProjectParam({...newProjectParam, status:input.value})}}
+                      options={getProjectStateOprions()}
+                    />
+                  </ModalContent>
+                </Modal>
+                {projects.count !== 0 && projects.projects.map((item, index) => {
+                  return(
+                  <ProjectCard key={item.title} onClick={() => viewProject(item)}>
+                    <SideBox>
+                      {getProjectIcon(index)}
+                    </SideBox>
+                    <ProjectInformation>
+                      <StyledHeading3> {item.title} </StyledHeading3>
+                      <StyledHeading5>{`Vottunarkerfi: ${item.certificatesystem}`}</StyledHeading5>
+                      <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
+                      <StyledHeading5> Land: {item.country} </StyledHeading5>
+                      <StyledHeading5> Staða: {item.status} </StyledHeading5>
+                    </ProjectInformation>
+                  </ProjectCard>)
+                })}
+                </MyProjectsContent>
+              </MyProjectsContainer>
+            </InformationContainer>
+          </Layout>
+        </Layout>      
     </Page>
   )
 }
@@ -300,26 +280,23 @@ const Page = styled.div`
   min-height:100vh;
 `
 
-const PageContainer = styled.div`
-  max-width: 1440px;
-  margin: 0 auto;
-  padding-bottom:200px;
+const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.tertiary.base};
 `
 
-const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+const ProjectInformation = styled.div`
+
 `
 
-const UserHeader = styled.div`
-  height:70px;
-  max-width: 1440px;
-  border-bottom:groove;
-  border-width: 3px;
-  border-color: light-grey;
-  margin-bottom:50px;
-  display: flex;
-  align-items: center;
+const SideBox = styled.div`
+  height: 120px;
+  width: 120px;
+  background-color:${({ theme }) => theme.colors.lightGreen};
+  margin-left: -90px;
+  margin-right:20px;
+  box-shadow: 0px 4px 26px 10px rgba(154,154,154,0.1);
+  border-radius: 16px;
+  padding: 0px 10px 0px 10px;
 `
 
 const UsernameContainer = styled.div`
@@ -343,26 +320,33 @@ const SideContainer = styled(motion.div)`
 `
 
 const InformationContainer = styled(motion.div)`
-  // padding-left:40px;
+ 
 `
 
 const UserCardContainer = styled.div`
-  height:24vh;
-  width:42vw;
-  border:solid;
-  // margin:10px;
-  margin:30px 0px 30px 0px;
-  padding: 25px 25px 25px 40px;
+  height:30vw;
+  width:100vw;
   display: flex;
   flex-direction: column;
-  // justify-content:flex-start;
-  align-items:center;
-  justify-content: center;
+  align-items:flex-start;
+  padding-left:40px;
+  padding-top:40px;
+  background-image:url('/wave_v5.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 30vh;
+
+  ${Heading3}{
+    font-size: 20px;
+    margin-bottom:10px;
+    font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
+  }
 `
 
 const MyProjectsContainer = styled.div`
   display:flex;
   flex-direction:column;
+  padding-left:40px;
 `
 
 const MyProjectsHeader = styled.div`
@@ -382,60 +366,50 @@ const MyProjectsContent = styled.div`
 
 // css for a single project card
 const ProjectCard = styled.div`
-  // background: #d3d3d3;
-  background: #FFFFFF;
-  // height:200px;
-  // width:180px;
-  margin: 15px 30px 15px 0px;
+  padding: 20px 30px 20px 30px;
+  margin: 15px 30px 15px 60px;
   min-width: 250px;
-  width: 18%;
+  width: 30%;
   height: auto;
   max-height: 510px;
   box-shadow: 0px 4px 26px 10px rgba(154, 154, 154, 0.1);
   border-radius: 16px;
   display:flex;
-  flex-direction:column;
-  padding: 12px;
+  flex-direction:row;
+  align-items:center;
   position:relative;
   transition: box-shadow 0.2s ease-in;
   cursor: pointer;
-  padding-bottom:40px;
-
-`
-
-const StyledHeader = styled(Header)`
-  margin-bottom:50px;
 `
 
 const MainHeading = styled(Heading1)`
   font-size: 48px;
   width:100%;
-  padding-bottom:6px;
+  padding-bottom:15px;
+
+`
+
+const StyledHeading2 = styled(Heading2)`
+  padding-bottom:10px;
+  width:100%;
+`
+
+const StyledHeading3 = styled(Heading3)`
+  font-size: 28px;
+  padding-top:10px;
+  padding-bottom:15px;
 `
 
 const StyledHeading5 = styled(Heading5)`
-  padding-bottom:4px;
+  padding-bottom:10px;
+  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+  font-weight: lighter;
+  font-size: 16px;
+  white-space: nowrap;
   width:100%;
 `
 
 const StyledInput = styled(TextInput)`
   margin-bottom:20px;
   margin-top:20px;
-  // background: green;
-`
-
-const NavItem = styled.span`
-  font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 104%;
-  letter-spacing: 0.09em;
-  /* font-variant: small-caps; */
-  color: #000000;
-  cursor: pointer;
-  padding-bottom: 8px;
-
-  &:hover{
-    color: ${({ theme }) => theme.colors.green};
-  }
 `
