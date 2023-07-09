@@ -18,6 +18,9 @@ import { projectStatesMapper } from '../../mappers/projectStates';
 import { Project } from '../../types/projects';
 import { User } from '../../types/auth';
 import { CustomError } from '../../components/Error/CustomError';
+import { ProductProps } from '../../types/products';
+import superjson from 'superjson'
+import ProductTable from '../../components/ProductTable';
 
 interface CertificateSystem {
     value: string
@@ -27,6 +30,7 @@ interface VerkefniProps {
   user: User
   certificateSystemList?: Array<CertificateSystem>
   thisProject: Project
+  productString: string
 }
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -54,6 +58,40 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         }
     })
 
+    let mappedProductIds = []
+
+    await prismaInstance.productsInProjects.findMany({
+      where: {
+        projectId: parseInt(id)
+      }
+    }).then((products) => {
+      console.log('products', products)
+      mappedProductIds = products.map(x => x.productId)
+    })  
+
+    console.log('mappedPrductsIds', mappedProductIds)
+
+    const mappedProducts = await prismaInstance.product.findMany({
+      where: {
+        id: {
+          in: mappedProductIds
+        }
+      },
+      include: {
+        sellingcompany: true,
+        categories : true,
+        subCategories: true,
+        certificateSystems: true,
+        certificates: {
+          include: {
+            certificate : true
+          }
+        }
+      },
+    })
+
+    const productsJSONString = superjson.stringify(mappedProducts)
+
     // Exclude keys from user 
     const exclude = (user: User, key: string) => {
         return Object.fromEntries(
@@ -69,13 +107,15 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         props: {
             user,
             certificateSystemList: filteredcertificateSystems,
-            thisProject: project
+            thisProject: project,
+            productString: productsJSONString
         }
     }
 }
 
-const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) => {
-
+const verkefni = ({ user, certificateSystemList, thisProject, productString } : VerkefniProps) => {
+    
+    const productsInProject: Array<ProductProps> = superjson.parse(productString)
     const [showError, setShowError] = useState(false)
 
     if(!!user && thisProject.owner.id !== user.id){
@@ -178,6 +218,7 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
       return options
     }
 
+    console.log('productsInProject', productsInProject)
     return(
     <Page>
       {showError ? (
@@ -202,14 +243,14 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
             </ProjectActions>
             <Layout>
               <ProjectCardContainer>
-                <StyledHeading1> {myProject.title}</StyledHeading1>
+                <StyledHeading1>{myProject.title}</StyledHeading1>
                 <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
-                <Heading3> Heimilisfang: {myProject.address} </Heading3> 
-                <Heading3> Land: {myProject.country} </Heading3> 
-                <Heading3> Staða: {projectStatesMapper[myProject.status]} </Heading3> 
+                <Heading3>Heimilisfang: {myProject.address}</Heading3> 
+                <Heading3>Land: {myProject.country}</Heading3> 
+                <Heading3>Staða: {projectStatesMapper[myProject.status]}</Heading3> 
               </ProjectCardContainer>
               <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                  <ModalHeading style={{fontSize: "28px"}}> Breyta verkefni </ModalHeading>
+                  <ModalHeading> Breyta verkefni </ModalHeading>
                   <StyledInput 
                       placeholder='Titill'
                       onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
@@ -241,7 +282,9 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
                 </Modal>
               <InformationContainer>
                 <StyledHeading2>Vörulisti verkefnis</StyledHeading2>
-
+                <ProductTable 
+                  products={productsInProject}
+                />
               </InformationContainer>
             </Layout>
         </Layout>
