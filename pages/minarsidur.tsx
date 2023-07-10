@@ -204,7 +204,16 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                   <Button style={{marginRight:"20px", width:"140px", backgroundColor: theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
                 </MyProjectsHeader>
                 <MyProjectsContent>
-                <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal} bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} style={{ backgroundColor: theme.colors.tertiary.base, borderRadius: 8}}>
+                <Modal 
+                  open={isModalOpen}
+                  bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} 
+                  style={{ borderRadius: 8}}
+                  closable={false}
+                  footer={[
+                    <Button onClick={handleCancelModal} style={{ backgroundColor: theme.colors.grey_two, color: 'black', fontFamily: theme.fonts.fontFamilySecondary, margin: '10px 0px 10px 0px'}} type="primary" >Hætta við</Button>,
+                    <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Búa til</Button>,
+                  ]}
+                >
                   <ModalContent >
                     <MainHeading style={{fontSize: "28px", color: "#fff"}}> Nýtt verkefni </MainHeading>
                     <StyledInput 
@@ -214,8 +223,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                     />
                     <Select
                       placeholder="Vottunarkerfi"
-                      style={{ width: '100%' }}
-                      // onChange={handleChangeSelect}
+                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      dropdownStyle={{borderRadius: '20px', background: 'white', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
                       options={certificateSystemList}
                     />
@@ -231,7 +240,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                     />
                     <Select
                       placeholder="Staða verks"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      dropdownStyle={{borderRadius: '20px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       onChange={(input) => {setNewProjectParam({...newProjectParam, status:input.value})}}
                       options={getProjectStateOprions()}
                     />
