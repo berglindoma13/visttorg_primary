@@ -138,6 +138,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     })
     .then((responsejson) => {
       setProjects({count: projects.count+1, projects: [...projects.projects, {...newProjectParam, id: responsejson}]})
+      setNewProjectParam(formInitValues);
       setIsLoading(false);
     })
     .catch((err: Error | AxiosError) => {
@@ -158,6 +159,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
 
   const handleCancelModal = () => {
     // if user cancels or closes modal
+    setNewProjectParam(formInitValues);
     setIsModalOpen(false);
   };
 
