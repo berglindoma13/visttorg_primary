@@ -164,18 +164,18 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     router.push({pathname:`/verkefni/${item.id}`, })
   }
 
-  const onLogout = () => {
-    document.cookie = "vistbokUser= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
-    router.push('/login')
-  };
+  // const onLogout = () => {
+  //   document.cookie = "vistbokUser= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+  //   router.push('/login')
+  // };
 
-  // dropdown items - called items because they are MenuProps from antd
-  const items = [
-    {
-      label: (<div onClick={() => onLogout()}>Útskrá</div>),
-      key: '1',
-    },
-  ];
+  // // dropdown items - called items because they are MenuProps from antd
+  // const items = [
+  //   {
+  //     label: (<div onClick={() => onLogout()}>Útskrá</div>),
+  //     key: '1',
+  //   },
+  // ];
 
   const getProjectIcon = (index: number) => {
     switch(index){
