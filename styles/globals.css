@@ -30,6 +30,10 @@ body #nprogress .spinner-icon {
 
 }
 
+.ant-spin-dot-item {
+	background-color: #ABC5A1 !important;
+}
+
 @font-face {
 	font-family : 'GT';
 	src: url('/fonts/GT_Walsheim/GT-Walsheim-Medium.ttf');

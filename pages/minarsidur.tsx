@@ -23,6 +23,8 @@ import HomeSix from '../components/Svg/ProjectIcons/HomeSix';
 import HomeTwo from '../components/Svg/ProjectIcons/HomeTwo';
 import { ProjectStates } from '../constants/projectStates';
 import { projectStatesMapper } from '../mappers/projectStates';
+import { Spin } from 'antd';
+import '../styles/globalStyles';
 
 interface User {
   fullname?: string
@@ -81,7 +83,6 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     });
   }
 
-
   // Get list of certificate systems
   const certificateSystems = await prismaInstance.certificatesystem.findMany({});
   const filteredcertificateSystems = certificateSystems.map(cert => {
@@ -101,6 +102,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   
+  const [isLoading, setIsLoading] = useState(false);
+
   const [newProjectParam, setNewProjectParam] = useState<SingleProject>(formInitValues)
 
   const [projects, setProjects] = useState<AllProjects>({count: projectList && projectList?.length, projects: projectList ? projectList : []})
@@ -135,6 +138,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     })
     .then((responsejson) => {
       setProjects({count: projects.count+1, projects: [...projects.projects, {...newProjectParam, id: responsejson}]})
+      setIsLoading(false);
     })
     .catch((err: Error | AxiosError) => {
       console.log("error", err)
@@ -148,6 +152,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   const handleOkModal = () => {
     // if user presses ok
     setIsModalOpen(false);
+    setIsLoading(true);
     onProjectCreation()
   };
 
@@ -194,7 +199,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
               </UserCardContainer>)}
               <MyProjectsContainer>
                 <MyProjectsHeader>
-                  <StyledHeading2> Mín verkefni </StyledHeading2>
+                  <StyledHeading2> Mín verkefni {isLoading && <Spin size="large" />} </StyledHeading2>
                   {/* <Button style={{marginRight:"12px", width:"100px", color:theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}}>Í vinnslu <DownOutlined color={theme.colors.black} /> </Button> */}
                   <Button style={{marginRight:"20px", width:"140px", backgroundColor: theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
                 </MyProjectsHeader>
