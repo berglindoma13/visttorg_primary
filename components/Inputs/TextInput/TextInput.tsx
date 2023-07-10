@@ -18,7 +18,7 @@ export const TextInput = forwardRef(({ placeholder, onSubmit, className, onChang
   
   const _onSubmit = (e) => {
     if (e.which === 13) {
-      onSubmit()
+      // onSubmit()
     }
   }
   
