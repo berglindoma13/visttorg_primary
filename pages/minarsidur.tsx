@@ -4,9 +4,7 @@ import { Header } from '../components/Header'
 import { Heading1, Heading5, Heading2, Heading3, H3 } from '../components/Typography';
 import { TextInput } from '../components/Inputs'
 import { Button, Modal, Select, Dropdown, Layout  } from 'antd';
-import { DownOutlined,
-        UserOutlined, 
-        PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
 // import Link from 'next/link';
 import { motion, useAnimation } from "framer-motion";
@@ -158,24 +156,9 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     setIsModalOpen(false);
   };
 
-
-
   const viewProject = (item : SingleProject) => {
     router.push({pathname:`/verkefni/${item.id}`, })
   }
-
-  // const onLogout = () => {
-  //   document.cookie = "vistbokUser= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
-  //   router.push('/login')
-  // };
-
-  // // dropdown items - called items because they are MenuProps from antd
-  // const items = [
-  //   {
-  //     label: (<div onClick={() => onLogout()}>Útskrá</div>),
-  //     key: '1',
-  //   },
-  // ];
 
   const getProjectIcon = (index: number) => {
     switch(index){
@@ -297,26 +280,6 @@ const SideBox = styled.div`
   box-shadow: 0px 4px 26px 10px rgba(154,154,154,0.1);
   border-radius: 16px;
   padding: 0px 10px 0px 10px;
-`
-
-const UsernameContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  width:97%;
-`
-
-const UserDropDownMenu = styled.div`
-  
-`
-
-const SideContainer = styled(motion.div)`
-  // background-color:${({ theme }) => theme.colors.green};
-  width:100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 `
 
 const InformationContainer = styled(motion.div)`
