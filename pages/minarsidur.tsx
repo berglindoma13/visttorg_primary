@@ -101,11 +101,8 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurProps) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
   const [isLoading, setIsLoading] = useState(false);
-
   const [newProjectParam, setNewProjectParam] = useState<SingleProject>(formInitValues)
-
   const [projects, setProjects] = useState<AllProjects>({count: projectList && projectList?.length, projects: projectList ? projectList : []})
 
   const router = useRouter()
@@ -118,7 +115,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   }, [])
 
   const onProjectCreation = () => {
-    console.log('new project to create', newProjectParam)
+    // console.log('new project to create', newProjectParam)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproject`, {
       headers: { 'Content-Type': 'application/json' },
       data: {

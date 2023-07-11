@@ -41,7 +41,7 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false)
   
-  const onSubmitLogin: SubmitHandler<User> = (data, event) => {
+  const onSubmitLogin: SubmitHandler<User> = (data) => {
     setIsLoading(true);
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
@@ -50,7 +50,6 @@ const Login = () => {
         password: data.password
       }
     }).then((response) => {
-      
       if (response.status === 200) {
         return response.data;
       }
@@ -87,7 +86,7 @@ const Login = () => {
     })
   };
 
-  const onSubmitRegister: SubmitHandler<User> = (data, event) => {
+  const onSubmitRegister: SubmitHandler<User> = (data) => {
     setIsLoading(true);
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
