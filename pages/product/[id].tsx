@@ -20,11 +20,51 @@ import { mediaMax } from "../../constants/breakpoints"
 import superjson from 'superjson'
 import { useRouter } from "next/router"
 import certMapper from '../../mappers/certificates'
+import { User } from "../../types/auth"
+import jwt_decode from 'jwt-decode';
+import { Project } from "../../types/projects"
+import { Select } from "antd"
+import { getCertImage } from "../../utils/getCertImage"
+import axios from 'axios'
+import { useState } from "react"
+
+const CertsWithIcons = [
+  'EPD',
+  'FSC',
+  'VOC',
+  'SV',
+  'EV',
+  'SV_ALLOWED',
+  'BLENGILL'
+]
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query.id !== undefined ? context.query.id.toString() : ''
   const company = parseInt(context.query.c.toString())
 
+  const currentUser = context.req.cookies?.vistbokUser ? context.req.cookies?.vistbokUser : null
+
+  let user : User = null
+  if(currentUser){
+    user = jwt_decode(currentUser)
+  }
+
+  const prismaUser = await prismaInstance.vistbokUser.findUnique({
+    where: {
+      id: parseInt(user.id as string)
+    },
+    include: {
+      projects: {
+        include: {
+          owner: true
+        }
+      }
+    }
+  })
+
+  const userProjects = prismaUser.projects as Array<Project>
+
+  
   const uniqueProduct = await prismaInstance.product.findUnique({
     where: {
       productIdentifier : { productid: id, companyid: company}
@@ -41,84 +81,69 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     },
   });
+
+  const productsInUserProjects = await prismaInstance.productsInProjects.findMany({
+    where: {
+      productId: uniqueProduct.productid,
+      project: {
+        owner: {
+          id: parseInt(user.id as string)
+        }
+      }
+    }
+  })
+
+  console.log('productsInUserProjects', productsInUserProjects)
+
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
   return {
     props: {
-      id,
-      productString: uniqueProductString
+      userProjects,
+      productString: uniqueProductString,
+      // productsInUserProjects
     },
   }
 }
 
 interface ProductPageProps{
   productString: string
+  userProjects?: Array<Project>
+  productsInUserProjects?: any
+
 }
 
-const Product = ({ productString } : ProductPageProps) => {
-
-  
-  // const router = useRouter()
-  
-  // const reRouteToSearchPage = (category: string, filterLevel: number) => {
-
-  //   //add the category to sessionStorage and reset all other sessionStorage items
-  //   if(filterLevel === 1){
-      
-  //     const newFilters = []
-  //     newFilters.push(category)
-      
-  //     sessionStorage.setItem('level1Filters', JSON.stringify(newFilters))
-  //     sessionStorage.setItem('level2Filters', JSON.stringify([]))
-  //     sessionStorage.setItem('queryParam', '')
-      
-  //   }else {
-      
-  //     const newFilters = []
-  //     newFilters.push(category)
-      
-  //     sessionStorage.setItem('level2Filters', JSON.stringify(newFilters))
-  //     sessionStorage.setItem('level1Filters', JSON.stringify([]))
-  //     sessionStorage.setItem('queryParam', '')
-  //   }
-    
-    
-  //   //Push to frontpage
-  //   router.push('/')
-    
-  // }
-  
-
+const Product = ({ productString, userProjects, productsInUserProjects } : ProductPageProps) => {
+  console.log('productsInUserProjects', productsInUserProjects)
   //TODO FIX PRODUCT TYPES
   const product: ProductProps = superjson.parse(productString)
+  const [chosenProject, setChosenProject] = useState<number>(userProjects && userProjects.length > 0 ? parseInt(userProjects[0].id as string) : null)
 
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   const showSwiper = false
   SwiperCore.use([Pagination])
 
-
-  const getCertImage = (cert: string) => {
-    switch(cert){
-      case 'EPD':
-        return <CertImageWrapper><Image src='/epdLogo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-      case 'FSC':
-        return <CertImageWrapper><Image src='/FSC_LOGO.jpg' layout="fill" objectFit="contain" /></CertImageWrapper>
-      case 'BREEAM':
-        return <CertImageWrapper><Image src='/BREEAM_LOGO.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-      case 'SV':
-        return <CertImageWrapper><SvanurinnLogoSVG /></CertImageWrapper>
-      case 'VOC':
-        return <CertImageWrapper><VocLogoSVG /></CertImageWrapper>
-      case 'SV_ALLOWED':
-        return <CertImageWrapper><Image src='/leyfilegt-svansvottad.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-      case 'EV':
-        return <CertImageWrapper><Image src='/Euroblume_logo.svg.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-      // case 'CE':
-      //   return <CertImageWrapper><Image src='/ce_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-      case 'BLENGILL':
-        return <CertImageWrapper><Image src='/blue_angel_logo.png' layout="fill" objectFit="contain" /></CertImageWrapper>
-    }
+  const handleChangeChosenProject = (e) => {
+    console.log('e', e)
+    setChosenProject(e.value)
   }
+
+  const addProductToProject = () => {
+    console.log('hello')
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproducttoproject`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: {
+        projectId: chosenProject,
+        productId: product.id
+      }
+    }).then((response) => {
+      console.log('response', response)
+    }).catch((error) => {
+      console.error('error', error)
+    })
+  }
+  
+  console.log('userProjects', userProjects)
 
   return(
     <Page>
@@ -167,7 +192,27 @@ const Product = ({ productString } : ProductPageProps) => {
             )}
           </ProductInfoLeft>
           <ProductInfoRight style={{ marginRight: 160 }}>
-            <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>
+            <TagAndProjects>
+              {product.brand && <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>}
+              <AddToProjectWrapper>
+                  <Select
+                    defaultValue={chosenProject}
+                    style={{  }}
+                    onChange={handleChangeChosenProject}
+                    options={
+                      userProjects.map(project => {
+                        return {
+                          value: project.id, label: project.title
+                        }
+                      })
+                    } 
+                  />
+                  <AddToProjectButton
+                    onClick={() => addProductToProject()}
+                    text="Bæta við verkefni"
+                  />
+              </AddToProjectWrapper>
+            </TagAndProjects>
             <Heading1 style={{marginTop: 23, marginBottom: 70 }}>{product.title}</Heading1> 
               <div style={{display:'flex'}}>
                 <div style={{flex:1}}>
@@ -213,23 +258,25 @@ const Product = ({ productString } : ProductPageProps) => {
               </>}
           </ProductInfoRight>
         </ProductInfo>
-        <ProductCertifications>
+
+        {/* TODO: Endurhugsa þetta */}
+        {product.certificates && product.certificates.length > 0 && product.certificates.filter(x => CertsWithIcons.includes(x.certificate.name)).length > 0 && <ProductCertifications>
            <Heading3 style={{marginBottom: 43}}>Vottanir</Heading3>
           <CertificateList>
             {product.certificates.map((certificate : ProductCertificate, index : number) => {
               if((certificate.certificate.name === "EPD" || certificate.certificate.name === "VOC"  || certificate.certificate.name === "FSC") && certificate.validDate < new Date() ) {
                 return
               }
-              else {
-              return (
-                <SingleCertificateItem key={index}>
-                  {getCertImage(certificate.certificate.name)}
-                </SingleCertificateItem>
-              )
-            }
+              else if(CertsWithIcons.includes(certificate.certificate.name)){
+                return (
+                  <SingleCertificateItem key={index}>
+                    {getCertImage(certificate.certificate.name)}
+                  </SingleCertificateItem>
+                )
+              }
             })}
           </CertificateList>  
-        </ProductCertifications>
+        </ProductCertifications>}
       </PageContainer>
       <Footer />
     </Page>
@@ -238,10 +285,35 @@ const Product = ({ productString } : ProductPageProps) => {
 
 export default Product
 
+const AddToProjectButton = styled(MainButton)`
+ 
+`
+
 const StyledImage = styled.img`
   object-fit: contain;
   height:100%;
   width:100%;
+`
+
+const AddToProjectWrapper = styled.div`
+  display:flex;
+  justify-content: flex-end;
+  width: 100%;
+
+  .ant-select{
+    width: 140px;
+    margin-right:10px;
+    .ant-select-selector{
+      border-radius: 1284.43px;
+      padding: 0 15px;
+    }
+  }
+`
+
+const TagAndProjects = styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
 `
 
 const FileLinks = styled.a`
@@ -252,15 +324,7 @@ const FileLinks = styled.a`
   letter-spacing: 0.09em;
 `
 
-const CertImageWrapper = styled.div`
-  position: relative;
-  height: 80px;
-  width: 100px;
-  display:flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`
+
 
 const SingleCertificateItem = styled.div`
   display:flex;

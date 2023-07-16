@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Header } from '../../components/Header'
-import { Heading1, Heading3, Heading5 } from '../../components/Typography';
+import { Heading1, Heading3, Heading2 } from '../../components/Typography';
 import { Drawer, Button, Modal, Select, Layout } from 'antd';
 import Link from 'next/link';
 import { MyPagesSidebar } from '../../components/Drawer/MyPagesSidebar'
@@ -18,6 +18,9 @@ import { projectStatesMapper } from '../../mappers/projectStates';
 import { Project } from '../../types/projects';
 import { User } from '../../types/auth';
 import { CustomError } from '../../components/Error/CustomError';
+import { ProductProps } from '../../types/products';
+import superjson from 'superjson'
+import ProductTable from '../../components/ProductTable';
 
 interface CertificateSystem {
     value: string
@@ -27,6 +30,7 @@ interface VerkefniProps {
   user: User
   certificateSystemList?: Array<CertificateSystem>
   thisProject: Project
+  productString: string
 }
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -54,21 +58,69 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         }
     })
 
+    let mappedProductIds = []
+
+    await prismaInstance.productsInProjects.findMany({
+      where: {
+        projectId: parseInt(id)
+      }
+    }).then((products) => {
+      console.log('products', products)
+      mappedProductIds = products.map(x => x.productId)
+    })  
+
+    console.log('mappedPrductsIds', mappedProductIds)
+
+    const mappedProducts = await prismaInstance.product.findMany({
+      where: {
+        id: {
+          in: mappedProductIds
+        }
+      },
+      include: {
+        sellingcompany: true,
+        categories : true,
+        subCategories: true,
+        certificateSystems: true,
+        certificates: {
+          include: {
+            certificate : true
+          }
+        }
+      },
+    })
+
+    const productsJSONString = superjson.stringify(mappedProducts)
+
+    // Exclude keys from user 
+    const exclude = (user: User, key: string) => {
+        return Object.fromEntries(
+          Object.entries(user).filter(([userKey]) => userKey !== key)
+        )
+    }
+
+    const userWithoutPassword = exclude(thisProject.owner as User, 'password')
+
+    const project = {...thisProject, owner: userWithoutPassword}
+
     return {
         props: {
             user,
             certificateSystemList: filteredcertificateSystems,
-            thisProject
+            thisProject: project,
+            productString: productsJSONString
         }
     }
 }
 
-const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) => {
-
+const verkefni = ({ user, certificateSystemList, thisProject, productString } : VerkefniProps) => {
+    
+    const productsInProject: Array<ProductProps> = superjson.parse(productString)
     const [showError, setShowError] = useState(false)
 
     if(!!user && thisProject.owner.id !== user.id){
-      setShowError(true)
+      console.log('error here', user, thisProject.owner.id, user.id)
+      // setShowError(true)
     }
 
     const [open, setOpen] = useState(true);
@@ -76,9 +128,11 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter()
 
+    console.log('myProject', myProject)
+
     useEffect(() => {
       if(!user){
-        router.push('/login')
+      //  router.push('/login')
       }
     }, [])
     
@@ -111,6 +165,7 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
         })
     };
 
+    //TODO: Vantar "staðfesta" modal þegar notandi ýtir á eyða takkann
     const onDeleteProject = () => {
          axios.delete(
              `${process.env.NODE_ENV === 'development' ?
@@ -149,10 +204,6 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
         setIsModalOpen(false);
     };
 
-    const onChangeSidebar = () => {
-        setOpen(!open);
-    };
-
     const getProjectStateOprions = () => {
       const options = []
       for (const key in ProjectStates) {
@@ -163,6 +214,7 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
       return options
     }
 
+    console.log('productsInProject', productsInProject)
     return(
     <Page>
       {showError ? (
@@ -186,17 +238,15 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
                 />
             </ProjectActions>
             <Layout>
-              <InformationContainer>
-                <ProjectCardContainer>
-                  <MainHeading> {myProject.title}</MainHeading>
-                  <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
-                  <Heading3> Heimilisfang: {myProject.address} </Heading3> 
-                  <Heading3> Land: {myProject.country} </Heading3> 
-                  <Heading3> Staða: {projectStatesMapper[myProject.status]} </Heading3> 
-                </ProjectCardContainer>
-              </InformationContainer>
+              <ProjectCardContainer>
+                <StyledHeading1>{myProject.title}</StyledHeading1>
+                <Heading3>Vottunarkerfi: {myProject.certificatesystem}</Heading3> 
+                <Heading3>Heimilisfang: {myProject.address}</Heading3> 
+                <Heading3>Land: {myProject.country}</Heading3> 
+                <Heading3>Staða: {projectStatesMapper[myProject.status]}</Heading3> 
+              </ProjectCardContainer>
               <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                  <MainHeading style={{fontSize: "28px"}}> Breyta verkefni </MainHeading>
+                  <ModalHeading> Breyta verkefni </ModalHeading>
                   <StyledInput 
                       placeholder='Titill'
                       onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
@@ -227,7 +277,10 @@ const verkefni = ({ user, certificateSystemList, thisProject } : VerkefniProps) 
                     />
                 </Modal>
               <InformationContainer>
-                  <StyledHeading5> Vörur </StyledHeading5>
+                <StyledHeading2>Vörulisti verkefnis</StyledHeading2>
+                <ProductTable 
+                  products={productsInProject}
+                />
               </InformationContainer>
             </Layout>
         </Layout>
@@ -269,7 +322,8 @@ const ProjectActions = styled.div`
 `
 
 const InformationContainer = styled.div`
-
+  padding-left:40px;
+  padding-right:40px;
 `
 
 const StyledInput = styled(TextInput)`
@@ -277,13 +331,18 @@ const StyledInput = styled(TextInput)`
   margin-top:20px;
 `
 
-const MainHeading = styled(Heading1)`
+const StyledHeading1 = styled(Heading1)`
   font-size: 48px;
   width:100%;
   padding-bottom:15px;
 `
 
-const StyledHeading5 = styled(Heading5)`
+const ModalHeading = styled(Heading2)`
+    padding-bottom:15px;
+    font-size: 28px;
+`
+
+const StyledHeading2 = styled(Heading2)`
   padding-bottom:4px;
   width:100%;
 `
