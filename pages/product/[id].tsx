@@ -64,6 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const userProjects = prismaUser.projects as Array<Project>
 
+  
   const uniqueProduct = await prismaInstance.product.findUnique({
     where: {
       productIdentifier : { productid: id, companyid: company}
@@ -80,12 +81,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     },
   });
+
+  const productsInUserProjects = await prismaInstance.productsInProjects.findMany({
+    where: {
+      productId: uniqueProduct.productid,
+      project: {
+        owner: {
+          id: parseInt(user.id as string)
+        }
+      }
+    }
+  })
+
+  console.log('productsInUserProjects', productsInUserProjects)
+
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
   return {
     props: {
       userProjects,
-      productString: uniqueProductString
+      productString: uniqueProductString,
+      // productsInUserProjects
     },
   }
 }
@@ -93,11 +109,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 interface ProductPageProps{
   productString: string
   userProjects?: Array<Project>
+  productsInUserProjects?: any
 
 }
 
-const Product = ({ productString, userProjects } : ProductPageProps) => {
-
+const Product = ({ productString, userProjects, productsInUserProjects } : ProductPageProps) => {
+  console.log('productsInUserProjects', productsInUserProjects)
   //TODO FIX PRODUCT TYPES
   const product: ProductProps = superjson.parse(productString)
   const [chosenProject, setChosenProject] = useState<number>(userProjects && userProjects.length > 0 ? parseInt(userProjects[0].id as string) : null)
@@ -176,11 +193,11 @@ const Product = ({ productString, userProjects } : ProductPageProps) => {
           </ProductInfoLeft>
           <ProductInfoRight style={{ marginRight: 160 }}>
             <TagAndProjects>
-              <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>
+              {product.brand && <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>}
               <AddToProjectWrapper>
                   <Select
                     defaultValue={chosenProject}
-                    style={{ width: 120 }}
+                    style={{  }}
                     onChange={handleChangeChosenProject}
                     options={
                       userProjects.map(project => {
@@ -269,7 +286,7 @@ const Product = ({ productString, userProjects } : ProductPageProps) => {
 export default Product
 
 const AddToProjectButton = styled(MainButton)`
-
+ 
 `
 
 const StyledImage = styled.img`
@@ -280,6 +297,17 @@ const StyledImage = styled.img`
 
 const AddToProjectWrapper = styled.div`
   display:flex;
+  justify-content: flex-end;
+  width: 100%;
+
+  .ant-select{
+    width: 140px;
+    margin-right:10px;
+    .ant-select-selector{
+      border-radius: 1284.43px;
+      padding: 0 15px;
+    }
+  }
 `
 
 const TagAndProjects = styled.div`

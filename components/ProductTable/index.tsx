@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { ProductProps } from '../../types/products';
-import { MainButton } from '../Buttons';
+import { MainButton, MainButtonText } from '../Buttons';
 import styled from 'styled-components';
-import { Checkbox } from 'antd';
+import { Checkbox, Tooltip } from 'antd';
 import { IconButton } from '../Buttons/iconButton';
-import { DownloadOutlined } from '@ant-design/icons';
-import { DownloadButton } from '../Buttons/DownloadButton';
+import { DownloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 interface ProductTableProps {
   products: Array<ProductProps>
@@ -27,6 +26,12 @@ const ProductTable = ({ products }: ProductTableProps) => {
   const handleDownload = (files: Array<string>) => {
     files.forEach(URL => window.open(URL))
   }
+
+  const handleDownloadAll = () => {
+    products.map(product => {
+      handleDownload(product.certificates.map(c => c.fileurl))
+    })
+  }  
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -54,17 +59,34 @@ const ProductTable = ({ products }: ProductTableProps) => {
                 icon={<DownloadOutlined />}
                 onClick={() => handleDownload(item.certificates.map(c => c.fileurl))}
               />
-              {/* <DownloadButton href={item.certificates[0].fileurl}/> */}
             </td>
            </tr>
          ))}
        </tbody>
      </table>
+    <ButtonWrapper>
+          <StyledMainButton text="Hlaða niður öllum skjölum" onClick={() => handleDownloadAll()} />
+          <Tooltip placement="left" title='Gætir þurft að leifa "popup" glugga í vafra fyrir skjöl sem bjóða ekki uppá beint niðurhal'>
+            <InfoCircleOutlined />
+          </Tooltip>
+    </ButtonWrapper>
+
    </div>
   );
 };
 
 export default ProductTable;
+
+const StyledMainButton = styled(MainButton)`
+  margin-right:10px;
+`
+
+const ButtonWrapper = styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content:flex-end;
+  margin-top: 20px;
+`
 
 const StyledTd = styled.td`
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
