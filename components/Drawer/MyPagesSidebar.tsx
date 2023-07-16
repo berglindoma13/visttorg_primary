@@ -4,7 +4,8 @@ import { HomeFilled,
   ProfileFilled,
   StarOutlined,
   SearchOutlined,
-  SettingOutlined
+  SettingOutlined,
+  LogoutOutlined
  } from '@ant-design/icons';
 import VistbokLogo from '../Svg/VistbokLogo';
 import { useRouter } from 'next/router';
@@ -18,6 +19,11 @@ export const MyPagesSidebar = () => {
 
   const useRoute = (log: string) => {
     router.push(log)
+  };
+
+  const onLogout = () => {
+    document.cookie = "vistbokUser= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+    router.push('/login')
   };
 
   return (
@@ -70,6 +76,13 @@ export const MyPagesSidebar = () => {
               label: 'Stillingar',
               style: { color: '#fff', backgroundColor: 'transparent' },
               onClick: () => useRoute('/')
+            },
+            {
+              key: '6',
+              icon:  <LogoutOutlined style={{ fontSize: '18px' }} color="#fff"/>,
+              label: 'Útskrá',
+              style: { color: '#fff', backgroundColor: 'transparent' },
+              onClick: () => onLogout()
             }
           ]}
         />

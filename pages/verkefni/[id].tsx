@@ -187,10 +187,6 @@ const verkefni = ({ user, certificateSystemList, thisProject, productString } : 
           .catch((err: Error | AxiosError) => {
             console.log("error", err)
           })
-          // TODO: væri til í að sleppa þessu og bara gera þetta þegar að axios post er búið
-          setTimeout(() => {
-            router.push('/minarsidur')
-          }, 1000)
     };
 
     const showModal = () => {

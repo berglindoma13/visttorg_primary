@@ -3,10 +3,8 @@ import styled from 'styled-components'
 import { Header } from '../components/Header'
 import { Heading1, Heading5, Heading2, Heading3, H3 } from '../components/Typography';
 import { TextInput } from '../components/Inputs'
-import { Button, Modal, Select, Layout } from 'antd';
-import { DownOutlined,
-        UserOutlined, 
-        PlusOutlined } from '@ant-design/icons';
+import { Button, Modal, Select, Dropdown, Layout  } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
 // import Link from 'next/link';
 import { motion, useAnimation } from "framer-motion";
@@ -25,6 +23,8 @@ import HomeSix from '../components/Svg/ProjectIcons/HomeSix';
 import HomeTwo from '../components/Svg/ProjectIcons/HomeTwo';
 import { ProjectStates } from '../constants/projectStates';
 import { projectStatesMapper } from '../mappers/projectStates';
+import { Spin } from 'antd';
+import '../styles/globalStyles';
 
 interface User {
   fullname?: string
@@ -83,7 +83,6 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     });
   }
 
-
   // Get list of certificate systems
   const certificateSystems = await prismaInstance.certificatesystem.findMany({});
   const filteredcertificateSystems = certificateSystems.map(cert => {
@@ -102,9 +101,8 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurProps) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
   const [newProjectParam, setNewProjectParam] = useState<SingleProject>(formInitValues)
-
   const [projects, setProjects] = useState<AllProjects>({count: projectList && projectList?.length, projects: projectList ? projectList : []})
 
   const router = useRouter()
@@ -118,7 +116,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   }, [])
 
   const onProjectCreation = () => {
-    console.log('new project to create', newProjectParam)
+    // console.log('new project to create', newProjectParam)
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproject`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
@@ -138,6 +136,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     })
     .then((responsejson) => {
       setProjects({count: projects.count+1, projects: [...projects.projects, {...newProjectParam, id: responsejson}]})
+      setNewProjectParam(formInitValues);
+      setIsLoading(false);
     })
     .catch((err: Error | AxiosError) => {
       console.log("error", err)
@@ -151,25 +151,19 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
   const handleOkModal = () => {
     // if user presses ok
     setIsModalOpen(false);
+    setIsLoading(true);
     onProjectCreation()
   };
 
   const handleCancelModal = () => {
     // if user cancels or closes modal
+    setNewProjectParam(formInitValues);
     setIsModalOpen(false);
   };
-
-
 
   const viewProject = (item : SingleProject) => {
     router.push({pathname:`/verkefni/${item.id}`, })
   }
-
-  // fyrir útskráningu
-  // const onCloseDropDown = () => {
-  //   setDropDownOpen(!dropDownOpen);
-  //   console.log('dropdown open', dropDownOpen)
-  // };
 
   const getProjectIcon = (index: number) => {
     switch(index){
@@ -205,12 +199,21 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
               </UserCardContainer>)}
               <MyProjectsContainer>
                 <MyProjectsHeader>
-                  <StyledHeading2> Mín verkefni </StyledHeading2>
+                  <StyledHeading2> Mín verkefni {isLoading && <Spin size="large" />} </StyledHeading2>
                   {/* <Button style={{marginRight:"12px", width:"100px", color:theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}}>Í vinnslu <DownOutlined color={theme.colors.black} /> </Button> */}
                   <Button style={{marginRight:"20px", width:"140px", backgroundColor: theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
                 </MyProjectsHeader>
                 <MyProjectsContent>
-                <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal} bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} style={{ backgroundColor: theme.colors.tertiary.base, borderRadius: 8}}>
+                <Modal 
+                  open={isModalOpen}
+                  bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} 
+                  style={{ borderRadius: 8}}
+                  closable={false}
+                  footer={[
+                    <Button onClick={handleCancelModal} style={{ backgroundColor: theme.colors.grey_two, color: 'black', fontFamily: theme.fonts.fontFamilySecondary, margin: '10px 0px 10px 0px'}} type="primary" >Hætta við</Button>,
+                    <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Búa til</Button>,
+                  ]}
+                >
                   <ModalContent >
                     <MainHeading style={{fontSize: "28px", color: "#fff"}}> Nýtt verkefni </MainHeading>
                     <StyledInput 
@@ -220,8 +223,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                     />
                     <Select
                       placeholder="Vottunarkerfi"
-                      style={{ width: '100%' }}
-                      // onChange={handleChangeSelect}
+                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      dropdownStyle={{borderRadius: '20px', background: 'white', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
                       options={certificateSystemList}
                     />
@@ -237,7 +240,8 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                     />
                     <Select
                       placeholder="Staða verks"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      dropdownStyle={{borderRadius: '20px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       onChange={(input) => {setNewProjectParam({...newProjectParam, status:input.value})}}
                       options={getProjectStateOprions()}
                     />
@@ -292,7 +296,6 @@ const SideBox = styled.div`
   border-radius: 16px;
   padding: 0px 10px 0px 10px;
 `
-
 
 const InformationContainer = styled(motion.div)`
  
