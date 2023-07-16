@@ -24,9 +24,13 @@ const ProductTable = ({ products }: ProductTableProps) => {
     }
   };
 
+  const handleDownload = (files: Array<string>) => {
+    files.forEach(URL => window.open(URL))
+  }
+
   return (
-     <div style={{ width: '100%', height: '100%' }}>
-      <table style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%', height: '100%' }}>
+    <table style={{ width: '100%', height: '100%', borderCollapse: 'collapse' }}>
        <thead>
          <tr>
            <th></th> {/* Empty header for checkboxes */}
@@ -36,7 +40,7 @@ const ProductTable = ({ products }: ProductTableProps) => {
        </thead>
        <tbody>
          {products && products.map((item) => (
-           <tr key={item.id}>
+            <tr key={item.id} style={{ borderBottom: '1px solid #ccc' }}>
              <td>
              <StyledCheckbox
                 checked={selectedItems.some((selectedItem) => selectedItem.id === item.id)}
@@ -45,12 +49,12 @@ const ProductTable = ({ products }: ProductTableProps) => {
               />
              </td>
              <StyledTd>{item.title}</StyledTd>
-            <td>
-              {/* <IconButton 
+            <td style={{ display:'flex', flexDirection:'row', justifyContent: 'flex-end', alignItems: 'center', height: '100%'}}>
+              <IconButton 
                 icon={<DownloadOutlined />}
-                onClick={() => console.log('clicking this')}
-              /> */}
-              <DownloadButton href="https://www.schomburg.com/de/de/dateien/modified-mineral-mortars-group-1/FEICA-EPD_Modified%20mineral%20mortars,%20group%201.pdf"/>
+                onClick={() => handleDownload(item.certificates.map(c => c.fileurl))}
+              />
+              {/* <DownloadButton href={item.certificates[0].fileurl}/> */}
             </td>
            </tr>
          ))}
@@ -64,9 +68,6 @@ export default ProductTable;
 
 const StyledTd = styled.td`
   font-family: ${({ theme }) => theme.fonts.fontFamilyPrimary};
-
-  
-
 `
 
 const StyledCheckbox = styled(Checkbox)`

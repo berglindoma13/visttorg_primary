@@ -8,9 +8,7 @@ export const DownloadButton = ({ href }) => {
   return (
     <a
         href={href}
-        download="Example-PDF-document"
-        target="_blank"
-        rel="noreferrer"
+        download
       >
         <button>Download .pdf file</button>
       </a>

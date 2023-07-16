@@ -327,6 +327,7 @@ const ProjectActions = styled.div`
 
 const InformationContainer = styled.div`
   padding-left:40px;
+  padding-right:40px;
 `
 
 const StyledInput = styled(TextInput)`
