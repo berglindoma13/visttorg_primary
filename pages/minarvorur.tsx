@@ -64,12 +64,12 @@ const MyFavorites = ({ user, productListString }: MyFavoritesProps) => {
   
   const productList: Array<ProductProps> = superjson.parse(productListString)
 
-  // const myProducts = useAppSelector((state) => state.favorites.products)
+  const myProducts = useAppSelector((state) => state.favorites.products)
   const [favorites, setFavorites] = useState([])
 
-  // useEffect(() => {
-  //   getCurrentFavorites()
-  // }, [])
+  useEffect(() => {
+    getCurrentFavorites()
+  }, [])
 
   useEffect(() => {
     console.log('user', user)
@@ -79,14 +79,14 @@ const MyFavorites = ({ user, productListString }: MyFavoritesProps) => {
     }
   }, [])
 
-  // const getCurrentFavorites = () => {
-  //   const currentFavorites = productList.map(prod => {
-  //     if(myProducts.includes(prod.productid.toString())) {
-  //       return prod
-  //     }
-  //   }).filter(item => {return item !== undefined })
-  //   setFavorites(currentFavorites)
-  // }
+  const getCurrentFavorites = () => {
+    const currentFavorites = productList.map(prod => {
+      if(myProducts.includes(prod.productid.toString())) {
+        return prod
+      }
+    }).filter(item => {return item !== undefined })
+    setFavorites(currentFavorites)
+  }
 
   return(
     <Page>
