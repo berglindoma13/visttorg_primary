@@ -30,9 +30,9 @@ body #nprogress .spinner-icon {
 
 }
 
-.ant-spin-dot-item {
+/* .ant-spin-dot-item {
 	background-color: #ABC5A1 !important;
-}
+} */
 
 .ant-modal-content {
 	background-color: #21333b !important;
@@ -41,13 +41,14 @@ body #nprogress .spinner-icon {
 .ant-select-selector {
 	background: transparent !important;
 	border: none !important;
-	color: '#424242' !important;
-	font-size: '20px' !important;
-}
+	/* color: '#424242' !important; */
+	padding: 0px 15px !important;
+} 
 
 .ant-select-selection-placeholder, .ant-select-arrow, .ant-select-selection-item  {
 	color:#424242 !important;
-}
+	border: transparent;
+} 
 
 @font-face {
 	font-family : 'GT';
