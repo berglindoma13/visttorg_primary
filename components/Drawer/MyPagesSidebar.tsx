@@ -61,7 +61,7 @@ export const MyPagesSidebar = () => {
               icon: <StarOutlined style={{ fontSize: '18px'}} color="#fff"/>,
               label: 'Mínar vörur',
               style: { color: '#fff', backgroundColor: 'transparent' },
-              onClick: () => useRoute('/')
+              onClick: () => useRoute('/minarvorur')
             },
             {
               key: '4',

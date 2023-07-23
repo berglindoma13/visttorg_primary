@@ -1,91 +1,145 @@
+import { GetServerSideProps, GetStaticProps, GetServerSidePropsContext } from 'next';
 import React, { useEffect, useState } from 'react'
+import { prismaInstance } from '../lib/prisma'
+import { ProductProps } from '../types/products';
 import styled from 'styled-components'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
+import { addToFavorites, getFavorites } from '../app/features/favorites/favoriteSlice'
+import superjson from 'superjson'
 import { Header } from '../components/Header'
+import { Product } from '../components/Product'
+import { mediaMax } from '../constants/breakpoints'
 import { Heading1, Heading5 } from '../components/Typography';
-import { Drawer, Button } from 'antd';
-import Link from 'next/link';
-import VistbokLogo from '../components/Svg/VistbokLogo';
-import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
-import { UserOutlined } from '@ant-design/icons';
 import jwt_decode from 'jwt-decode';
-import { motion, useAnimation } from "framer-motion";
-import { useRouter } from 'next/router';
+import { MyPagesSidebar } from '../components/Drawer/MyPagesSidebar'
+import { Layout } from 'antd';
+
 
 interface User {
-    fullName?: string
-    email: string
-    company?: string
-    jobTitle?: string
-    password: string
+  fullname?: string
+  email: string
+  company?: string
+  jobtitle?: string
+  password: string
+}
+
+interface MyFavoritesProps {
+  user: User
+  productListString: string
 }
 
 
-const minarvorur = () => {
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
 
-    const [user, setUser] = useState<User>(null)
-    const [open, setOpen] = useState(true);
+  const currentUser = context.req.cookies?.vistbokUser ? context.req.cookies?.vistbokUser : null
+
+  let user : User = null
+  let email: string = null
+  if(currentUser){
+    user = jwt_decode(currentUser)
+    email = user.email
+  } 
+
+  const productList = await prismaInstance.product.findMany({
+    include: {
+      sellingcompany: true,
+      categories : true,
+      certificates: {
+        include: {
+          certificate : true
+        }
+      }
+    },
+  });
+
+  const productListString = superjson.stringify(productList)
+
+  return { props: { 
+    user: user,
+    productListString: productListString
+  }}
+}
+
+const MyFavorites = ({ user, productListString }: MyFavoritesProps) => {
   
-    const router = useRouter()
+  const productList: Array<ProductProps> = superjson.parse(productListString)
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('jwttoken');
-        if(!!token){
-          const decoded: any = jwt_decode(token);
-          console.log("decoded", decoded);
-          setUser({ fullName: decoded.fullname, jobTitle: decoded.jobtitle, company: decoded.company, email: decoded.email, password: decoded.password })
-        }
-        else {
-          // reroute user to the login site when not logged in
-          router.push('/login')
-        }
-      }, [])
-    
-      //Framer motion controls for showing and hiding filter drawer
-      const pageContentControls = useAnimation()
-        
-      useEffect(() => {
-        if(open){
-          pageContentControls.start({
-            x: "0px",
-            width: '75%',
-            marginLeft:'340px',
-            transition: { duration : 0.2 }
-          })
-        }
-        else if(!open){
-          pageContentControls.start({
-            x: "20px",
-            width: '85%',
-            transition: { duration : 0.2 },
-            marginLeft:'120px'
-          })
-        }
-      }, [open])
+  // const myProducts = useAppSelector((state) => state.favorites.products)
+  const [favorites, setFavorites] = useState([])
 
-    const onChange = () => {
-        setOpen(!open);
-    };
+  // useEffect(() => {
+  //   getCurrentFavorites()
+  // }, [])
 
-    return(
+  useEffect(() => {
+    console.log('user', user)
+    if(!user){
+      //TODO: Fix this - if user not logged in
+      // router.push('/login')
+    }
+  }, [])
+
+  // const getCurrentFavorites = () => {
+  //   const currentFavorites = productList.map(prod => {
+  //     if(myProducts.includes(prod.productid.toString())) {
+  //       return prod
+  //     }
+  //   }).filter(item => {return item !== undefined })
+  //   setFavorites(currentFavorites)
+  // }
+
+  return(
     <Page>
-      <PageContainer>
-            <MyPagesSidebar/>
-            <UserHeader >
-                <UsernameContainer>
-                    <UserOutlined style={{ fontSize: '20px' }}/>
-                    <StyledHeading5 style={{ width: '180px', marginLeft:'10px' }}> {"María"}</StyledHeading5> 
-                </UsernameContainer>
-            </UserHeader>
-            <InformationContainer 
-                style={{ marginLeft: open ? '340px' : '120px' }}
-                animate={pageContentControls}
-            >
-                <StyledHeading5> Mínar Vörur </StyledHeading5>
-          </InformationContainer>
-      </PageContainer>
+      <Layout>
+        <MyPagesSidebar/>
+          <Layout>
+            {/* <StyledHeader showSearch={false} /> */}
+            { user && (<UserCardContainer> 
+                <MainHeading> Þínar uppáhalds vörur </MainHeading>
+            </UserCardContainer>)}
+            <PageContainer>
+              {favorites.length === 0 && <StyledHeading5>Þú átt engar uppáhalds vörur</StyledHeading5> }
+              {/* <ProductList>
+                {myProducts && (
+                  productList.map(prod => {
+                    if(myProducts.includes(prod.productid.toString())) {
+                      return (
+                        <StyledProduct
+                          key={prod.productid}
+                          productId={prod.productid}
+                          title={prod.title}
+                          shortdescription={prod.shortdescription}
+                          sellingcompany={prod.sellingcompany.name}
+                          productimageurl={prod.productimageurl}
+                        />
+                      )
+                    }
+                  })
+                )}
+              </ProductList> */}
+              <ProductList>
+                {favorites.map(prod => {
+                  return (
+                    <StyledProduct
+                      key={prod.productid}
+                      productId={prod.productid}
+                      title={prod.title}
+                      shortdescription={prod.shortdescription}
+                      sellingcompany={prod.sellingcompany.name}
+                      productimageurl={prod.productimageurl}
+                      productCompany={prod.sellingcompany.id}
+                    />
+                  )
+                })}
+              </ProductList>
+            </PageContainer>
+          </Layout>
+      </Layout>
     </Page>
   )
 }
+
+export default MyFavorites
 
 const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.grey_one};
@@ -98,36 +152,54 @@ const PageContainer = styled.div`
   padding-bottom:200px;
 `
 
-const ContentContainer = styled.div`
+const MainHeading = styled(Heading1)`
+  // max-width:930px;
+  // width:100%;
+  // text-align:center;
+  // margin: 0 auto;
+  // padding-bottom:80px;
+  font-size: 48px;
+  width:100%;
+  padding-bottom:15px;
+`
+
+const UserCardContainer = styled.div`
+  height:30vw;
+  width:100vw;
   display: flex;
   flex-direction: column;
-`
+  align-items:flex-start;
+  padding-left:40px;
+  padding-top:40px;
+  background-image:url('/wave_v5.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 30vh;
 
-const UserHeader = styled.div`
-  height:70px;
-  max-width: 1440px;
-  border-bottom:groove;
-  border-width: 3px;
-  border-color: light-grey;
-  margin-bottom:50px;
-  display: flex;
-  align-items: center;
-`
-
-const InformationContainer = styled(motion.div)`
-  // padding-left:40px;
-`
-
-const UsernameContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  width:97%;
 `
 
 const StyledHeading5 = styled(Heading5)`
-  padding-bottom:4px;
+  max-width:930px;
   width:100%;
+  text-align:center;
+  margin: 0 auto;
+  padding-bottom:80px;
 `
 
-export default minarvorur
+const StyledProduct = styled(Product)`
+  margin-right: 15px;
+  margin-bottom:15px;
+
+  @media ${mediaMax.tablet}{
+    margin-right:0;
+  }
+`
+
+const ProductList = styled.div`
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  width:100%;
+  justify-content: center;
+`
+
