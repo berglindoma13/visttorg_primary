@@ -41,6 +41,7 @@ export const MyPagesSidebar = () => {
             { 
               key: '0',
               icon: <VistbokLogo fill="#fff" width="90%"/>,
+              onClick: () => useRoute('/')
             },
             {
               key: '1',
