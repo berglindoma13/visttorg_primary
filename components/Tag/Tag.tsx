@@ -18,21 +18,29 @@ export const Tag = ({ title, style, clickable, onClick }: TagProps) => {
   }
 }
 
-const CustomTag = styled.div`
-  background-color: ${({ theme }) => theme.colors.grey_two};
-  border-radius: 999px;
-  display:flex;
-  flex-direction:row;
-  justify-content: center;
-  align-items: center;
-  padding: 7px 15px 8px;
-  width: fit-content;
+// const CustomTag = styled.div`
+//   background-color: ${({ theme }) => theme.colors.grey_two};
+//   border-radius: 999px;
+//   display:flex;
+//   flex-direction:row;
+//   justify-content: center;
+//   align-items: center;
+//   padding: 7px 15px 8px;
+//   width: fit-content;
 
+//   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+//   font-weight: 600;
+//   font-size: 12px;
+//   line-height: 104%;
+//   letter-spacing: 0.09em;
+//   /* font-variant: small-caps; */
+//   color: #000000;
+// `
+
+const CustomTag = styled.div`
   font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
   font-weight: 600;
   font-size: 12px;
   line-height: 104%;
   letter-spacing: 0.09em;
-  /* font-variant: small-caps; */
-  color: #000000;
 `

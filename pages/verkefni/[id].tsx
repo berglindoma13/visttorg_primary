@@ -21,6 +21,7 @@ import { CustomError } from '../../components/Error/CustomError';
 import { ProductProps } from '../../types/products';
 import superjson from 'superjson'
 import ProductTable from '../../components/ProductTable';
+import { theme } from '../../styles';
 
 interface CertificateSystem {
     value: string
@@ -245,36 +246,50 @@ const verkefni = ({ user, certificateSystemList, thisProject, productString } : 
                 <Heading3>Land: {myProject.country}</Heading3> 
                 <Heading3>Staða: {projectStatesMapper[myProject.status]}</Heading3> 
               </ProjectCardContainer>
-              <Modal open={isModalOpen} onOk={handleOkModal} onCancel={handleCancelModal}>
-                  <ModalHeading> Breyta verkefni </ModalHeading>
-                  <StyledInput 
-                      placeholder='Titill'
-                      onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
-                      value={myProject.title}
-                  />
-                  <Select
-                    placeholder={myProject.certificatesystem}
-                    style={{ width: '100%' }}
-                    onChange={(input) => {setMyProject({...myProject, certificatesystem:input})}}
-                    options={certificateSystemList}
-                  />
-                  <StyledInput 
-                      placeholder='Heimilisfang'
-                      onChange={(input) => {setMyProject({...myProject, address:input.target.value})}}
-                      value={myProject.address}
-                  />
-                  <StyledInput 
-                      placeholder='Land'
-                      onChange={(input) => {setMyProject({...myProject, country:input.target.value})}}
-                      value={myProject.country}
-                  />
-                   <Select
-                      placeholder="Staða verks"
-                      style={{ width: '100%' }}
-                      onChange={(input) => {setMyProject({...myProject, status:input})}}
-                      value={projectStatesMapper[myProject.status]}
-                      options={getProjectStateOprions()}
+              <Modal 
+                open={isModalOpen} 
+                bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} 
+                style={{ borderRadius: 8}}
+                closable={false}
+                footer={[
+                  <Button onClick={handleCancelModal} style={{ backgroundColor: theme.colors.grey_two, color: 'black', fontFamily: theme.fonts.fontFamilySecondary, margin: '10px 0px 10px 0px'}} type="primary" >Hætta við</Button>,
+                  <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Búa til</Button>,
+                ]}
+              >
+                  {/* <ModalHeading> Breyta verkefni </ModalHeading> */}
+                  <ModalContent>
+                    <MainHeading style={{fontSize: "28px", color: "#fff"}}> Breyta verkefni </MainHeading>
+                    <StyledInput 
+                        placeholder='Titill'
+                        onChange={(input) => {setMyProject({...myProject, title:input.target.value})}}
+                        value={myProject.title}
                     />
+                    <Select
+                      placeholder={myProject.certificatesystem}
+                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      dropdownStyle={{borderRadius: '20px', background: 'white', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      onChange={(input) => {setMyProject({...myProject, certificatesystem:input})}}
+                      options={certificateSystemList}
+                    />
+                    <StyledInput 
+                        placeholder='Heimilisfang'
+                        onChange={(input) => {setMyProject({...myProject, address:input.target.value})}}
+                        value={myProject.address}
+                    />
+                    <StyledInput 
+                        placeholder='Land'
+                        onChange={(input) => {setMyProject({...myProject, country:input.target.value})}}
+                        value={myProject.country}
+                    />
+                    <Select
+                        placeholder="Staða verks"
+                        style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                        dropdownStyle={{borderRadius: '20px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                        onChange={(input) => {setMyProject({...myProject, status:input})}}
+                        value={projectStatesMapper[myProject.status]}
+                        options={getProjectStateOprions()}
+                      />
+                    </ModalContent>
                 </Modal>
               <InformationContainer>
                 <StyledHeading2>Vörulisti verkefnis</StyledHeading2>
@@ -315,6 +330,23 @@ const ProjectCardContainer = styled.div`
   }
 `
 
+const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.tertiary.base};
+
+  .ant-select-selector {
+    font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+	  color: #424242;
+  }
+
+  .ant-select-selection-item {
+    font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.09em; 
+  } 
+
+`
+
 const ProjectActions = styled.div`
   position: absolute;
   right: 20px;
@@ -340,6 +372,12 @@ const StyledHeading1 = styled(Heading1)`
 const ModalHeading = styled(Heading2)`
     padding-bottom:15px;
     font-size: 28px;
+`
+
+const MainHeading = styled(Heading1)`
+  font-size: 48px;
+  width:100%;
+  padding-bottom:15px;
 `
 
 const StyledHeading2 = styled(Heading2)`

@@ -204,7 +204,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                   <Button style={{marginRight:"20px", width:"140px", backgroundColor: theme.colors.black, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" onClick={showModal} >Búa til verkefni <PlusOutlined /> </Button>
                 </MyProjectsHeader>
                 <MyProjectsContent>
-                <Modal 
+                { isModalOpen && <Modal 
                   open={isModalOpen}
                   bodyStyle={{ backgroundColor: theme.colors.tertiary.base}} 
                   style={{ borderRadius: 8}}
@@ -223,7 +223,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                     />
                     <Select
                       placeholder="Vottunarkerfi"
-                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
+                      style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       dropdownStyle={{borderRadius: '20px', background: 'white', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       onChange={(input) => {setNewProjectParam({...newProjectParam, certificatesystem:input})}}
                       options={certificateSystemList}
@@ -246,7 +246,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                       options={getProjectStateOprions()}
                     />
                   </ModalContent>
-                </Modal>
+                </Modal>}
                 {projects.count !== 0 && projects.projects.map((item, index) => {
                   return(
                   <ProjectCard key={item.title} onClick={() => viewProject(item)}>
@@ -280,6 +280,19 @@ const Page = styled.div`
 
 const ModalContent = styled.div`
   background-color: ${({ theme }) => theme.colors.tertiary.base};
+
+  .ant-select-selector {
+    font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+	  color: #424242;
+  }
+
+  .ant-select-selection-item {
+    font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.09em; 
+  } 
+
 `
 
 const ProjectInformation = styled.div`
@@ -370,6 +383,11 @@ const MainHeading = styled(Heading1)`
 const StyledHeading2 = styled(Heading2)`
   padding-bottom:10px;
   width:100%;
+
+  .ant-spin-dot-item {
+    background-color: #ABC5A1;
+  }
+
 `
 
 const StyledHeading3 = styled(Heading3)`
