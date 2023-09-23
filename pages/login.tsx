@@ -310,6 +310,10 @@ const SubmitButton = styled.button`
   width:90px;
   margin:6px;
   margin-top:20px;
+
+  .ant-spin-dot-item {
+    background-color: black;
+  }
 `
 
 const Sideline = styled.div`

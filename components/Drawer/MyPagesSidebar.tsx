@@ -41,6 +41,7 @@ export const MyPagesSidebar = () => {
             { 
               key: '0',
               icon: <VistbokLogo fill="#fff" width="90%"/>,
+              onClick: () => useRoute('/')
             },
             {
               key: '1',
@@ -61,7 +62,7 @@ export const MyPagesSidebar = () => {
               icon: <StarOutlined style={{ fontSize: '18px'}} color="#fff"/>,
               label: 'Mínar vörur',
               style: { color: '#fff', backgroundColor: 'transparent' },
-              onClick: () => useRoute('/')
+              onClick: () => useRoute('/minarvorur')
             },
             {
               key: '4',
