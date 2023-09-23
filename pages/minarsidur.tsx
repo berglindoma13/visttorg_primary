@@ -258,7 +258,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
                       <StyledHeading5>{`Vottunarkerfi: ${item.certificatesystem}`}</StyledHeading5>
                       <StyledHeading5> Heimilisfang: {item.address} </StyledHeading5>
                       <StyledHeading5> Land: {item.country} </StyledHeading5>
-                      <StyledHeading5> Staða: {item.status} </StyledHeading5>
+                      <StyledHeading5> Staða: {projectStatesMapper[item.status]} </StyledHeading5>
                     </ProjectInformation>
                   </ProjectCard>)
                 })}

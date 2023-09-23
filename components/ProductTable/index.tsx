@@ -11,7 +11,7 @@ interface ProductTableProps {
 }
 
 const ProductTable = ({ products }: ProductTableProps) => {
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<Array<ProductProps>>([]);
 
   const handleCheckboxChange = (event, item) => {
     const { checked } = event.target;
@@ -29,7 +29,10 @@ const ProductTable = ({ products }: ProductTableProps) => {
 
   const handleDownloadAll = () => {
     products.map(product => {
-      handleDownload(product.certificates.map(c => c.fileurl))
+      const isSelected = selectedItems.filter(x => x.id === product.id).length > 0
+      if(isSelected){
+        handleDownload(product.certificates.map(c => c.fileurl))
+      }
     })
   }  
 
@@ -65,7 +68,7 @@ const ProductTable = ({ products }: ProductTableProps) => {
        </tbody>
      </table>
     <ButtonWrapper>
-          <StyledMainButton text="Hlaða niður öllum skjölum" onClick={() => handleDownloadAll()} />
+          <StyledMainButton text="Hlaða niður völdum skjölum" onClick={() => handleDownloadAll()} />
           <Tooltip placement="left" title='Gætir þurft að leifa "popup" glugga í vafra fyrir skjöl sem bjóða ekki uppá beint niðurhal'>
             <InfoCircleOutlined />
           </Tooltip>

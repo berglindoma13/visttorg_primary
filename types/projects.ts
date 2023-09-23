@@ -8,9 +8,15 @@ export interface Project {
   status?: number | string
   id: string | number
   ownerEmail: string
-  owner: ProjectOwner
+  owner?: ProjectOwner
 }
 
 export interface ProjectOwner extends User {
   projects: Array<Project>
+}
+
+export interface ProductsInProjects {
+  productId: string
+  project: Project
+  projectId: string | number
 }

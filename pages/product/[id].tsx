@@ -22,11 +22,13 @@ import { useRouter } from "next/router"
 import certMapper from '../../mappers/certificates'
 import { User } from "../../types/auth"
 import jwt_decode from 'jwt-decode';
-import { Project } from "../../types/projects"
-import { Select } from "antd"
+import { ProductsInProjects, Project } from "../../types/projects"
+import { Button, Modal, Select } from "antd"
 import { getCertImage } from "../../utils/getCertImage"
 import axios from 'axios'
 import { useState } from "react"
+import { theme } from "../../styles"
+import { DeleteOutlined } from '@ant-design/icons'
 
 const CertsWithIcons = [
   'EPD',
@@ -45,26 +47,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const currentUser = context.req.cookies?.vistbokUser ? context.req.cookies?.vistbokUser : null
 
   let user : User = null
-  if(currentUser){
-    user = jwt_decode(currentUser)
-  }
+  let userProjects : Array<Project> = []
+  let productsInUserProjects: Array<ProductsInProjects> = []
 
-  const prismaUser = await prismaInstance.vistbokUser.findUnique({
-    where: {
-      id: parseInt(user.id as string)
-    },
-    include: {
-      projects: {
-        include: {
-          owner: true
-        }
-      }
-    }
-  })
-
-  const userProjects = prismaUser.projects as Array<Project>
-
-  
   const uniqueProduct = await prismaInstance.product.findUnique({
     where: {
       productIdentifier : { productid: id, companyid: company}
@@ -82,46 +67,73 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  const productsInUserProjects = await prismaInstance.productsInProjects.findMany({
-    where: {
-      productId: uniqueProduct.productid,
-      project: {
-        owner: {
-          id: parseInt(user.id as string)
+  
+  if(currentUser){
+    user = jwt_decode(currentUser)
+
+    const prismaUser = await prismaInstance.vistbokUser.findUnique({
+      where: {
+        id: parseInt(user.id as string)
+      },
+      include: {
+        projects: {
+          include: {
+            owner: true
+          }
         }
       }
-    }
-  })
+    })
+  
+    userProjects = prismaUser.projects as Array<Project>
 
-  console.log('productsInUserProjects', productsInUserProjects)
+    productsInUserProjects = await prismaInstance.productsInProjects.findMany({
+      where: {
+        productId: uniqueProduct.id,
+        project: {
+          owner: {
+            id: parseInt(user.id as string)
+          }
+        }
+      },
+      include: {
+        project: true
+      }
+    })
+  
+  }
 
   const uniqueProductString = superjson.stringify(uniqueProduct)
 
   return {
     props: {
+      user,
       userProjects,
       productString: uniqueProductString,
-      // productsInUserProjects
+      productsInUserProjects: productsInUserProjects
     },
   }
 }
 
 interface ProductPageProps{
+  user: User
   productString: string
   userProjects?: Array<Project>
-  productsInUserProjects?: any
-
+  productsInUserProjects?: Array<ProductsInProjects>
 }
 
-const Product = ({ productString, userProjects, productsInUserProjects } : ProductPageProps) => {
-  console.log('productsInUserProjects', productsInUserProjects)
+const Product = ({ productString, userProjects, productsInUserProjects, user } : ProductPageProps) => {
+  console.log('productsInUserProjects', productsInUserProjects) 
   //TODO FIX PRODUCT TYPES
   const product: ProductProps = superjson.parse(productString)
   const [chosenProject, setChosenProject] = useState<number>(userProjects && userProjects.length > 0 ? parseInt(userProjects[0].id as string) : null)
-
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [projectList, setProjectList] = useState(productsInUserProjects)
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
-  const showSwiper = false
+  let showSwiper = false
   SwiperCore.use([Pagination])
+
+  const [projectsNotAssigned, setProjectsNotAssigned] = useState(userProjects.filter(x => projectList.filter(y => y.projectId === x.id).length === 0))
+  console.log('projectsNotAssigned', projectsNotAssigned)
 
   const handleChangeChosenProject = (e) => {
     console.log('e', e)
@@ -137,6 +149,40 @@ const Product = ({ productString, userProjects, productsInUserProjects } : Produ
         productId: product.id
       }
     }).then((response) => {
+      console.log('response', response)
+      //TODO
+      setProjectList([...projectList, { project: null,  projectId: chosenProject, productId: product.id}])
+    }).catch((error) => {
+      console.error('error', error)
+    })
+  }
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOkModal = () => {
+    // if user presses ok
+    setIsModalOpen(false);
+    // setIsLoading(true);
+    // onProjectCreation()
+  };
+
+  const handleCancelModal = () => {
+    // if user cancels or closes modal
+    // setNewProjectParam(formInitValues);
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteProductFromProject = (projectID: string | number) => {
+    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/deleteproductfromproject`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: {
+        projectId: chosenProject,
+        productId: product.id
+      }
+    }).then((response) => {
+
       console.log('response', response)
     }).catch((error) => {
       console.error('error', error)
@@ -195,23 +241,67 @@ const Product = ({ productString, userProjects, productsInUserProjects } : Produ
             <TagAndProjects>
               {product.brand && <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>}
               <AddToProjectWrapper>
-                  <Select
-                    defaultValue={chosenProject}
-                    style={{  }}
-                    onChange={handleChangeChosenProject}
-                    options={
-                      userProjects.map(project => {
-                        return {
-                          value: project.id, label: project.title
-                        }
-                      })
-                    } 
-                  />
                   <AddToProjectButton
-                    onClick={() => addProductToProject()}
-                    text="Bæta við verkefni"
+                    onClick={() => showModal()}
+                    text="Bæta vöru við verkefni"
                   />
               </AddToProjectWrapper>
+              <Modal
+                  open={isModalOpen}
+                  bodyStyle={{ backgroundColor: theme.colors.white}} 
+                  style={{ borderRadius: 8}}
+                  closable={false}
+                  footer={[
+                    <Button onClick={handleCancelModal} style={{ backgroundColor: theme.colors.grey_two, color: 'black', fontFamily: theme.fonts.fontFamilySecondary, margin: '10px 0px 10px 0px'}} type="primary" >Hætta við</Button>,
+                    <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Bæta vöru við verkefni</Button>,
+                  ]}
+                >
+                  <ModalContent>
+                    {productsInUserProjects.length > 0 && (
+                      <div>
+                        <MainHeading style={{fontSize: "28px", color: "#fff"}}> Verkefni sem varan er hengd á: </MainHeading>  
+                        <div>
+                          <ProjectWithProductList>
+                            {productsInUserProjects.map(project => {
+                              return(
+                                  <ProjectWithProductItem>
+                                    <span>
+                                      {project.project.title}
+                                    </span>
+                                    <Button 
+                                      onClick={() =>  handleDeleteProductFromProject(project.projectId)}
+                                      style={{backgroundColor: 'transparent', border: 'none'}}
+                                    > 
+                                      <DeleteOutlined
+                                        style={{color: "white", fontSize: 18}}
+                                      />
+                                    </Button>
+                                  </ProjectWithProductItem>
+                              )
+                            })}
+                          </ProjectWithProductList>
+                          </div>
+                      </div>
+                    )}
+                    {projectsNotAssigned.length > 0 && 
+                      <div>
+                        <MainHeading style={{fontSize: "28px", color: "#fff"}}> Bæta við </MainHeading>
+                        <Select
+                          style={{width: '100%'}}
+                          placeholder="Veldu verkefni"
+                          onChange={handleChangeChosenProject}
+                          options={
+                            projectsNotAssigned.map(p => {
+                              return {
+                                value: p.id, label: p.title
+                              }
+                            })
+                          } 
+                        />
+                      </div>
+                    }
+                  </ModalContent>
+                </Modal>
             </TagAndProjects>
             <Heading1 style={{marginTop: 23, marginBottom: 70 }}>{product.title}</Heading1> 
               <div style={{display:'flex'}}>
@@ -285,8 +375,42 @@ const Product = ({ productString, userProjects, productsInUserProjects } : Produ
 
 export default Product
 
+const ProjectWithProductList = styled.div`
+  padding-bottom: 10px;
+  display:flex;
+  flex-direction:column;
+`
+
+const ProjectWithProductItem = styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
+  width: 100%;
+  margin-bottom:5px;
+
+  >span{
+    color: ${({ theme }) => theme.colors.white};
+    font-family: ${({ theme }) => theme.fonts.fontFamilySecondary};
+    font-size: 16px;
+
+  }
+
+`
+
+
+const MainHeading = styled(Heading1)`
+  font-size: 48px;
+  width:100%;
+  padding-bottom:15px;
+
+`
+
 const AddToProjectButton = styled(MainButton)`
  
+`
+
+const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.tertiary.base};
 `
 
 const StyledImage = styled.img`
