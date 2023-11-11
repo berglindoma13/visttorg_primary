@@ -253,7 +253,7 @@ const verkefni = ({ user, certificateSystemList, thisProject, productString } : 
                 closable={false}
                 footer={[
                   <Button onClick={handleCancelModal} style={{ backgroundColor: theme.colors.grey_two, color: 'black', fontFamily: theme.fonts.fontFamilySecondary, margin: '10px 0px 10px 0px'}} type="primary" >Hætta við</Button>,
-                  <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Búa til</Button>,
+                  <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Breyta</Button>,
                 ]}
               >
                   {/* <ModalHeading> Breyta verkefni </ModalHeading> */}
@@ -268,7 +268,9 @@ const verkefni = ({ user, certificateSystemList, thisProject, productString } : 
                       placeholder={myProject.certificatesystem}
                       style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                       dropdownStyle={{borderRadius: '20px', background: 'white', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
-                      onChange={(input) => {setMyProject({...myProject, certificatesystem:input})}}
+                      onChange={(input) => {
+                       
+                        setMyProject({...myProject, certificatesystem:input})}}
                       options={certificateSystemList}
                     />
                     <StyledInput 
@@ -285,7 +287,9 @@ const verkefni = ({ user, certificateSystemList, thisProject, productString } : 
                         placeholder="Staða verks"
                         style={{ width: '100%', borderRadius:'999px', background: '#FAFAFA', height: '40px', paddingTop: '5px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
                         dropdownStyle={{borderRadius: '20px', fontFamily: theme.fonts.fontFamilySecondary, fontWeight:'700', letterSpacing: '0.09em', fontSize: '14px'}}
-                        onChange={(input) => {setMyProject({...myProject, status:input})}}
+                        onChange={(input) => {
+                          console.log('ahhhh')
+                          setMyProject({...myProject, status:input})}}
                         value={projectStatesMapper[myProject.status]}
                         options={getProjectStateOprions()}
                       />

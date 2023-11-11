@@ -12,7 +12,7 @@ import 'swiper/components/pagination/pagination.min.css'
 import SwiperCore, { Pagination } from 'swiper';
 import { Header } from "../../components/Header"
 import { Tag } from "../../components/Tag"
-import { Heading1, Heading3, Heading4, UIBig } from "../../components/Typography"
+import { Heading1, Heading3, Heading4, UIBig, UIMedium, UISmall } from "../../components/Typography"
 import { MainButton, MainButtonText } from "../../components/Buttons"
 import SvanurinnLogoSVG from "../../components/Svg/Logos/Svanurinn"
 import VocLogoSVG from "../../components/Svg/Logos/Voc"
@@ -26,9 +26,10 @@ import { ProductsInProjects, Project } from "../../types/projects"
 import { Button, Modal, Select } from "antd"
 import { getCertImage } from "../../utils/getCertImage"
 import axios from 'axios'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { theme } from "../../styles"
 import { DeleteOutlined } from '@ant-design/icons'
+import Link from "next/link"
 
 const CertsWithIcons = [
   'EPD',
@@ -48,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   let user : User = null
   let userProjects : Array<Project> = []
-  let productsInUserProjects: Array<ProductsInProjects> = []
+  let projectsWithCurrentProduct: Array<ProductsInProjects> = []
 
   const uniqueProduct = await prismaInstance.product.findUnique({
     where: {
@@ -86,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   
     userProjects = prismaUser.projects as Array<Project>
 
-    productsInUserProjects = await prismaInstance.productsInProjects.findMany({
+    projectsWithCurrentProduct = await prismaInstance.productsInProjects.findMany({
       where: {
         productId: uniqueProduct.id,
         project: {
@@ -109,7 +110,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       user,
       userProjects,
       productString: uniqueProductString,
-      productsInUserProjects: productsInUserProjects
+      projectsWithCurrentProduct: projectsWithCurrentProduct
     },
   }
 }
@@ -118,40 +119,38 @@ interface ProductPageProps{
   user: User
   productString: string
   userProjects?: Array<Project>
-  productsInUserProjects?: Array<ProductsInProjects>
+  projectsWithCurrentProduct?: Array<ProductsInProjects>
 }
 
-const Product = ({ productString, userProjects, productsInUserProjects, user } : ProductPageProps) => {
-  console.log('productsInUserProjects', productsInUserProjects) 
+const Product = ({ productString, userProjects, projectsWithCurrentProduct, user } : ProductPageProps) => {
+  
   //TODO FIX PRODUCT TYPES
   const product: ProductProps = superjson.parse(productString)
-  const [chosenProject, setChosenProject] = useState<number>(userProjects && userProjects.length > 0 ? parseInt(userProjects[0].id as string) : null)
+  const [chosenProjectId, setChosenProjectId] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [projectList, setProjectList] = useState(productsInUserProjects)
+  const router = useRouter()
   //Temp way to show and hide swiper so that it's ready when a company has more than 1 picture per product
   let showSwiper = false
   SwiperCore.use([Pagination])
-
+  
+  const [projectList, setProjectList] = useState(projectsWithCurrentProduct)
   const [projectsNotAssigned, setProjectsNotAssigned] = useState(userProjects.filter(x => projectList.filter(y => y.projectId === x.id).length === 0))
-  console.log('projectsNotAssigned', projectsNotAssigned)
 
-  const handleChangeChosenProject = (e) => {
-    console.log('e', e)
-    setChosenProject(e.value)
-  }
+  useEffect(() => {
+    setProjectsNotAssigned(userProjects.filter(x => projectList.filter(y => y.projectId === x.id).length === 0))
+  },[projectList])
+
 
   const addProductToProject = () => {
-    console.log('hello')
+    const projectInfo = userProjects.filter(x => x.id === chosenProjectId)[0]
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/addproducttoproject`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
-        projectId: chosenProject,
+        projectId: projectInfo.id,
         productId: product.id
       }
     }).then((response) => {
-      console.log('response', response)
-      //TODO
-      setProjectList([...projectList, { project: null,  projectId: chosenProject, productId: product.id}])
+      setProjectList([...projectList, { project: projectInfo,  projectId: projectInfo.id, productId: product.id}])
     }).catch((error) => {
       console.error('error', error)
     })
@@ -164,6 +163,7 @@ const Product = ({ productString, userProjects, productsInUserProjects, user } :
   const handleOkModal = () => {
     // if user presses ok
     setIsModalOpen(false);
+    addProductToProject()
     // setIsLoading(true);
     // onProjectCreation()
   };
@@ -178,22 +178,20 @@ const Product = ({ productString, userProjects, productsInUserProjects, user } :
     axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/deleteproductfromproject`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
-        projectId: chosenProject,
+        projectId: projectID,
         productId: product.id
       }
     }).then((response) => {
-
-      console.log('response', response)
+      setIsModalOpen(false)
+      setProjectList(projectList.filter(x => x.projectId !== projectID))
     }).catch((error) => {
       console.error('error', error)
     })
   }
-  
-  console.log('userProjects', userProjects)
 
   return(
     <Page>
-      <StyledHeader showSearch={true}/>
+      <StyledHeader showSearch={false}/>
       <PageContainer>
         <ProductInfo>
           <ProductInfoLeft>
@@ -240,12 +238,12 @@ const Product = ({ productString, userProjects, productsInUserProjects, user } :
           <ProductInfoRight style={{ marginRight: 160 }}>
             <TagAndProjects>
               {product.brand && <Tag title={product.brand} style={{marginBottom: 8}} clickable={false}/>}
-              <AddToProjectWrapper>
+              {user && <AddToProjectWrapper>
                   <AddToProjectButton
                     onClick={() => showModal()}
                     text="Bæta vöru við verkefni"
                   />
-              </AddToProjectWrapper>
+              </AddToProjectWrapper>}
               <Modal
                   open={isModalOpen}
                   bodyStyle={{ backgroundColor: theme.colors.white}} 
@@ -253,23 +251,24 @@ const Product = ({ productString, userProjects, productsInUserProjects, user } :
                   closable={false}
                   footer={[
                     <Button onClick={handleCancelModal} style={{ backgroundColor: theme.colors.grey_two, color: 'black', fontFamily: theme.fonts.fontFamilySecondary, margin: '10px 0px 10px 0px'}} type="primary" >Hætta við</Button>,
-                    <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Bæta vöru við verkefni</Button>,
+                    userProjects.length > 0 && projectsNotAssigned.length > 0  && <Button onClick={handleOkModal} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary" >Bæta vöru við verkefni</Button>,
+                    userProjects.length === 0 && <Button onClick={() => router.push('/minarsidur')} style={{ backgroundColor: theme.colors.green, fontFamily: theme.fonts.fontFamilySecondary}} type="primary">Fara á mínar síður</Button>,
                   ]}
                 >
                   <ModalContent>
-                    {productsInUserProjects.length > 0 && (
+                    {projectList.length > 0 && (
                       <div>
                         <MainHeading style={{fontSize: "28px", color: "#fff"}}> Verkefni sem varan er hengd á: </MainHeading>  
                         <div>
                           <ProjectWithProductList>
-                            {productsInUserProjects.map(project => {
+                            {projectList.map(project => {
                               return(
                                   <ProjectWithProductItem>
                                     <span>
                                       {project.project.title}
                                     </span>
                                     <Button 
-                                      onClick={() =>  handleDeleteProductFromProject(project.projectId)}
+                                      onClick={() => handleDeleteProductFromProject(project.projectId)}
                                       style={{backgroundColor: 'transparent', border: 'none'}}
                                     > 
                                       <DeleteOutlined
@@ -287,9 +286,12 @@ const Product = ({ productString, userProjects, productsInUserProjects, user } :
                       <div>
                         <MainHeading style={{fontSize: "28px", color: "#fff"}}> Bæta við </MainHeading>
                         <Select
+                          id="NotchosenProjectSelect"
                           style={{width: '100%'}}
                           placeholder="Veldu verkefni"
-                          onChange={handleChangeChosenProject}
+                          onChange={(input) => {
+                            setChosenProjectId(input)
+                          }}
                           options={
                             projectsNotAssigned.map(p => {
                               return {
@@ -299,6 +301,11 @@ const Product = ({ productString, userProjects, productsInUserProjects, user } :
                           } 
                         />
                       </div>
+                    }
+                    {userProjects.length === 0 &&
+                    <div>
+                      <UIMedium color={theme.colors.white}>Engin verkefni fundust</UIMedium>
+                    </div>
                     }
                   </ModalContent>
                 </Modal>
@@ -411,6 +418,34 @@ const AddToProjectButton = styled(MainButton)`
 
 const ModalContent = styled.div`
   background-color: ${({ theme }) => theme.colors.tertiary.base};
+
+  .ant-select{
+    width: 140px;
+    margin-right:10px;
+    background-color: ${({ theme }) => theme.colors.white};
+
+    border-radius: 999px;
+    height: 40px;
+    font-family:  ${({ theme }) => theme.fonts.fontFamilySecondary};
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    font-size: 14px;
+    line-height: 40px;
+
+    &:focus{
+      outline: none;
+    }
+
+    .ant-select-selector{
+      border-radius: 1284.43px;
+      padding: 0 15px;
+      height: 100%;
+
+      .ant-select-selection-placeholder, .ant-select-selection-item{
+        line-height:40px;
+      }
+    }
+  }
 `
 
 const StyledImage = styled.img`
@@ -424,14 +459,7 @@ const AddToProjectWrapper = styled.div`
   justify-content: flex-end;
   width: 100%;
 
-  .ant-select{
-    width: 140px;
-    margin-right:10px;
-    .ant-select-selector{
-      border-radius: 1284.43px;
-      padding: 0 15px;
-    }
-  }
+  
 `
 
 const TagAndProjects = styled.div`

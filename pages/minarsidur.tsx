@@ -111,7 +111,7 @@ const MinarSidur = ({ user, projectList, certificateSystemList } : MinarSidurPro
     console.log('user', user)
     if(!user){
       //TODO: Fix this
-      // router.push('/login')
+      router.push('/login')
     }
   }, [])
 
