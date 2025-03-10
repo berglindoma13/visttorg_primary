@@ -24,6 +24,8 @@
   ],
   "include": [
     "next-env.d.ts",
+    "global.d.ts",
+    "google.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ]

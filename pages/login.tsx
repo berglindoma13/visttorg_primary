@@ -1,18 +1,10 @@
-import { GetServerSideProps, GetStaticProps } from 'next';
 import React, { useEffect, useState } from 'react'
-import { prismaInstance } from '../lib/prisma'
-import superjson from 'superjson'
 import styled from 'styled-components'
-// import { ProductProps } from '../types/products';
-// import { useAppSelector, useAppDispatch } from '../app/hooks'
-// import { addToFavorites, getFavorites } from '../app/features/favorites/favoriteSlice'
 import { Header } from '../components/Header'
-// import { Product } from '../components/Product'
 import { mediaMax } from '../constants/breakpoints'
 import { Heading1 } from '../components/Typography';
 import { TextInput } from '../components/Inputs';
 import { Banner } from '../components/Banner';
-import jwt_decode from 'jwt-decode';
 import bcrypt from 'bcryptjs'
 import axios, { AxiosError } from 'axios';
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
@@ -20,8 +12,9 @@ import { useRouter } from 'next/router';
 import { validateEmail } from '../utils/emailValidation';
 import { Spin } from 'antd';
 import { readCookie } from '../utils/readCookie';
+import Script from 'next/script'
+import { env } from 'process';
 
-const COOKIE_NAME = 'vistbokUser'
 const salt = bcrypt.genSaltSync(10)
 
 interface User {
@@ -36,8 +29,6 @@ const Login = () => {
 
   const { handleSubmit, watch, control, formState: { errors } } = useForm<User>({ defaultValues: {fullName: "", email: "", company: "", jobTitle:"", password:""}});
 
-  const watchAllFields = watch();
-
   const router = useRouter()
 
   const [loginError, setLoginError] = useState(false)
@@ -49,7 +40,7 @@ const Login = () => {
 
     const hashedPassword = bcrypt.hashSync(data.password, salt)
 
-    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/login`, {
+    axios.post(`${process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_SERVER_URL_LOCAL : process.env.NEXT_PUBLIC_SERVER_URL_PRODUCTION}/api/login`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
@@ -64,8 +55,7 @@ const Login = () => {
       throw new Error(response.statusText);
     })
     .then((responsejson) => {
-      console.log('success', responsejson)
-      document.cookie = `${COOKIE_NAME}=${JSON.stringify(responsejson)}`
+      document.cookie = `${process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME}=${JSON.stringify(responsejson)}`
       setIsLoading(false);
       router.push('/minarsidur')
     })
@@ -96,7 +86,7 @@ const Login = () => {
   const onSubmitRegister: SubmitHandler<User> = data => {
     setIsLoading(true);
     const hashedPassword = bcrypt.hashSync(data.password, salt)
-    axios.post(`${process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vistbokserver.herokuapp.com'}/api/register`, {
+    axios.post(`${process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_SERVER_URL_LOCAL : process.env.NEXT_PUBLIC_SERVER_URL_PRODUCTION}/api/register`, {
       headers: { 'Content-Type': 'application/json' },
       data: {
         email: data.email,
@@ -116,7 +106,7 @@ const Login = () => {
     .then((responsejson) => {
       console.log('success', responsejson);
       setIsLoading(false);
-      document.cookie = `${COOKIE_NAME}=${JSON.stringify(responsejson)}`
+      document.cookie = `${process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME}=${JSON.stringify(responsejson)}`
       router.push('/minarsidur')
     })
     .catch((err: Error | AxiosError) => {
@@ -133,22 +123,14 @@ const Login = () => {
         console.error('is regular error', err)
         setLoginError(true);
         setMessage("Villa við innskráningu, reyndu aftur seinna");
-        // Just a stock error
       }
     })
-    // .catch((error) => {
-    //   console.log('this is the error', error)
-    // //   console.error('error registering - Message:', error.message)
-    //   //TODO get the .send() to work in Postlist api in express to get the correct error message through the server
-    //   // setInputError(error.message)
-     
-    // });
   };
 
   const [isNewUser, setIsNewUser] = useState(false)
 
   useEffect(() => {
-    const token = readCookie(COOKIE_NAME);
+    const token = readCookie(process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME);
     if(!!token){
       router.push('/minarsidur')
     }
@@ -162,6 +144,55 @@ const Login = () => {
     const subscription = watch((value, { name, type }) => setLoginError(false));
     return () => subscription.unsubscribe();
   }, [watch])
+
+  useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById('googleSignInButton') as HTMLElement,
+        { theme: 'outline', size: 'large' }
+      );
+    }
+  }, []);
+
+  const handleCredentialResponse = (response: google.accounts.id.CredentialResponse) => {
+    console.log('response', response)
+    console.log('Encoded JWT ID token:', response.credential);
+   
+
+    // Send response.credential to your backend for verification
+    axios.post(`${process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_SERVER_URL_LOCAL : process.env.NEXT_PUBLIC_SERVER_URL_PRODUCTION}/api/googlelogin`, {
+      headers: { 'Content-Type': 'application/json' },
+      data: {
+        token: response.credential
+      }
+    }).then((loginResponse) => {
+
+      document.cookie = `${process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME}=${JSON.stringify(response.credential)}`
+      router.push('/minarsidur')
+    })
+    .catch((err: Error | AxiosError) => {
+      console.log('err', err)
+      // if (axios.isAxiosError(err))  {
+      //   setIsLoading(false);
+      //   setLoginError(true);
+      //   setMessage("Villa við innskráningu, reyndu aftur seinna");
+      //   console.error('isAxios error', err)
+      //   if(!!err.response && err.response.data == "user already exists") {
+      //     setLoginError(true);
+      //     setMessage("Þetta netfang er í notkun");
+      //   }
+      // } else {
+      //   console.error('is regular error', err)
+      //   setLoginError(true);
+      //   setMessage("Villa við innskráningu, reyndu aftur seinna");
+      // }
+    })
+  };
 
   return(
     <Page>
@@ -248,6 +279,7 @@ const Login = () => {
             <SubmitButton onClick={() => setIsNewUser(!isNewUser)}>Nýskráning</SubmitButton>
           </LoginContainer>
         }
+        <div id="googleSignInButton"></div>
       </PageContainer>
     </Page>
   )
